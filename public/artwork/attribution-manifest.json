@@ -1,0 +1,1393 @@
+{
+  "generatedAt": "2026-08-24T05:19:13.155Z",
+  "purpose": "Temporary, inspectable placeholder artwork for the Prehistoric Card Game demo.",
+  "notice": "These images are not final card illustrations. Every image is reused under the license shown for that entry. Cropping, padding, background extension, color-space conversion, resizing, and WebP conversion were performed where needed.",
+  "output": {
+    "width": 2300,
+    "height": 1300,
+    "format": "WebP",
+    "colorSpace": "sRGB"
+  },
+  "assets": [
+    {
+      "cardKey": "wildfire",
+      "cardName": "Wildfire",
+      "cardKind": "event",
+      "scientificName": null,
+      "commonsFile": "File:Creeping Flames through the Ponderosa Forest (54210807661).jpg",
+      "creator": "Grand Canyon NPS",
+      "credit": "Creeping Flames through the Ponderosa Forest",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Creeping_Flames_through_the_Ponderosa_Forest_(54210807661).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/41/Creeping_Flames_through_the_Ponderosa_Forest_%2854210807661%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "fab474f1046144e2f2e70091f1af381ecb345a1c",
+      "sourceDimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "protoceratops",
+      "cardName": "Protoceratops",
+      "cardKind": "creature",
+      "scientificName": "Protoceratops andrewsi",
+      "commonsFile": "File:Protoceratops andrewsi Restoration.png",
+      "creator": "PaleoNeolitic",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Protoceratops_andrewsi_Restoration.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/8/84/Protoceratops_andrewsi_Restoration.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "ed0e1e45ae50a9eb3f1be1f115ebc47caa0647a5",
+      "sourceDimensions": {
+        "width": 4438,
+        "height": 2310
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "yinlong",
+      "cardName": "Yinlong",
+      "cardKind": "creature",
+      "scientificName": "Yinlong downsi",
+      "commonsFile": "File:Yinlong BW.jpg",
+      "creator": "Nobu Tamura ( http://spinops.blogspot.com )",
+      "credit": "Own work",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Yinlong_BW.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Yinlong_BW.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "5ebaed7c7889407d3d5c6a5eb698da298b0d5726",
+      "sourceDimensions": {
+        "width": 800,
+        "height": 444
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "amargasaurus",
+      "cardName": "Amargasaurus",
+      "cardKind": "creature",
+      "scientificName": "Amargasaurus cazaui",
+      "commonsFile": "File:Amargasaurus BW.jpg",
+      "creator": "Nobu Tamura ( http://spinops.blogspot.com )",
+      "credit": "Own work",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Amargasaurus_BW.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Amargasaurus_BW.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "9ed8c85ca04dd8da47efad17df234a9c5a02271a",
+      "sourceDimensions": {
+        "width": 800,
+        "height": 465
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "ankylosaurus",
+      "cardName": "Ankylosaurus",
+      "cardKind": "creature",
+      "scientificName": "Ankylosaurus magniventris",
+      "commonsFile": "File:Ankylosaurus 2026.jpg",
+      "creator": "Plegadis",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ankylosaurus_2026.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Ankylosaurus_2026.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "04fc688cdbd0cb765b218ec8a2ee475861c0b22d",
+      "sourceDimensions": {
+        "width": 3099,
+        "height": 1329
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "giant-moa",
+      "cardName": "Giant Moa",
+      "cardKind": "creature",
+      "scientificName": "Dinornis robustus",
+      "commonsFile": "File:Moa Franz Josef MRD.jpg",
+      "creator": "Mike Dickison",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Moa_Franz_Josef_MRD.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/45/Moa_Franz_Josef_MRD.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "4907e6cbe3b5cff3db1b0a34a798f1da5b5bdfc5",
+      "sourceDimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "kentrosaurus",
+      "cardName": "Kentrosaurus",
+      "cardKind": "creature",
+      "scientificName": "Kentrosaurus aethiopicus",
+      "commonsFile": "File:Fossil Kentrosaurus aethiopicus in Museum für Naturkunde Berlin 001.JPG",
+      "creator": "Sebastian Wallroth",
+      "credit": "Own work",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fossil_Kentrosaurus_aethiopicus_in_Museum_f%C3%BCr_Naturkunde_Berlin_001.JPG",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Fossil_Kentrosaurus_aethiopicus_in_Museum_f%C3%BCr_Naturkunde_Berlin_001.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "73db30081e8d43e3fbd6457129015c166c4a6e7c",
+      "sourceDimensions": {
+        "width": 2491,
+        "height": 1164
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "mussaurus",
+      "cardName": "Mussaurus",
+      "cardKind": "creature",
+      "scientificName": "Mussaurus patagonicus",
+      "commonsFile": "File:Mussaurus Scale.svg",
+      "creator": "User:Slate Weasel",
+      "credit": "Own work",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Mussaurus_Scale.svg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/d/da/Mussaurus_Scale.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "7ea083ae3cf3005c941e352323c4f91e69d48f6a",
+      "sourceDimensions": {
+        "width": 2795,
+        "height": 1147
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "pachycephalosaurus",
+      "cardName": "Pachycephalosaurus",
+      "cardKind": "creature",
+      "scientificName": "Pachycephalosaurus wyomingensis",
+      "commonsFile": "File:Pachycephalosaurus Reconstruction.jpg",
+      "creator": "Fred Wierum",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pachycephalosaurus_Reconstruction.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Pachycephalosaurus_Reconstruction.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "1237b7a9e2fd039da8f5f9278d6eddb58b96ec8c",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 2400
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "plateosaurus",
+      "cardName": "Plateosaurus",
+      "cardKind": "creature",
+      "scientificName": "Plateosaurus trossingensis",
+      "commonsFile": "File:Plateosaurus BW.jpg",
+      "creator": "Nobu Tamura ( http://spinops.blogspot.com )",
+      "credit": "Own work",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Plateosaurus_BW.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Plateosaurus_BW.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "dde9fc3447413ef361e485c14034fa7154298ded",
+      "sourceDimensions": {
+        "width": 800,
+        "height": 353
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "styracosaurus",
+      "cardName": "Styracosaurus",
+      "cardKind": "creature",
+      "scientificName": "Styracosaurus albertensis",
+      "commonsFile": "File:Styracosaurus albertensis.png",
+      "creator": "Connor Ashbridge",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Styracosaurus_albertensis.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/70/Styracosaurus_albertensis.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "28701dc4f0e081142e3fc5c349768c595eed93f0",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 2069
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "iguanodon",
+      "cardName": "Iguanodon",
+      "cardKind": "creature",
+      "scientificName": "Iguanodon bernissartensis",
+      "commonsFile": "File:Iguanodon bernissartensis (Davide Bonadonna).png",
+      "creator": "Davide Bonadonna",
+      "credit": "Iguanodon bernissartensis : Media Detail: M986268",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Iguanodon_bernissartensis_(Davide_Bonadonna).png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/70/Iguanodon_bernissartensis_%28Davide_Bonadonna%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "7f57887eaf88ef8e62ec46ec45e3f2793a9e0947",
+      "sourceDimensions": {
+        "width": 7701,
+        "height": 4105
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "pachyrhinosaurus",
+      "cardName": "Pachyrhinosaurus",
+      "cardKind": "creature",
+      "scientificName": "Pachyrhinosaurus canadensis",
+      "commonsFile": "File:Pachyrhinosaurus canadensis.png",
+      "creator": "Connor Ashbridge",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pachyrhinosaurus_canadensis.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/76/Pachyrhinosaurus_canadensis.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "4482fcd7331fe3bbd22701b284758213295fdd11",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 1762
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "parasaurolophus",
+      "cardName": "Parasaurolophus",
+      "cardKind": "creature",
+      "scientificName": "Parasaurolophus walkeri",
+      "commonsFile": "File:Parasaurolophus TD.png",
+      "creator": "TotalDino",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Parasaurolophus_TD.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Parasaurolophus_TD.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "3d9557c7e131c39c8b702001ff6e158b894ccd92",
+      "sourceDimensions": {
+        "width": 2800,
+        "height": 1000
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "saltasaurus",
+      "cardName": "Saltasaurus",
+      "cardKind": "creature",
+      "scientificName": "Saltasaurus loricatus",
+      "commonsFile": "File:Saltasaurus TD.png",
+      "creator": "TotalDino",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Saltasaurus_TD.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/58/Saltasaurus_TD.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "9bc286d7352fc59fe9278e33d7e31a45c1249a9e",
+      "sourceDimensions": {
+        "width": 2800,
+        "height": 1200
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "shunosaurus",
+      "cardName": "Shunosaurus",
+      "cardKind": "creature",
+      "scientificName": "Shunosaurus lii",
+      "commonsFile": "File:Zigong Dinosaur Museum Shunosaurus lii.jpg",
+      "creator": "Zhangzhugang",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Zigong_Dinosaur_Museum_Shunosaurus_lii.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Zigong_Dinosaur_Museum_Shunosaurus_lii.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "fb5a3436517bee453766c5a109b928108582f7b4",
+      "sourceDimensions": {
+        "width": 5472,
+        "height": 3648
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "stegosaurus",
+      "cardName": "Stegosaurus",
+      "cardKind": "creature",
+      "scientificName": "Stegosaurus stenops",
+      "commonsFile": "File:Stegosaurus TD.png",
+      "creator": "TotalDino",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Stegosaurus_TD.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/09/Stegosaurus_TD.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "a14503beee13ea23329c2be4e1ebbf4937fc207d",
+      "sourceDimensions": {
+        "width": 2800,
+        "height": 1200
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "therizinosaurus",
+      "cardName": "Therizinosaurus",
+      "cardKind": "creature",
+      "scientificName": "Therizinosaurus cheloniformis",
+      "commonsFile": "File:Therizinosaurus Restoration.png",
+      "creator": "PaleoNeolitic",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Therizinosaurus_Restoration.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Therizinosaurus_Restoration.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "3d9f3a2673e18a73a7490d77c64de96fce29da5f",
+      "sourceDimensions": {
+        "width": 5730,
+        "height": 3508
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "brachiosaurus",
+      "cardName": "Brachiosaurus",
+      "cardKind": "creature",
+      "scientificName": "Brachiosaurus altithorax",
+      "commonsFile": "File:Brachiosaurus mount.jpg",
+      "creator": "Matt Wedel",
+      "credit": "https://svpow.com/2013/08/30/heres-that-brachiosaurus-altithorax-skeleton-you-ordered/",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Brachiosaurus_mount.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Brachiosaurus_mount.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "23cc8651c572a17533ea26d4b485cd371b306141",
+      "sourceDimensions": {
+        "width": 2000,
+        "height": 1673
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "mamenchisaurus",
+      "cardName": "Mamenchisaurus",
+      "cardKind": "creature",
+      "scientificName": "Mamenchisaurus hochuanensis",
+      "commonsFile": "File:Mamenchisaurus hochuanensis.jpg",
+      "creator": "Gary Todd",
+      "credit": "https://www.flickr.com/photos/101561334@N08/19583867922/",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Mamenchisaurus_hochuanensis.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Mamenchisaurus_hochuanensis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "22961bbb79a686d27ed689c698456907a70a4886",
+      "sourceDimensions": {
+        "width": 5184,
+        "height": 3456
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "shantungosaurus",
+      "cardName": "Shantungosaurus",
+      "cardKind": "creature",
+      "scientificName": "Shantungosaurus giganteus",
+      "commonsFile": "File:Shantungosaurus life.png",
+      "creator": "IJReid",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Shantungosaurus_life.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Shantungosaurus_life.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "f7abbd3504bdeff7c9139674b8b99df154765380",
+      "sourceDimensions": {
+        "width": 1520,
+        "height": 777
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "triceratops",
+      "cardName": "Triceratops",
+      "cardKind": "creature",
+      "scientificName": "Triceratops horridus",
+      "commonsFile": "File:Triceratops TD.png",
+      "creator": "TotalDino",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Triceratops_TD.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/45/Triceratops_TD.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "4af6f92c532487d5e82e4dae86a2b61f5a6cdc84",
+      "sourceDimensions": {
+        "width": 3000,
+        "height": 1200
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "dreadnoughtus",
+      "cardName": "Dreadnoughtus",
+      "cardKind": "creature",
+      "scientificName": "Dreadnoughtus schrani",
+      "commonsFile": "File:Dreadnoughtus Published Reconstruction (Version 2).jpg",
+      "creator": "ArcaneHalveKnot",
+      "credit": "File:Dreadnoughtus_Published_Reconstruction.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dreadnoughtus_Published_Reconstruction_(Version_2).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/09/Dreadnoughtus_Published_Reconstruction_%28Version_2%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "b90d18c8207da6175adec816bd7fbe9cb0638496",
+      "sourceDimensions": {
+        "width": 4568,
+        "height": 1824
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 4.0"
+    },
+    {
+      "cardKey": "drought",
+      "cardName": "Drought",
+      "cardKind": "event",
+      "scientificName": null,
+      "commonsFile": "File:California Drought Dry Lakebed 2009.jpg",
+      "creator": "National Oceanic and Atmospheric Administration",
+      "credit": "National Oceanic and Atmospheric Administration [1]",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:California_Drought_Dry_Lakebed_2009.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/d/d3/California_Drought_Dry_Lakebed_2009.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "a37b31a2d79d12d181e075bb0815ab394249ed7a",
+      "sourceDimensions": {
+        "width": 700,
+        "height": 525
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "geological-boundary",
+      "cardName": "Geological Boundary",
+      "cardKind": "event",
+      "scientificName": null,
+      "commonsFile": "File:Cryogenian-Ediacaran boundary (basal Nuccaleena Formation, Neoproterozoic; Enorama Creek section, Flinders Ranges, South Australia) 25.jpg",
+      "creator": "James St. John",
+      "credit": "https://www.flickr.com/photos/47445767@N05/50847232077/",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cryogenian-Ediacaran_boundary_(basal_Nuccaleena_Formation,_Neoproterozoic;_Enorama_Creek_section,_Flinders_Ranges,_South_Australia)_25.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Cryogenian-Ediacaran_boundary_%28basal_Nuccaleena_Formation%2C_Neoproterozoic%3B_Enorama_Creek_section%2C_Flinders_Ranges%2C_South_Australia%29_25.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "15e572a985063a915d6bba2c284c8c91b5380647",
+      "sourceDimensions": {
+        "width": 3008,
+        "height": 2000
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "air-sacs",
+      "cardName": "Air Sacs",
+      "cardKind": "adaptation",
+      "scientificName": null,
+      "commonsFile": "File:Dino bird h.jpg",
+      "creator": "Zina Deretsky, National Science Foundation",
+      "credit": "National Science Foundation",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dino_bird_h.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/05/Dino_bird_h.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "b27024e4eb43be5ef898613f9c716ed907d9fb6e",
+      "sourceDimensions": {
+        "width": 999,
+        "height": 629
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "thagomizer",
+      "cardName": "Thagomizer",
+      "cardKind": "adaptation",
+      "scientificName": null,
+      "commonsFile": "File:Thagomizer.jpg",
+      "creator": "Chris Gladis from Kyoto, Japan",
+      "credit": "Thagomizer",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thagomizer.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/50/Thagomizer.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "0a8681d04928689b7dcf2047bb419a8bc73aad20",
+      "sourceDimensions": {
+        "width": 2272,
+        "height": 1704
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "dental-battery",
+      "cardName": "Dental Battery",
+      "cardKind": "adaptation",
+      "scientificName": null,
+      "commonsFile": "File:Nigersaurus taqueti skull dental battery.jpg",
+      "creator": "Sereno et al http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0001230",
+      "credit": "Sereno PC, Wilson JA, Witmer LM, Whitlock JA, Maga A, et al. Structural Extremes in a Cretaceous Dinosaur. PLoS ONE. 2, 11, e1230. 2007. DOI:10.1371/journal.pone.0001230",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nigersaurus_taqueti_skull_dental_battery.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Nigersaurus_taqueti_skull_dental_battery.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "5f7edbba088399b91d51ecf693577da87c0c8517",
+      "sourceDimensions": {
+        "width": 2732,
+        "height": 1548
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "facultative-quadrupedality",
+      "cardName": "Facultative Quadrupedality",
+      "cardKind": "adaptation",
+      "scientificName": null,
+      "commonsFile": "File:Iguanodon TD.png",
+      "creator": "TotalDino",
+      "credit": "Own work",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Iguanodon_TD.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Iguanodon_TD.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "20ade6f6311ce3f8bef08ea4c6d4f2ea9bffed44",
+      "sourceDimensions": {
+        "width": 2800,
+        "height": 1000
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 4.0"
+    },
+    {
+      "cardKey": "genetic-mutations",
+      "cardName": "Genetic Mutations",
+      "cardKind": "concept",
+      "scientificName": null,
+      "commonsFile": "File:Gene Mutation (NIH BioArt 170).png",
+      "creator": "Courtesy of NIAID Ryan Kissinger",
+      "credit": "Gene Mutation",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Gene_Mutation_(NIH_BioArt_170).png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Gene_Mutation_%28NIH_BioArt_170%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "623a533d0d6fd4b60e779518d273f3a2af5f4046",
+      "sourceDimensions": {
+        "width": 3352,
+        "height": 598
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "stampede",
+      "cardName": "Stampede",
+      "cardKind": "event",
+      "scientificName": null,
+      "commonsFile": "File:Wildebeest crossing the riverbank during the Great Migration, Serengeti National Park.jpg",
+      "creator": "Agness Abubakar Saidi",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Wildebeest_crossing_the_riverbank_during_the_Great_Migration,_Serengeti_National_Park.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Wildebeest_crossing_the_riverbank_during_the_Great_Migration%2C_Serengeti_National_Park.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "0e9354f88b181cb72d034956a267a0d56a5fec22",
+      "sourceDimensions": {
+        "width": 1280,
+        "height": 854
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "anomalocaris",
+      "cardName": "Anomalocaris",
+      "cardKind": "creature",
+      "scientificName": "Anomalocaris canadensis",
+      "commonsFile": "File:USNM PAL 207255 Anomalocaris canadensis Image 1.jpg",
+      "creator": "Han Zeng",
+      "credit": "http://n2t.net/ark:/65665/3670aab7a-6227-4e1f-af97-d8488dde411c",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:USNM_PAL_207255_Anomalocaris_canadensis_Image_1.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/3/39/USNM_PAL_207255_Anomalocaris_canadensis_Image_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "43ba562a853370d26af8a515c9e81fa66281ca4c",
+      "sourceDimensions": {
+        "width": 4288,
+        "height": 2848
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "black-swallower",
+      "cardName": "Black Swallower",
+      "cardKind": "creature",
+      "scientificName": "Chiasmodon niger",
+      "commonsFile": "File:Chiasmodon niger specimen.jpg",
+      "creator": "HulloThere",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Chiasmodon_niger_specimen.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/06/Chiasmodon_niger_specimen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "852b5fc4cf857b4cdb2c1f4583c8aa7210818d74",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 2672
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "cladoselache",
+      "cardName": "Cladoselache",
+      "cardKind": "creature",
+      "scientificName": "Cladoselache kepleri",
+      "commonsFile": "File:Cladoselache kepleri 1889 counterpart.jpg",
+      "creator": "Newberry, J.S.",
+      "credit": "https://www.biodiversitylibrary.org/item/51025#page/418/mode/2up",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cladoselache_kepleri_1889_counterpart.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Cladoselache_kepleri_1889_counterpart.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "49426d4fe07b1f22f367d88aaf4ce87a03514452",
+      "sourceDimensions": {
+        "width": 1214,
+        "height": 1637
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "dollocaris",
+      "cardName": "Dollocaris",
+      "cardKind": "creature",
+      "scientificName": "Dollocaris ingens",
+      "commonsFile": "File:Dollocaris ingens 1.jpg",
+      "creator": "Charbonnier, S., Vannier, J., Hantzpergue, P., and Gaillard, Ch.",
+      "credit": "Charbonnier, S., Vannier, J., Hantzpergue, P., and Gaillard, Ch. 2010. Ecological significance of the arthropod fauna from the Jurassic (Callovian) La Voulte Lagerstätte. Acta Palaeontologica Polonica 55 (1): 111–132.",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dollocaris_ingens_1.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Dollocaris_ingens_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "1b5be2fa50b19ff5475b1e3d2811122e59a27f7a",
+      "sourceDimensions": {
+        "width": 985,
+        "height": 672
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 4.0"
+    },
+    {
+      "cardKey": "tiktaalik",
+      "cardName": "Tiktaalik",
+      "cardKind": "creature",
+      "scientificName": "Tiktaalik roseae",
+      "commonsFile": "File:Tiktaalik roseae life restor.jpg",
+      "creator": "Zina Deretsky , National Science Foundation",
+      "credit": "National Science Foundation Multimedia Gallery http://nsf.gov/news/mmg/mmg_disp.cfm?med_id=58310 http://nsf.gov/news/news_summ.jsp?cntn_id=106807 https://flickr.com/photos/nsf_beta/3705198718",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Tiktaalik_roseae_life_restor.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Tiktaalik_roseae_life_restor.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "fbf04452b586189871926c6183108c0ef9571aea",
+      "sourceDimensions": {
+        "width": 1890,
+        "height": 1092
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "edestus",
+      "cardName": "Edestus",
+      "cardKind": "creature",
+      "scientificName": "Edestus heinrichi",
+      "commonsFile": "File:Edestus heinrichi 34.JPG",
+      "creator": "Ghedoghedo",
+      "credit": "Own work",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Edestus_heinrichi_34.JPG",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Edestus_heinrichi_34.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "3301b1984849ad706e5eca74ed45ae4793506059",
+      "sourceDimensions": {
+        "width": 1659,
+        "height": 1159
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 3.0"
+    },
+    {
+      "cardKey": "endoceras",
+      "cardName": "Endoceras",
+      "cardKind": "creature",
+      "scientificName": "Endoceras giganteum",
+      "commonsFile": "File:Endoceras spp Svezia Museo Milano.png",
+      "creator": "Antonov",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Endoceras_spp_Svezia_Museo_Milano.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/2/20/Endoceras_spp_Svezia_Museo_Milano.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "7ef896faf127f5006adecadb34f3f1eaefe035cc",
+      "sourceDimensions": {
+        "width": 3603,
+        "height": 2029
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "helicoprion",
+      "cardName": "Helicoprion",
+      "cardKind": "creature",
+      "scientificName": "Helicoprion davisii",
+      "commonsFile": "File:Helicoprion sp. (fossil shark tooth whorl) (Phosphoria Formation, mid-Permian; Idaho, USA) 6 (34254480436).jpg",
+      "creator": "James St. John",
+      "credit": "Helicoprion sp. (fossil shark tooth whorl) (Phosphoria Formation, mid-Permian; Idaho, USA) 6",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Helicoprion_sp._(fossil_shark_tooth_whorl)_(Phosphoria_Formation,_mid-Permian;_Idaho,_USA)_6_(34254480436).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/79/Helicoprion_sp._%28fossil_shark_tooth_whorl%29_%28Phosphoria_Formation%2C_mid-Permian%3B_Idaho%2C_USA%29_6_%2834254480436%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "93dfe9f160c66cf3d0f9009992bf9a8ca0a680e7",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 3000
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "hyneria",
+      "cardName": "Hyneria",
+      "cardKind": "creature",
+      "scientificName": "Hyneria lindae",
+      "commonsFile": "File:Hyneria (cropped).jpg",
+      "creator": "ABelov2014 ( https://abelov2014.deviantart.com/ )",
+      "credit": "https://abelov2014.deviantart.com/art/Hyneria-lindae-533667663",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hyneria_(cropped).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/8/80/Hyneria_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "137a60401f46e4ce9c8b888e2c8034228c9fd2bd",
+      "sourceDimensions": {
+        "width": 1502,
+        "height": 1041
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 3.0"
+    },
+    {
+      "cardKey": "omnidens",
+      "cardName": "Omnidens",
+      "cardKind": "creature",
+      "scientificName": "Omnidens amplus",
+      "commonsFile": "File:Omnidens qiongqii fossil.jpg",
+      "creator": "Prehistorica CM",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Omnidens_qiongqii_fossil.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/40/Omnidens_qiongqii_fossil.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "ed8de7970be2e1005c9fdeb9a94d1a54398b22bb",
+      "sourceDimensions": {
+        "width": 4483,
+        "height": 2550
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "parapuzosia",
+      "cardName": "Parapuzosia",
+      "cardKind": "creature",
+      "scientificName": "Parapuzosia seppenradensis",
+      "commonsFile": "File:Parapuzosia seppenradensis 4.jpg",
+      "creator": "-- Xocolatl 16:32, 22 April 2006 (UTC)",
+      "credit": "Own work",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Parapuzosia_seppenradensis_4.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/09/Parapuzosia_seppenradensis_4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "0562ca26a0c31c065f87717f849cc965766919aa",
+      "sourceDimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "dunkleosteus",
+      "cardName": "Dunkleosteus",
+      "cardKind": "creature",
+      "scientificName": "Dunkleosteus terrelli",
+      "commonsFile": "File:Dunkleosteus closed mouth.png",
+      "creator": "LiterallyMiguel",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dunkleosteus_closed_mouth.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Dunkleosteus_closed_mouth.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "711d685e033f0d05e76fc5368871fd17723d85f7",
+      "sourceDimensions": {
+        "width": 4500,
+        "height": 3707
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "jaekelopterus",
+      "cardName": "Jaekelopterus",
+      "cardKind": "creature",
+      "scientificName": "Jaekelopterus rhenaniae",
+      "commonsFile": "File:Jaekelopterus rhenaniae reconstruction.jpg",
+      "creator": "ДиБгд",
+      "credit": "Own work",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jaekelopterus_rhenaniae_reconstruction.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/a/af/Jaekelopterus_rhenaniae_reconstruction.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "90d36a218221d9aefbeffa168045dc8dbc2dc97c",
+      "sourceDimensions": {
+        "width": 3744,
+        "height": 2496
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 4.0"
+    },
+    {
+      "cardKey": "orca",
+      "cardName": "Orca",
+      "cardKind": "creature",
+      "scientificName": "Orcinus orca",
+      "commonsFile": "File:Killer Whales Hunting a Crabeater Seal.jpg",
+      "creator": "Callan Carpenter",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Killer_Whales_Hunting_a_Crabeater_Seal.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Killer_Whales_Hunting_a_Crabeater_Seal.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "eb2af8c5f33d73e5edb08e8923cef36e86eb8797",
+      "sourceDimensions": {
+        "width": 4942,
+        "height": 2668
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "ptychodus",
+      "cardName": "Ptychodus",
+      "cardKind": "creature",
+      "scientificName": "Ptychodus latissimus",
+      "commonsFile": "File:Ptychodus in a group illustration.png",
+      "creator": "Bubblesorg",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ptychodus_in_a_group_illustration.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Ptychodus_in_a_group_illustration.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "8492a9f705168d0314e87d1d411edafae3b5311e",
+      "sourceDimensions": {
+        "width": 2224,
+        "height": 1668
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "xiphactinus",
+      "cardName": "Xiphactinus",
+      "cardKind": "creature",
+      "scientificName": "Xiphactinus audax",
+      "commonsFile": "File:Xiphactinus audax, Gove County, Kansas, USA, Late Cretaceous - Royal Ontario Museum - DSC00057.JPG",
+      "creator": "Daderot",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Xiphactinus_audax,_Gove_County,_Kansas,_USA,_Late_Cretaceous_-_Royal_Ontario_Museum_-_DSC00057.JPG",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Xiphactinus_audax%2C_Gove_County%2C_Kansas%2C_USA%2C_Late_Cretaceous_-_Royal_Ontario_Museum_-_DSC00057.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "69e5f267690c8d4a25c46fae9db9e93a0039ffa4",
+      "sourceDimensions": {
+        "width": 4301,
+        "height": 2388
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "leedsichthys",
+      "cardName": "Leedsichthys",
+      "cardKind": "creature",
+      "scientificName": "Leedsichthys problematicus",
+      "commonsFile": "File:Leedsichthys paleoart.jpg",
+      "creator": "LiterallyMiguel",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Leedsichthys_paleoart.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/79/Leedsichthys_paleoart.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "6434f387b32360a4d6507b829deba64e669173e7",
+      "sourceDimensions": {
+        "width": 6124,
+        "height": 2746
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "livyatan",
+      "cardName": "Livyatan",
+      "cardKind": "creature",
+      "scientificName": "Livyatan melvillei",
+      "commonsFile": "File:Livyatan skull.jpg",
+      "creator": "bertknot",
+      "credit": "https://www.flickr.com/photos/bertknot/31656572118/",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Livyatan_skull.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Livyatan_skull.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "58a6006edf8f2d4cb1329489c3c8e14e0c678a8d",
+      "sourceDimensions": {
+        "width": 3758,
+        "height": 5248
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": "CC BY-SA 2.0"
+    },
+    {
+      "cardKey": "megalodon",
+      "cardName": "Megalodon",
+      "cardKind": "creature",
+      "scientificName": "Otodus megalodon",
+      "commonsFile": "File:Otodus megalodon in sea restoration.jpg",
+      "creator": "Hugo Saláis",
+      "credit": "https://rs.figshare.com/articles/figure/Illustration_for_social_media_and_potential_cover_image_from_Use_of_nursery_areas_by_the_extinct_megatooth_shark_i_Otodus_megalodon_i_Chondrichthyes_Lamniformes_/13200575",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Otodus_megalodon_in_sea_restoration.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Otodus_megalodon_in_sea_restoration.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "79364e6250359fbe961fec1362ee624a021d0846",
+      "sourceDimensions": {
+        "width": 3780,
+        "height": 2126
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "blue-whale",
+      "cardName": "Blue Whale",
+      "cardKind": "creature",
+      "scientificName": "Balaenoptera musculus",
+      "commonsFile": "File:Anim1754 - Flickr - NOAA Photo Library.jpg",
+      "creator": "NOAA Photo Library",
+      "credit": "anim1754",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "27fb591a5dd4e822480a6afa429ab325858314e1",
+      "sourceDimensions": {
+        "width": 2600,
+        "height": 1800
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "island-dwarfism",
+      "cardName": "Island Dwarfism",
+      "cardKind": "adaptation",
+      "scientificName": null,
+      "commonsFile": "File:Palaeoloxodon falconeri (Sicilian dwarf elephant).jpg",
+      "creator": "James St. John",
+      "credit": "https://www.flickr.com/photos/jsjgeology/32552806631/",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Palaeoloxodon_falconeri_(Sicilian_dwarf_elephant).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Palaeoloxodon_falconeri_%28Sicilian_dwarf_elephant%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "0325a0cc41d543a962471c697121888e0081ddc1",
+      "sourceDimensions": {
+        "width": 3337,
+        "height": 1768
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "eoraptor",
+      "cardName": "Eoraptor",
+      "cardKind": "creature",
+      "scientificName": "Eoraptor lunensis",
+      "commonsFile": "File:Eoraptor resto. 01.png",
+      "creator": "Conty",
+      "credit": "Own work",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Eoraptor_resto._01.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Eoraptor_resto._01.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "6a1224fe4a369a11bcbdb33905c7fe719d9a559d",
+      "sourceDimensions": {
+        "width": 3970,
+        "height": 2224
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "lystrosaurus",
+      "cardName": "Lystrosaurus",
+      "cardKind": "creature",
+      "scientificName": "Lystrosaurus murrayi",
+      "commonsFile": "File:Lystrosaurus BW.jpg",
+      "creator": "Nobu Tamura ( https://spinops.blogspot.com )",
+      "credit": "Own work",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Lystrosaurus_BW.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/1/17/Lystrosaurus_BW.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "014c6f2f735cf1ca8f2e76bd3d236d8eb7ce36ff",
+      "sourceDimensions": {
+        "width": 800,
+        "height": 410
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "edaphosaurus",
+      "cardName": "Edaphosaurus",
+      "cardKind": "creature",
+      "scientificName": "Edaphosaurus pogonias",
+      "commonsFile": "File:Edaphosaurus pogonias skeletal mount 1 (Chicago, Field Museum).jpg",
+      "creator": "Crawdad Blues",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Edaphosaurus_pogonias_skeletal_mount_1_(Chicago,_Field_Museum).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/52/Edaphosaurus_pogonias_skeletal_mount_1_%28Chicago%2C_Field_Museum%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "3f5105a4fdf9c584cbcc4fc3f3ba5b997bbc1218",
+      "sourceDimensions": {
+        "width": 5337,
+        "height": 2559
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "cotylorhynchus",
+      "cardName": "Cotylorhynchus",
+      "cardKind": "creature",
+      "scientificName": "Cotylorhynchus romeri",
+      "commonsFile": "File:Cotylorhynchus romeri - AMNH - DSC06317.JPG",
+      "creator": "Daderot",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cotylorhynchus_romeri_-_AMNH_-_DSC06317.JPG",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Cotylorhynchus_romeri_-_AMNH_-_DSC06317.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "809d31daaabc3671c5186c79402a9d854d1f03af",
+      "sourceDimensions": {
+        "width": 4320,
+        "height": 3240
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "thrinaxodon",
+      "cardName": "Thrinaxodon",
+      "cardKind": "creature",
+      "scientificName": "Thrinaxodon liorhinus",
+      "commonsFile": "File:Thrinaxodon liorhinus skeleton.jpg",
+      "creator": "Karen Neoh",
+      "credit": "Thrinaxodon Liorhinus",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thrinaxodon_liorhinus_skeleton.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Thrinaxodon_liorhinus_skeleton.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "dd11d8be256dec49cfd80b7f4dd095d929a33b64",
+      "sourceDimensions": {
+        "width": 3872,
+        "height": 2592
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "ichthyosaurus",
+      "cardName": "Ichthyosaurus",
+      "cardKind": "creature",
+      "scientificName": "Ichthyosaurus communis",
+      "commonsFile": "File:Ichthyosaurus communis in London.jpg",
+      "creator": "Gary Todd",
+      "credit": "https://www.flickr.com/photos/101561334@N08/36451246576/",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ichthyosaurus_communis_in_London.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Ichthyosaurus_communis_in_London.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "eda96731f1ebb8b616e426dc4a536cb1ac999a9c",
+      "sourceDimensions": {
+        "width": 4804,
+        "height": 1984
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "shastasaurus",
+      "cardName": "Shastasaurus",
+      "cardKind": "creature",
+      "scientificName": "Shastasaurus sikanniensis",
+      "commonsFile": "File:Shastasaurus sikanniensis.jpg",
+      "creator": "Ornitholestes",
+      "credit": "Own work",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Shastasaurus_sikanniensis.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/8/84/Shastasaurus_sikanniensis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "8f207eb8690e9747cbbd8c4ad1366248a2a4a9b6",
+      "sourceDimensions": {
+        "width": 937,
+        "height": 310
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "plesiosaurus",
+      "cardName": "Plesiosaurus",
+      "cardKind": "creature",
+      "scientificName": "Plesiosaurus dolichodeirus",
+      "commonsFile": "File:202006 Plesiosaurus dolichodeirus.png",
+      "creator": "DataBase Center for Life Science (DBCLS)",
+      "credit": "https://doi.org/10.7875/togopic.2020.164 ( direct source )",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:202006_Plesiosaurus_dolichodeirus.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/ee/202006_Plesiosaurus_dolichodeirus.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "d7c55cac8ad85b17f08fa99101dc24dd44cf62c4",
+      "sourceDimensions": {
+        "width": 3508,
+        "height": 2480
+      },
+      "modifications": "Resized; placed over a blurred, darkened extension derived from the same source; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "mosasaurus",
+      "cardName": "Mosasaurus",
+      "cardKind": "creature",
+      "scientificName": "Mosasaurus hoffmannii",
+      "commonsFile": "File:Maastricht Mosasaurus 26092015 13.jpg",
+      "creator": "Vassil",
+      "credit": "Own work",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Maastricht_Mosasaurus_26092015_13.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Maastricht_Mosasaurus_26092015_13.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "2f123be0e04e79da956da1576f3170d1b325c87d",
+      "sourceDimensions": {
+        "width": 4928,
+        "height": 3264
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "purussaurus",
+      "cardName": "Purussaurus",
+      "cardKind": "creature",
+      "scientificName": "Purussaurus brasiliensis",
+      "commonsFile": "File:Purussaurus BW.jpg",
+      "creator": "Nobu Tamura ( http://spinops.blogspot.com )",
+      "credit": "Own work",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Purussaurus_BW.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/76/Purussaurus_BW.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "7aa9f2e0a808ce5bbbc6f0a0351a9f9eecc78b12",
+      "sourceDimensions": {
+        "width": 719,
+        "height": 318
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "smilodon",
+      "cardName": "Smilodon",
+      "cardKind": "creature",
+      "scientificName": "Smilodon fatalis",
+      "commonsFile": "File:Smilodon fatalis.jpg",
+      "creator": "Dantheman9758 at English Wikipedia",
+      "credit": "( Original text: self-made ) and http://dantheman9758.deviantart.com/art/Wiki-Smilodon-78082433",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Smilodon_fatalis.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Smilodon_fatalis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "091bab19f076d7dfccda3f121ba695b79e6337e2",
+      "sourceDimensions": {
+        "width": 1559,
+        "height": 900
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "woolly-mammoth",
+      "cardName": "Woolly Mammoth",
+      "cardKind": "creature",
+      "scientificName": "Mammuthus primigenius",
+      "commonsFile": "File:Woolly mammoths.jpg",
+      "creator": "Charles Robert Knight",
+      "credit": "http://www.uky.edu/OtherOrgs/KPS/poky/pages/pokych10.htm and https://archive.org/stream/menofoldstoneage00osborich#page/208/mode/2up",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Woolly_mammoths.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Woolly_mammoths.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "7813c79dfda1d8f8ee159fc8cc641d18d82994a3",
+      "sourceDimensions": {
+        "width": 2377,
+        "height": 1723
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "paraceratherium",
+      "cardName": "Paraceratherium",
+      "cardKind": "creature",
+      "scientificName": "Paraceratherium transouralicum",
+      "commonsFile": "File:Indricotherium11.jpg",
+      "creator": "Dmitry Bogdanov",
+      "credit": "dmitrchel@mail.ru and http://dibgd.deviantart.com/art/Indricotherium-121044660?q=gallery%3ADiBgd%2F8278727&qo=168",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Indricotherium11.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Indricotherium11.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "1b1211b80bb9dcea9d67ee69f77667da55d2dbb0",
+      "sourceDimensions": {
+        "width": 3904,
+        "height": 2516
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "megatherium",
+      "cardName": "Megatherium",
+      "cardKind": "creature",
+      "scientificName": "Megatherium americanum",
+      "commonsFile": "File:Megatherium americanum.jpg",
+      "creator": "R. Bruce Horsfall",
+      "credit": "A History of Land Mammals in the Western Hemisphere , page 220",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Megatherium_americanum.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/40/Megatherium_americanum.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "72fb53db718948216de17097e94016c09cd850b0",
+      "sourceDimensions": {
+        "width": 2094,
+        "height": 1621
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "arctotherium",
+      "cardName": "Arctotherium",
+      "cardKind": "creature",
+      "scientificName": "Arctotherium angustidens",
+      "commonsFile": "File:Arctotherium.jpg",
+      "creator": "R. Bruce Horsfall",
+      "credit": "W.B. Scott's A History of Land Mammals in the Western Hemisphere . New York: The Macmillan Company, page 549",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Arctotherium.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/53/Arctotherium.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "354274c9293175c749c30b2f8a69fc754de66632",
+      "sourceDimensions": {
+        "width": 1635,
+        "height": 1361
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "epicyon",
+      "cardName": "Epicyon",
+      "cardKind": "creature",
+      "scientificName": "Epicyon haydeni",
+      "commonsFile": "File:Epicyon haydeni skeleton (white background).jpg",
+      "creator": "Dawn Pedersen",
+      "credit": "[1]",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Epicyon_haydeni_skeleton_(white_background).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Epicyon_haydeni_skeleton_%28white_background%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "d4b98a20a290d0b8dc6b943269842eabb32c67be",
+      "sourceDimensions": {
+        "width": 3804,
+        "height": 1892
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "dire-wolf",
+      "cardName": "Dire Wolf",
+      "cardKind": "creature",
+      "scientificName": "Aenocyon dirus",
+      "commonsFile": "File:The American Museum journal (c1900-(1918)) (Aenocyon dirus).jpg",
+      "creator": "Mariomassone , based on an original by Erwin S. Christman",
+      "credit": "[1]",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_American_Museum_journal_(c1900-(1918))_(Aenocyon_dirus).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/f/fd/The_American_Museum_journal_%28c1900-%281918%29%29_%28Aenocyon_dirus%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "e2d643a263b9e3e5fe35690c2a0a1fb96b4942c2",
+      "sourceDimensions": {
+        "width": 1720,
+        "height": 944
+      },
+      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP.",
+      "derivativeLicense": null
+    }
+  ]
+}

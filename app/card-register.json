@@ -1,0 +1,842 @@
+{
+  "version": "2.0",
+  "title": "Prehistoric Card Game — Three-Deck Playable Implementation Register",
+  "deck": {
+    "size": 40,
+    "identity": "Carnivore / Predator Board-Control Midrange",
+    "creatureCount": 22,
+    "supportCount": 18,
+    "curve": {
+      "level0": 5,
+      "level1": 6,
+      "level2": 8,
+      "level3": 3
+    },
+    "supportSplit": {
+      "continuousEvents": 3,
+      "instantaneousEvents": 1,
+      "adaptations": 3,
+      "concepts": 11
+    }
+  },
+  "rulesChanges": [
+    {
+      "title": "Final 40-card manifest",
+      "rule": "The 40-card singleton manifest in this register replaces the former 30-card demo deck, Bottleneck, and all five temporary Support placeholders."
+    },
+    {
+      "title": "Independent Concept resolution",
+      "rule": "Concept effects never combine or interact. A second Concept permitted by Resourceful may be played only after the first Concept has completely resolved, including all mandatory choices and any pending override it creates."
+    },
+    {
+      "title": "Resourceful allowance",
+      "rule": "While a player controls at least one Creature with Resourceful, that player may play up to two Concept cards during their turn instead of one. Multiple instances do not stack."
+    },
+    {
+      "title": "Semi-Aquatic scope",
+      "rule": "Semi-Aquatic is an unrestricted bridge identity. It counts as Aquatic by name for Event and Concept effects and for satisfying a printed Aquatic occupant's override gate, but not for Adaptations or Aquatic's own effect. A Semi-Aquatic occupant supplies the Tag category when it interacts with Aquatic or Semi-Aquatic."
+    },
+    {
+      "title": "Visual Tags",
+      "rule": "Visual Tags are hidden card data. Raptorial Claws checks the hidden Raptorial Claws Visual Tag; it does not check the visible Raptorial gameplay Tag."
+    },
+    {
+      "title": "Transitional and Cynognathus",
+      "rule": "Transitional is unchanged. Cynognathus is not a universal pivot: Generalist lets it override naturally into Level 2 Triassic Carnivores, while other routes require ordinary matching or Support help."
+    },
+    {
+      "title": "Autotomy eligibility",
+      "rule": "Autotomy remains intentionally narrow. In Deck 1 its Aquatic targets are Nautilus, Horseshoe Crab, and Diplocaulus; Semi-Aquatic Creatures do not qualify. Its card draw triggers only when the attached Creature is overridden, not when Autotomy prevents battle destruction."
+    },
+    {
+      "title": "Wildfire lane event",
+      "rule": "Wildfire is an Instantaneous Event played into an unlocked Niche on its controller's side instead of the Event Zone. It may fill an empty Niche or override any friendly Creature there without Level or compatibility matching; normal override restrictions and triggers still apply. It sends the opposing Creature and its Adaptation to History, locks the entire lane through the end of the controller's next turn, then enters History."
+    },
+    {
+      "title": "Cranial Display",
+      "rule": "Cranial Crest, Cranial Armament, and Cranial Display are consolidated under the single Tag name Cranial Display, using the former Cranial Crest gameplay effect."
+    },
+    {
+      "title": "Optional Hunt commitment",
+      "rule": "Choosing an attacker and target opens a projected Battle Level preview. Canceling consumes nothing; a Hunt affects game state only after the player selects Commit Hunt."
+    },
+    {
+      "title": "Elusive coin",
+      "rule": "The first Hunt against an eligible Elusive defender each turn uses an animated Jurassic-themed coin. The red Rex face means Elusive succeeds and forces a tie; the black reverse means Elusive fails and the Hunt resolves normally."
+    },
+    {
+      "title": "Inspection",
+      "rule": "Hovering or focusing a visible card previews it in the permanent sidewall while no card is pinned. Clicking or tapping a card pins it until another card is clicked or tapped; hover and focus previews never override that pin. The primary Card view omits Card Role and Period Color, presents every Tag and its full effect in printed order before flavor and taxonomy, and allows the Tag area to scroll when necessary. Sovereign expands into Gigantic and Territorial and identifies both as granted Tags."
+    },
+    {
+      "title": "Artwork readiness",
+      "rule": "Every Creature and Support inspection card uses the same exact 23:13 artwork window. Cards without final artwork display a deliberate artwork-pending panel, and production assets should be supplied as 2300 by 1300 pixel sRGB PNG files."
+    },
+    {
+      "title": "Setup deck inspection",
+      "rule": "The opening screen includes a read-only browser covering all three complete 40-card singleton decks and a separate General Pool. Each player independently selects Deck 1, Deck 2, or Deck 3 before choosing a Biome; General Pool cards remain clearly marked as not playable and work in progress."
+    },
+    {
+      "title": "Deck 3 playable release",
+      "rule": "Deck 3: Aquatic Carnivores is selectable and playable with 22 Creatures and 18 Supports. Its three new Supports are Drought, Island Dwarfism, and Geological Boundary; Superpredators and Dig Site Excavation are included among its inherited Supports."
+    },
+    {
+      "title": "Biome battlefield presentation",
+      "rule": "Each player's selected Biome is the true background of that player's battlefield half. The viewing player's background is upright and the opponent's background is rotated exactly 180 degrees without mirroring; only the artwork rotates. Empty Niches, Adaptation slots, Event Zones, ribbons, and their controls remain translucent so the Biome is visible, while played cards remain opaque and readable."
+    },
+    {
+      "title": "Obligate Migration control",
+      "rule": "Obligate Migration may move one Creature on either side of the board into a different empty Niche on that same side, carrying its attached Adaptation. This movement does not count as filling or overriding a Niche and creates no entry trigger."
+    },
+    {
+      "title": "Convergent Evolution bridge",
+      "rule": "For the next override this turn, if the two Creatures share an eligible Tag and already match in at least one of Diet, Time Period, or Primary Taxon, Convergent Evolution supplies one missing category among those three as the third match. Apex Predator, Generalist, Living Fossil, Specialized, and Transitional are excluded from its shared-Tag requirement."
+    },
+    {
+      "title": "Cryptic Camouflage",
+      "rule": "Ghost Lineage is removed and replaced one-for-one by Cryptic Camouflage. The Level 2-or-lower Adaptation creates a defensive evasion wager for Herbivores, or an attacking Battle Level wager for Carnivores and Omnivores; Ambush doubles the attacking coin count."
+    },
+    {
+      "title": "Aerial battle effect",
+      "rule": "When an Aerial Creature is Hunted, the attacker gets -1 Battle Level for that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only to bypass this penalty and for compatibility; it does not grant the defensive effect."
+    },
+    {
+      "title": "Evolutionary Radiation sequence",
+      "rule": "Evolutionary Radiation cannot be played on its controller's first turn. At the start of resolution, record whether Level 0 and Level 1 are absent. Its controller chooses the corresponding Level 0 effect, the corresponding Level 1 effect, or both when both prerequisites were met. Choosing both requires different empty, unlocked Niches and skips the Battle Phase that turn while preserving the rest of Development. Neither placement uses the normal Creature play."
+    },
+    {
+      "title": "Semelparity replacement",
+      "rule": "Semelparity sends a Level 0 Creature from hand or the controller's board to History as an additional cost, then draws 2 cards. Only when the paid Creature was in play, its controller may play a Level 0 Creature from hand into an empty, unlocked Niche without using the normal Creature play. Accepting that replacement preserves the rest of the Development Phase but skips the Battle Phase that turn; declining it preserves the Battle Phase."
+    },
+    {
+      "title": "Abiogenesis choice",
+      "rule": "Abiogenesis now offers a choice between its existing Level 0 deck search and placing a Level 0 Creature from hand into an empty, unlocked Niche. The placement does not use the normal Creature play or end the Development Phase, but it requires the controller to skip the Battle Phase that turn."
+    },
+    {
+      "title": "Cambrian Explosion entry draw",
+      "rule": "When a player plays Cambrian Explosion while controlling a Level 0 Creature, that player immediately draws 1 card. The conditional draw compensates for the opponent receiving the first benefit from the symmetrical start-of-turn draw effect."
+    },
+    {
+      "title": "Carnian Pluvial Episode",
+      "rule": "Once during each of its controller's Development Phases, Carnian Pluvial Episode may send a controlled non-Dinosaur Creature to History, then find a Dinosaur with Printed Level 2 or lower. The activation does not use the normal Creature play or Event play."
+    },
+    {
+      "title": "General Pool expansion",
+      "rule": "Competitive Exclusion Principle remains in the non-playable General Pool, with Wildfire taking its former Deck 1 slot. Locked Deck 3 cards appear in their own playable register and no longer appear as General Pool candidates."
+    },
+    {
+      "title": "Opportunist extra play",
+      "rule": "After the normal Creature play, if the opponent controls a Continuous Event, a Creature with Opportunist may enter as the extra Creature play. It may fill an empty Niche, or if it is Level 1 or Level 2 it may perform a legal override under all normal restrictions. The Opportunist play ends the Development Phase."
+    },
+    {
+      "title": "Spinal Sail Victory protection",
+      "rule": "Event and Tag effects each apply 1 less Victory Level decrease to a Creature with Spinal Sail. This does not affect Battle Level; in particular, it mitigates that Creature’s Apex Predator crowding decrease by 1."
+    },
+    {
+      "title": "Aquatic override identity",
+      "rule": "A printed Aquatic Creature can override, or be overridden by, only a Creature that counts as Aquatic. Semi-Aquatic satisfies that gate but is not itself restricted against non-Aquatic Creatures. When the occupied Creature has Aquatic, the two Creatures' Primary Taxa count as matching; if those Taxa already match, Aquatic supplies the Tag category instead. When the occupied Creature has Semi-Aquatic, Aquatic or Semi-Aquatic supplies only the Tag category."
+    },
+    {
+      "title": "Standard Aquatic progression",
+      "rule": "Aquatic and Semi-Aquatic use the normal equal-Level or +1-Level override progression. Neither Tag changes Printed Level or permits a larger jump; Rapid Speciation remains the dedicated exactly-2-Level override effect."
+    },
+    {
+      "title": "Carnivore Diet consolidation",
+      "rule": "Piscivore is removed as a Diet and all former Piscivores become Carnivores. Piscivore may return later as a Tag, Adaptation, or other concept."
+    },
+    {
+      "title": "Tropical multi-draw suppression",
+      "rule": "Tropical Biodiversity does not trigger when an effect such as Cambrian Explosion will cause multiple cards to be drawn during that Start Phase."
+    },
+    {
+      "title": "Draw-then-discard presentation",
+      "rule": "When an effect draws multiple cards and then requires one of those cards to be sent to History, the mandatory choice resolves before the card-by-card draw presentation begins. Genetic Drift uses this sequence."
+    },
+    {
+      "title": "Charge Battle timing",
+      "rule": "Charge grants same-turn Hunt permission during the Battle Phase, ignores Diet only against the opposing Creature in the facing Niche, and permanently prevents that Creature from initiating Hunts into other Niches. It never creates a Development Phase Hunt."
+    },
+    {
+      "title": "Sovereign Battle protection",
+      "rule": "Sovereign makes its bearer count as Gigantic and prevents opposing Tags or Adaptations from lowering its Battle Level during a Hunt. A Carnivore or Omnivore bearer also gains Territorial. A Herbivore bearer instead prevents opposing Tags or Adaptations from lowering its Victory Level. Events, Concepts, and Biomes are not prevented."
+    },
+    {
+      "title": "Apex boss differentiation",
+      "rule": "Tyrannosaurus rex replaces the Osteophagy placeholder with Durophagy; Sovereign continues to grant Gigantic and Territorial. Purussaurus is locked in the General Pool as Semi-Aquatic · Ambush · Crushing Bite · Apex Predator. Megalodon is Aquatic · Apex Predator · Specialized · Crushing Bite; Specialized doubles only the numerical effect of its immediately following Tag and is not itself eligible for override matching."
+    },
+    {
+      "title": "Compact mandatory-choice controls",
+      "rule": "Cranial Display uses a fixed overlay inside the control bar instead of a board banner. Duplicate allowance information is removed, the inspector artwork expands proportionally, and the Development button becomes End Turn when no legal Hunt exists."
+    },
+    {
+      "title": "Engulf operational ruling",
+      "rule": "Engulf checks the destroyed Creature’s Printed Level and may trigger whether its bearer attacked or defended. Destruction prevention resolves first. The engulfed Creature occupies the Adaptation Slot but is not an Adaptation or a Creature in play; its own effects and Victory Level are inactive. The bearer gains Engulf’s Victory Level bonus and cannot initiate Hunts while the card remains attached. If the bearer leaves play, the engulfed card goes to its owner’s History Pile. Specialized doubles only Engulf’s numerical Victory Level bonus."
+    },
+    {
+      "title": "Cold Gigantic augmentation",
+      "rule": "Thermal Inertia causes the Gigantic Tag itself to gain its conditional +1 defending Battle Level effect for Creatures controlled by the Cold player. Specialized therefore doubles that modifier when immediately followed by printed Gigantic, but it does not change the hunting-Creature counters."
+    },
+    {
+      "title": "Exceptional Level 4 capstone",
+      "rule": "Blue Whale is the playable Level 4 Deck 3 capstone. Existing placement rules remain unchanged: it cannot fill an empty Niche, normally progresses from a legal Level 3 override, and may use Rapid Speciation only from an exactly two-Levels-lower Creature."
+    },
+    {
+      "title": "Deck 2 playable release",
+      "rule": "Deck 2: Herbivore Development is selectable and playable as a 40-card singleton deck with 23 Creatures and 17 Supports. Its curve is 3, 8, 7, 4, and 1 across Levels 0 through 4; its Support split is 5 Adaptations, 8 Concepts, and 4 Instantaneous Events."
+    },
+    {
+      "title": "Directional Diet matching",
+      "rule": "For override checks, an incoming Herbivore matches only a Herbivore occupant; an incoming Omnivore matches any Diet; and an incoming Carnivore matches an Omnivore or Carnivore occupant. Hunt permissions are unchanged."
+    },
+    {
+      "title": "Adaptation departure",
+      "rule": "When a Creature leaves play, its attached Adaptation is sent to its owner's History Pile unless an effect explicitly transfers or preserves it. Dental Battery is an explicit transfer exception."
+    },
+    {
+      "title": "Stampede sequence",
+      "rule": "Stampede traverses the board counter-clockwise from its controller's leftmost Creature. All Herbivores on both sides participate, Diet and same-turn entry are ignored, every Hunt fully resolves before the next, and defensive-only Tag effects—but not Adaptations or Hunt-eligibility effects—also apply offensively."
+    }
+  ],
+  "tagRules": {
+    "Living Fossil": "For overrides, this Creature’s Time Period matches every Time Period. Once per game, if it leaves play for a reason other than battle, return it from History to its owner’s hand at the start of that player’s next turn.",
+    "Shell": "This Creature gets +1 Battle Level while defending. If that bonus alone would otherwise cause the attacking Creature to be destroyed, the attacker is not destroyed.",
+    "Aquatic": "This Creature can override, or be overridden by, only a Creature that counts as Aquatic. When the occupied Creature has Aquatic, the two Creatures' Primary Taxa count as matching; if those Taxa already match, Aquatic supplies the Tag category instead.",
+    "Propulsion": "After the normal Creature play, this Creature may be played into a second empty Niche as the extra Creature play; doing so ends the Development Phase.",
+    "Opportunist": "After your normal Creature play, if your opponent controls a Continuous Event, you may play this Creature from your hand as your extra Creature play. It may fill an empty Niche; if it is Level 1 or Level 2, it may instead perform a legal override. Normal placement, Level progression, matching, and override restrictions apply. Then end your Development Phase.",
+    "Burrower": "This Creature cannot be Hunted until its controller’s next turn or until it initiates a Hunt.",
+    "Generalist": "When this Creature is the current occupant in an override and two of Diet, Time Period, and Primary Taxon already match, Generalist supplies the Tag match.",
+    "Glider": "Counts as Aerial for compatibility without gaining an inherent Aerial effect.",
+    "Elusive": "This Creature cannot Hunt Level 1 or higher Creatures. The first time it is Hunted each turn, flip the Elusive coin: red Rex forces a tie; black reverse resolves normally.",
+    "Small Game Hunter": "Gets +1 Battle Level while attacking a Level 0 Creature.",
+    "Mob Feeder": "After another friendly Creature makes the first kill that can trigger this Tag during a turn, this Creature gets +1 Battle Level in its next initiated Hunt that turn.",
+    "Resourceful": "Represents behavioral or ecological flexibility. While you control at least one Creature with Resourceful, your normal Concept allowance is two per turn instead of one. Multiple instances do not stack.",
+    "Aerial": "When this Creature is Hunted, the attacker gets -1 Battle Level during that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only for bypassing this penalty and for compatibility; Glider does not grant this defensive effect.",
+    "Transitional": "For an override involving this Creature, treat the two Time Periods as matching when the two Creatures share their Primary Taxon.",
+    "Ambush": "May Hunt during the turn it enters play.",
+    "Saboteur": "When this Creature initiates a Hunt that ends in a tie, the opposing Creature cannot Hunt during its controller’s next Battle Phase.",
+    "Raptorial": "When this Creature initiates a Hunt that ends in a tie, the opposing Creature cannot be overridden during its controller’s next turn.",
+    "Semi-Aquatic": "An unrestricted bridge Tag. It counts as Aquatic by name for Events and Concepts and for satisfying a printed Aquatic occupant's override gate, but not for Adaptations or Aquatic's own effect. When the occupied Creature has Semi-Aquatic, Aquatic or Semi-Aquatic supplies the Tag category.",
+    "Diver": "Gets +1 Battle Level while attacking a Creature with the Aquatic Tag.",
+    "Bruiser": "Gets +1 Battle Level while attacking a Level 2 or Level 3 Creature.",
+    "Cranial Display": "When this Creature enters play, choose an opposing Creature of equal or lower Level. The chosen Creature cannot Hunt this Creature through its controller’s next turn. Entry remains legal when no eligible target exists.",
+    "Pack Hunter": "Gets +1 Battle Level while attacking a Creature that has already been Hunted this turn.",
+    "Spinal Sail": "Event and Tag effects each apply 1 less Victory Level decrease to this Creature.",
+    "Apex Predator": "Contributes +2 Victory Levels, reduced by 1 for each other Apex Predator on the board, to a minimum bonus of 0.",
+    "Charge": "This Creature may Hunt during the Battle Phase of the turn it enters play. It may only Hunt the opposing Creature in its facing Niche, regardless of Diet.",
+    "Rivalry": "During a Hunt between this Creature and the opposing Creature in its facing Niche, this Creature gets +1 Battle Level, whether attacking or defending. This bonus does not contribute Victory Level.",
+    "Solitary": "Gets +1 Battle Level while it has no adjacent friendly Creatures.",
+    "Sovereign": "This Creature also counts as Gigantic. Its Battle Level cannot be lowered by opposing Tags or Adaptations during a Hunt. If it is a Carnivore or Omnivore, it also gains Territorial. If it is a Herbivore, its Victory Level cannot be lowered by opposing Tags or Adaptations.",
+    "Gigantic": "Cannot be Hunted by Level 1 or lower Creatures and contributes +1 Victory Level.",
+    "Territorial": "May Hunt the opposing Creature in its facing Niche regardless of ordinary Diet restrictions.",
+    "Crushing Bite": "Reduces the defender’s qualifying attacked-only defensive Battle Level bonus by 1.",
+    "Specialized": "Double each numerical modifier or quantity generated by the immediately following printed Tag. Specialized does not alter that Tag’s conditions, thresholds, restrictions, or permissions.",
+    "Armament": "This Creature gets +1 Battle Level while attacking or defending. This bonus does not contribute Victory Level.",
+    "Osteoderm": "This Creature gets +2 Battle Level while defending.",
+    "Herd": "Once per turn, when a Creature with Herd enters play under your control, you may search your deck for another Herd Creature whose Printed Level is no more than 1 higher, reveal it, add it to your hand, then shuffle. Herd does not count as a shared Tag for overrides.",
+    "Nesting": "When this Creature enters a Niche, after resolving its other Tag effects, you may play a Level 0 Creature from your hand into an empty adjacent friendly Niche and resolve its entry effects. If you do, end your turn without entering your Battle Phase after those effects resolve.",
+    "Bastion": "If this Creature is Level 2 or higher, adjacent friendly Level 0–1 Creatures get +1 Battle Level while defending. If it is Level 0–1, the first time it is Hunted each turn it gets +2 Battle Level for that Hunt; the hunter is not destroyed solely because of this bonus.",
+    "Deimatic": "This Creature cannot be targeted for a Hunt for 1 opposing turn after it enters a Niche.",
+    "Graviportal": "This Creature cannot be moved to another Niche or returned to its owner's hand by an effect. It can still enter History through a Hunt or eligible effect.",
+    "Overreach": "When this Creature enters a Niche, draw 1 additional card during the Start-of-Turn Draw Phase of your next turn. Overreach can trigger only once per turn across all bearers you control.",
+    "Resonance": "Placeholder Tag, effect undecided.",
+    "Retaliation": "When this Creature is defending and the Hunt ends in a tie, destroy the attacking Creature.",
+    "Visual": "The first time this Creature is involved in a Hunt after entering play, it gets +1 Battle Level for that Hunt.",
+    "Engulf": "When this Creature destroys a Creature with a lower or equal Printed Level in a Hunt, if its Adaptation Slot is empty, you may place the destroyed Creature face-up in that Adaptation Slot instead of sending it to History. While a Creature is engulfed this way, this Creature contributes +1 Victory Level but cannot attack. When this Creature leaves play, send the engulfed Creature to its owner’s History Pile.",
+    "Filter Feeder": "When this Creature enters play, look at the top 2 cards of your deck, then return them to the top in any order.",
+    "Dermal Armor": "This Creature gets +1 Battle Level while defending. If that bonus alone would otherwise cause the attacking Creature to be destroyed, the attacker is not destroyed. For override checks, Dermal Armor may match either Shell or Osteoderm.",
+    "Durophagy": "When this Creature destroys a Creature in a Hunt, if that Creature has Shell, Osteoderm, Dermal Armor, or another designated hard-defense Tag, draw 1 card.",
+    "Shearing Bite": "Placeholder Tag, effect undecided.",
+    "Retention": "Placeholder Tag, effect undecided."
+  },
+  "creatures": [
+    {
+      "key": "nautilus",
+      "kind": "creature",
+      "name": "Nautilus",
+      "scientificName": "Nautilus praepompilius",
+      "printedLevel": 0,
+      "diet": "Carnivore",
+      "period": "Paleogene",
+      "periodColor": "Magenta",
+      "gameplayTaxon": "Mollusk",
+      "taxa": ["Invertebrate", "Protostome", "Mollusk", "Cephalopod", "Nautilid"],
+      "tags": ["Living Fossil", "Shell", "Aquatic", "Propulsion"],
+      "visualTags": [],
+      "role": "Flexible aquatic starter; Living Fossil and Propulsion support repeated low-level development.",
+      "flavorText": "Its chambered shell regulated buoyancy while a jet of water propelled it through Paleogene seas. The genus Nautilus entered the fossil record about 60 million years ago, although nautiloids have a fossil history extending nearly 500 million years.",
+      "cardFace": "/card-faces/nautilus.png",
+      "status": "Locked"
+    },
+    {
+      "key": "horseshoe-crab",
+      "kind": "creature",
+      "name": "Horseshoe Crab",
+      "scientificName": null,
+      "printedLevel": 0,
+      "diet": "Carnivore",
+      "period": "Ordovician",
+      "periodColor": "Amber Orange",
+      "gameplayTaxon": "Arthropod",
+      "taxa": ["Invertebrate", "Protostome", "Arthropod", "Chelicerate", "Xiphosuran"],
+      "tags": ["Living Fossil", "Shell", "Aquatic", "Burrower"],
+      "visualTags": [],
+      "role": "Defensive aquatic starter that trades Propulsion for temporary protection.",
+      "flavorText": "Although their body plan has endured for roughly 445 million years, horseshoe crabs are not evolutionarily frozen: their lineage underwent at least three whole-genome duplications.",
+      "status": "Locked"
+    },
+    {
+      "key": "microraptor",
+      "kind": "creature",
+      "name": "Microraptor",
+      "scientificName": "Microraptor gui",
+      "printedLevel": 0,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Paravian", "Dromaeosaurid"],
+      "tags": ["Generalist", "Glider", "Elusive"],
+      "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
+      "role": "Flexible Archosaur foundation and bridge Creature.",
+      "flavorText": "Microraptor bore long flight feathers on its arms, legs, and tail, forming multiple aerodynamic surfaces for gliding. Fossil gut contents from different specimens include birds, fish, lizards, and mammals, revealing a remarkably adaptable predator.",
+      "status": "Locked"
+    },
+    {
+      "key": "compsognathus",
+      "kind": "creature",
+      "name": "Compsognathus",
+      "scientificName": "Compsognathus longipes",
+      "printedLevel": 0,
+      "diet": "Carnivore",
+      "period": "Jurassic",
+      "periodColor": "Logo Red",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Tetanuran", "Coelurosaur"],
+      "tags": ["Small Game Hunter", "Mob Feeder"],
+      "visualTags": [],
+      "role": "Aggressive starter that pressures Level 0 utility Creatures and rewards successful kills.",
+      "flavorText": "The Compsognathus holotype preserves the lizard Schoenesmahl dyspepsia in its abdomen—a holotype within another holotype. The find directly confirms small-vertebrate prey, although there is no direct evidence that Compsognathus hunted or fed in groups.",
+      "status": "Locked"
+    },
+    {
+      "key": "hoatzin",
+      "kind": "creature",
+      "name": "Hoatzin",
+      "scientificName": "Opisthocomus hoazin",
+      "printedLevel": 0,
+      "diet": "Herbivore",
+      "period": "Quaternary",
+      "periodColor": "Ice White",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Avialan", "Bird", "Opisthocomiform"],
+      "tags": ["Resourceful", "Living Fossil", "Aerial"],
+      "visualTags": [],
+      "role": "Resourceful non-carnivore starter that broadens the deck’s development package while remaining a vulnerable Level 0 foundation.",
+      "flavorText": "The last surviving member of an ancient bird lineage, the hoatzin ferments leaves in an enlarged crop using foregut microbes, much like a ruminant. Its chicks escape predators by dropping into water, swimming, and climbing back through vegetation with clawed wings before they can fly.",
+      "status": "Locked"
+    },
+    {
+      "key": "archaeopteryx",
+      "kind": "creature",
+      "name": "Archaeopteryx",
+      "scientificName": "Archaeopteryx lithographica",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Jurassic",
+      "periodColor": "Logo Red",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Paravian", "Avialan"],
+      "tags": ["Small Game Hunter", "Transitional", "Aerial"],
+      "visualTags": ["Feathered", "Wings"],
+      "role": "Transitional aerial bridge; Transitional can supply the Time Period match when Primary Taxon also matches.",
+      "flavorText": "The Chicago Archaeopteryx preserves long tertial feathers that would have filled the aerodynamic gap between wing and body, strengthening evidence that this early bird was capable of powered flight.",
+      "status": "Locked"
+    },
+    {
+      "key": "velociraptor",
+      "kind": "creature",
+      "name": "Velociraptor",
+      "scientificName": "Velociraptor mongoliensis",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Paravian", "Dromaeosaurid"],
+      "tags": ["Ambush", "Saboteur", "Small Game Hunter"],
+      "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
+      "role": "Immediate small-prey pressure and early disruption.",
+      "flavorText": "Quill knobs along a Velociraptor forearm show that long wing feathers anchored to the ulna, although the animal could not fly. The famous Fighting Dinosaurs fossil preserves one locked in combat with Protoceratops—a small, feathered predator far removed from its oversized screen portrayals.",
+      "status": "Locked"
+    },
+    {
+      "key": "herrerasaurus",
+      "kind": "creature",
+      "name": "Herrerasaurus",
+      "scientificName": "Herrerasaurus ischigualastensis",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Triassic",
+      "periodColor": "Slate Gray",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Herrerasaurian", "Herrerasaurid"],
+      "tags": ["Transitional", "Raptorial"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Early-dinosaur bridge; Theropod is intentionally omitted because herrerasaurid placement remains disputed.",
+      "flavorText": "Although often described as an early theropod, Herrerasaurus occupies a disputed branch: competing analyses place herrerasaurs either within Theropoda or separately near the base of Saurischia.",
+      "status": "Locked"
+    },
+    {
+      "key": "diplocaulus",
+      "kind": "creature",
+      "name": "Diplocaulus",
+      "scientificName": "Diplocaulus magnicornis",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Permian",
+      "periodColor": "Sandstone Tan",
+      "gameplayTaxon": "Amphibian",
+      "taxa": ["Vertebrate", "Tetrapod", "Amphibian", "Nectridean", "Diplocaulid"],
+      "tags": ["Aquatic", "Small Game Hunter"],
+      "visualTags": [],
+      "role": "Aquatic side-line foundation; it ordinarily overrides into Dimetrodon through Permian, Carnivore, and Small Game Hunter.",
+      "flavorText": "Juvenile Diplocaulus had short projections at the rear of the skull that lengthened dramatically with maturity. Hydrodynamic models suggest the adult’s boomerang-shaped head generated lift and high underwater maneuverability, although its actual biological function remains uncertain.",
+      "status": "Locked"
+    },
+    {
+      "key": "natovenator",
+      "kind": "creature",
+      "name": "Natovenator",
+      "scientificName": "Natovenator polydontus",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Paravian", "Dromaeosaurid"],
+      "tags": ["Semi-Aquatic", "Diver"],
+      "visualTags": [],
+      "role": "Aquatic specialist and principal lower-level route toward the spinosaur line.",
+      "flavorText": "Natovenator’s backward-swept ribs formed a low, streamlined body like those of diving birds, while its long neck and many small teeth likely helped it pursue fish beneath the water.",
+      "status": "Locked"
+    },
+    {
+      "key": "cynognathus",
+      "kind": "creature",
+      "name": "Cynognathus",
+      "scientificName": "Cynognathus crateronotus",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Triassic",
+      "periodColor": "Slate Gray",
+      "gameplayTaxon": "Synapsid",
+      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Cynodont", "Cynognathid"],
+      "tags": ["Transitional", "Generalist"],
+      "visualTags": [],
+      "role": "Flexible Triassic Carnivore bridge; Generalist supplies the third match for Level 2 Triassic Carnivores, while broader routes require Support help.",
+      "flavorText": "One of the largest predatory cynodonts, Cynognathus grew rapidly and could exceed 100 kilograms, combining a powerful skull and serrated, blade-like teeth with increasingly mammal-like anatomy.",
+      "status": "Locked"
+    },
+    {
+      "key": "allosaurus",
+      "kind": "creature",
+      "name": "Allosaurus",
+      "scientificName": "Allosaurus fragilis",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Jurassic",
+      "periodColor": "Logo Red",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Carnosaur", "Allosaurid"],
+      "tags": ["Mob Feeder", "Bruiser"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Large opportunistic predator and a clean route into Torvosaurus through Bruiser.",
+      "flavorText": "Allosaurus carried recurved, serrated teeth replaced roughly every 100 days. At one Morrison Formation quarry, abundant theropod bite marks likely record repeated scavenging and possible cannibalism by Allosaurus; they do not prove cooperative feeding, but show that competition around carcasses could be intense.",
+      "status": "Locked"
+    },
+    {
+      "key": "baryonyx",
+      "kind": "creature",
+      "name": "Baryonyx",
+      "scientificName": "Baryonyx walkeri",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Spinosaurid"],
+      "tags": ["Semi-Aquatic", "Raptorial"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Semi-aquatic mid-route predator connecting the lower aquatic package to Spinosaurus. Its Diet is Carnivore, not Piscivore.",
+      "flavorText": "Fish scales preserved in its stomach prove that Baryonyx ate fish, while young Iguanodon bones reveal a broader carnivorous diet. Its long, crocodile-like jaws seized slippery prey, while powerful forelimbs bore thumb claws more than 30 centimetres long.",
+      "status": "Locked"
+    },
+    {
+      "key": "utahraptor",
+      "kind": "creature",
+      "name": "Utahraptor",
+      "scientificName": "Utahraptor ostrommaysi",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Paravian", "Dromaeosaurid"],
+      "tags": ["Bruiser", "Raptorial", "Saboteur"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Large-prey disruption specialist and flexible Level 2 bridge.",
+      "flavorText": "One of the largest known dromaeosaurids, Utahraptor reached roughly six metres long and around half a tonne. It was built more for power than speed and armed with enormous sickle claws likely used to grip and subdue large prey.",
+      "status": "Locked"
+    },
+    {
+      "key": "yutyrannus",
+      "kind": "creature",
+      "name": "Yutyrannus",
+      "scientificName": "Yutyrannus huali",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Coelurosaur"],
+      "tags": ["Cranial Display", "Pack Hunter"],
+      "visualTags": [],
+      "role": "Coordinated follow-up attacker and natural route into Tyrannosaurus rex.",
+      "flavorText": "Meaning “beautiful feathered tyrant,” Yutyrannus was a nine-metre predator whose long plumage likely insulated it in the cool forests of Early Cretaceous China and whose prominent crest crowned its deep skull. Three individuals of different ages were reportedly found together, suggesting some level of social behavior.",
+      "status": "Locked"
+    },
+    {
+      "key": "dilophosaurus",
+      "kind": "creature",
+      "name": "Dilophosaurus",
+      "scientificName": "Dilophosaurus wetherilli",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Jurassic",
+      "periodColor": "Logo Red",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Neotheropod"],
+      "tags": ["Raptorial", "Cranial Display"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Raptorial control predator with a direct Jurassic route into Torvosaurus.",
+      "flavorText": "Dilophosaurus carried two tall crests formed from enlarged nasal and lacrimal bones. Their function remains unknown, but display or recognition is plausible; its grasping forelimbs could seize and hold prey beneath its chest after the mouth made first contact.",
+      "status": "Locked"
+    },
+    {
+      "key": "dimetrodon",
+      "kind": "creature",
+      "name": "Dimetrodon",
+      "scientificName": "Dimetrodon grandis",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Permian",
+      "periodColor": "Sandstone Tan",
+      "gameplayTaxon": "Synapsid",
+      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Sphenacodontian", "Sphenacodontid"],
+      "tags": ["Spinal Sail", "Small Game Hunter", "Apex Predator"],
+      "visualTags": [],
+      "role": "Permian Synapsid endpoint; naturally accessible from Diplocaulus and a Convergent Evolution route into Spinosaurus through Spinal Sail.",
+      "flavorText": "Dimetrodon was a non-mammalian synapsid, making it more closely related to mammals than to dinosaurs; it lived tens of millions of years before the first dinosaurs appeared.",
+      "status": "Locked"
+    },
+    {
+      "key": "gojirasaurus",
+      "kind": "creature",
+      "name": "Gojirasaurus",
+      "scientificName": "Gojirasaurus quayi",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Triassic",
+      "periodColor": "Slate Gray with Burnt Orange",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Neotheropod"],
+      "tags": ["Transitional", "Bruiser"],
+      "visualTags": [],
+      "role": "Triassic Level 2 bridge combining Transitional compatibility with Bruiser access to larger predators.",
+      "flavorText": "Named for Gojira—the monster known as Godzilla—Gojirasaurus was one of the largest known Triassic neotheropods, showing that large body size had already evolved among early theropods before the Jurassic. Its holotype was skeletally immature and had not yet reached full size.",
+      "status": "Locked"
+    },
+    {
+      "key": "carnotaurus",
+      "kind": "creature",
+      "name": "Carnotaurus",
+      "scientificName": "Carnotaurus sastrei",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Ceratosaur", "Abelisaurid"],
+      "tags": ["Charge", "Rivalry"],
+      "visualTags": [],
+      "role": "Aggressive lane-locked predator that may immediately challenge the opposing Creature when it fills a Niche.",
+      "flavorText": "Carnotaurus means “meat-eating bull,” named for the thick horns above its eyes. Its tiny arms could contribute little to a hunt, while powerful legs and massive tail muscles could drive explosive, straight-line charges.",
+      "status": "Locked"
+    },
+    {
+      "key": "torvosaurus",
+      "kind": "creature",
+      "name": "Torvosaurus",
+      "scientificName": "Torvosaurus tanneri",
+      "printedLevel": 3,
+      "diet": "Carnivore",
+      "period": "Jurassic",
+      "periodColor": "Logo Red",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Tetanuran", "Megalosaurid"],
+      "tags": ["Apex Predator", "Solitary", "Bruiser"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Heavy Jurassic finisher and primary top-end route from Allosaurus.",
+      "flavorText": "Reaching roughly ten meters in length, Torvosaurus was among the Jurassic’s largest land predators. Its deep jaws carried large, recurved, blade-shaped teeth edged with coarse serrations.",
+      "status": "Locked"
+    },
+    {
+      "key": "tyrannosaurus-rex",
+      "kind": "creature",
+      "name": "Tyrannosaurus rex",
+      "scientificName": "Tyrannosaurus rex",
+      "printedLevel": 3,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Coelurosaur", "Tyrannosaurid"],
+      "tags": ["Apex Predator", "Sovereign", "Crushing Bite", "Durophagy"],
+      "visualTags": [],
+      "role": "Flagship boss Creature whose Durophagy converts victories over hard-defended prey into card flow.",
+      "flavorText": "Biomechanical models estimate that an adult T. rex could bite with nearly 7,800 pounds of force, while its thick teeth concentrated enough pressure to fracture and pulverize bone. Bone fragments preserved in coprolites provide direct evidence of osteophagy: it swallowed and digested the crushed remains.",
+      "cardFace": "/card-faces/tyrannosaurus-rex.png",
+      "status": "Locked"
+    },
+    {
+      "key": "spinosaurus",
+      "kind": "creature",
+      "name": "Spinosaurus",
+      "scientificName": "Spinosaurus aegyptiacus",
+      "printedLevel": 3,
+      "diet": "Carnivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Tetanuran", "Spinosaurid"],
+      "tags": ["Semi-Aquatic", "Diver", "Spinal Sail", "Apex Predator"],
+      "visualTags": ["Raptorial Claws"],
+      "role": "Aquatic-oriented finisher with direct Baryonyx access and a convergent route from Dimetrodon.",
+      "flavorText": "Spinosaurus had a deep, flexible tail that could generate thrust in water, yet whether it chased fish underwater or hunted while wading along river margins remains debated.",
+      "status": "Locked"
+    }
+  ],
+  "supports": [
+    {
+      "key": "cambrian-explosion",
+      "kind": "event",
+      "eventType": "continuous",
+      "name": "Cambrian Explosion",
+      "rules": "Each Level 0 Creature contributes +1 additional Victory Level. Each player draws 1 additional card at the start of their turn. When you play this card, if you control a Level 0 Creature, draw 1 card.",
+      "note": "The Victory bonus changes Victory contribution only; it does not change Level for override or battle purposes. The conditional entry draw occurs only when this card is played.",
+      "status": "Locked"
+    },
+    {
+      "key": "superpredators",
+      "kind": "event",
+      "eventType": "continuous",
+      "name": "Superpredators",
+      "rules": "Carnivore and Omnivore Creatures may Hunt any opposing Creature regardless of Diet.",
+      "note": "Does not grant additional Hunts and does not ignore non-Diet restrictions.",
+      "status": "Locked"
+    },
+    {
+      "key": "wildfire",
+      "kind": "event",
+      "eventType": "instant",
+      "name": "Wildfire",
+      "rules": "Play this card in an unlocked Niche on your side instead of your Event Zone. It may fill an empty Niche or override a Creature you control in that Niche regardless of Level and without requiring normal override matches. This does not count as playing a Creature or use your normal Creature play. Normal restrictions and effects involving your Creature being overridden still apply. When Wildfire enters the Niche, send the opposing Creature in that lane and its attached Adaptation to its owner’s History Pile. Neither player may play, place, move, or override a Creature into that lane through the end of your next turn. Then send Wildfire to your History Pile.",
+      "note": "Wildfire uses your Event play but never occupies the Event Zone. It cannot override an opposing Creature; its effect removes that Creature after Wildfire enters your own Niche. Raptorial can prevent Wildfire from overriding your Creature, while Autotomy and Living Fossil process that friendly override normally.",
+      "status": "Locked"
+    },
+    {
+      "key": "carnian-pluvial-episode",
+      "kind": "event",
+      "eventType": "continuous",
+      "name": "Carnian Pluvial Episode",
+      "rules": "Once during each of your Development Phases, you may send 1 Creature you control without Dinosaur in its Taxa to its owner's History Pile. If you do, search your deck for a Creature with Dinosaur in its Taxa and Printed Level 2 or lower, reveal it, add it to your hand, then shuffle your deck.",
+      "note": "It may be activated during the Development Phase in which it is played. Activating it does not use the normal Creature play or Event play. A Dinosaur is identified through its Taxa, so birds cannot be sent as the cost. It cannot be activated at the 10-card hand limit.",
+      "status": "Locked"
+    },
+    {
+      "key": "autotomy",
+      "kind": "adaptation",
+      "name": "Autotomy",
+      "eligibility": "aquatic-or-lepidosaur",
+      "rules": "Attach to an Aquatic Creature or an eligible Creature with Lepidosaur in its Taxa. If the attached Creature would be destroyed in a Hunt, send Autotomy to its owner’s History Pile instead. That Creature is not destroyed, but it cannot Hunt during its controller’s next Battle Phase. When the attached Creature is overridden, draw 1 card.",
+      "note": "Semi-Aquatic does not qualify. Preventing battle destruction does not draw a card. The skipped Battle Phase clears the restriction even if the Creature had no legal target.",
+      "status": "Locked"
+    },
+    {
+      "key": "raptorial-claws",
+      "kind": "adaptation",
+      "name": "Raptorial Claws",
+      "eligibility": "raptorial-claws",
+      "rules": "Attach to an eligible Creature with the hidden Raptorial Claws Visual Tag. It gets +1 Battle Level while Hunting.",
+      "note": "Eligibility is hidden card data and is independent of the visible Raptorial Tag.",
+      "status": "Locked"
+    },
+    {
+      "key": "cryptic-camouflage",
+      "kind": "adaptation",
+      "name": "Cryptic Camouflage",
+      "eligibility": "level-2-or-lower",
+      "rules": "Attach only to a Level 2 or lower Creature. If the attached Creature is a Herbivore, it cannot initiate a Hunt. The first time it is Hunted each turn, flip the Battle Coin: one or more red Rex results force the Hunt to end in a tie; black reverse results resolve it normally. If it already has Elusive, flip two coins total. This does not grant Elusive for overriding or Tag matching. If the attached Creature is a Carnivore or Omnivore, whenever it initiates a Hunt, flip the Battle Coin and give it +1 Battle Level for each red Rex result during that Hunt. If it also has Ambush, flip two coins total.",
+      "note": "Defensive double flipping succeeds if either coin shows red Rex. Offensive Ambush results range from +0 to +2 Battle Level. Coin modifiers affect Battle Level only.",
+      "status": "Locked"
+    },
+    {
+      "key": "convergent-evolution",
+      "kind": "concept",
+      "name": "Convergent Evolution",
+      "rules": "During your next override this turn, if the incoming Creature and current occupant share an eligible Tag and already match in at least one of Primary Taxon, Diet, or Time Period, choose one of those three categories in which they do not match. Treat that category as matching for this override.",
+      "note": "Apex Predator, Generalist, Living Fossil, Specialized, and Transitional are not eligible shared Tags. The normal Level rule still applies.",
+      "status": "Locked"
+    },
+    {
+      "key": "rapid-speciation",
+      "kind": "concept",
+      "name": "Rapid Speciation",
+      "rules": "Play only before you have played a Creature this turn. As this card resolves, use your Creature play to override one of your Creatures with a Creature from your hand exactly 2 Levels higher. The override must still satisfy the normal 3-of-4 matching requirement.",
+      "note": "The incoming Creature is newly played and follows normal Hunt-timing restrictions.",
+      "status": "Locked"
+    },
+    {
+      "key": "biogenesis",
+      "kind": "concept",
+      "name": "Biogenesis",
+      "rules": "Draw 1 card for every Niche filled on your side of the board.",
+      "status": "Locked"
+    },
+    {
+      "key": "evolutionary-radiation",
+      "kind": "concept",
+      "name": "Evolutionary Radiation",
+      "rules": "You cannot play this card on your first turn. Choose 1 of the following effects for which you meet the prerequisite, or choose both if you meet both prerequisites:\n\n• If you control no Level 0 Creatures: Play 1 Level 0 Creature from your hand into an empty, unlocked Niche.\n• If you control no Level 1 Creatures: Play 1 Level 1 Creature from your hand into an empty, unlocked Niche.\n\nIf you choose both effects, play those Creatures into different Niches and continue your Development Phase, but skip your Battle Phase this turn. Neither of these plays counts as your normal Creature play.",
+      "note": "The prerequisites are checked when this card begins resolving. Playing the first Creature does not invalidate the other effect. After the first play, you may finish resolving the card and retain your Battle Phase, or resolve the other effect and skip Battle.",
+      "status": "Locked"
+    },
+    {
+      "key": "whale-fall",
+      "kind": "concept",
+      "name": "Whale Fall",
+      "rules": "Send a Level 2 or Level 3 Creature from your hand to your History Pile and draw 2 cards. If it was Aquatic, draw 1 additional card.",
+      "note": "Semi-Aquatic counts as Aquatic for this Concept effect.",
+      "status": "Locked"
+    },
+    {
+      "key": "natural-selection",
+      "kind": "concept",
+      "name": "Natural Selection",
+      "rules": "As an additional cost to play this card, send a Creature card from your hand to your History Pile. Search your deck for a Creature card, reveal it, and add it to your hand. Then shuffle your deck.",
+      "status": "Locked"
+    },
+    {
+      "key": "genetic-drift",
+      "kind": "concept",
+      "name": "Genetic Drift",
+      "rules": "Shuffle your hand into your deck and draw 5 cards. After you draw, send one of those drawn cards from your hand to your History Pile.",
+      "status": "Locked"
+    },
+    {
+      "key": "dig-site-excavation",
+      "kind": "concept",
+      "name": "Dig Site Excavation",
+      "rules": "Choose a card in your History Pile other than Dig Site Excavation and add it to your hand.",
+      "status": "Locked"
+    },
+    {
+      "key": "semelparity",
+      "kind": "concept",
+      "name": "Semelparity",
+      "rules": "As an additional cost to play this card, choose a Level 0 Creature card from your hand or your side of the board and send it to its owner’s History Pile. Draw 2 cards. If that Creature was in play, you may play another Level 0 Creature from your hand into an empty, unlocked Niche on your side. This does not count as your normal Creature play. If you do, continue your Development Phase, but skip your Battle Phase this turn.",
+      "note": "If the chosen Creature occupied a Niche, its attached Adaptation goes to History normally. The optional replacement resolves normal entry effects and does not use the normal Creature play or empty-Niche fill. Declining the replacement preserves the Battle Phase.",
+      "status": "Locked"
+    },
+    {
+      "key": "obligate-migration",
+      "kind": "concept",
+      "name": "Obligate Migration",
+      "rules": "Choose one Creature on either side of the board and move it to a different empty Niche on the same side. Move its attached Adaptation with it.",
+      "note": "This movement does not count as filling or overriding a Niche and does not trigger Charge, Cranial Display, Burrower, or another entry effect.",
+      "status": "Locked"
+    },
+    {
+      "key": "abiogenesis",
+      "kind": "concept",
+      "name": "Abiogenesis",
+      "rules": "Choose 1 of the following effects:\n• Search your deck for a Level 0 Creature, add it to your hand, and shuffle your deck.\n• Play a Level 0 Creature from your hand into an empty, unlocked Niche on your side. This does not count as your normal Creature play. Continue your Development Phase, but skip your Battle Phase this turn.",
+      "note": "The placement effect resolves normal entry effects. It does not use the normal Creature play or the turn's ordinary empty-Niche fill.",
+      "status": "Locked"
+    }
+  ],
+  "generalPool": [
+    {
+      "key": "inostrancevia",
+      "kind": "creature",
+      "name": "Inostrancevia",
+      "scientificName": "Inostrancevia alexandri",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Permian",
+      "periodColor": "Sandstone Tan",
+      "gameplayTaxon": "Synapsid",
+      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Gorgonopsian"],
+      "tags": ["Ambush", "Raptorial", "Apex Predator"],
+      "visualTags": [],
+      "role": "Aggressive Permian apex endpoint for the Synapsid branch.",
+      "flavorText": "One of the largest gorgonopsians, Inostrancevia was an apex predator near the end of the Permian, likely ambushing prey, restraining it with powerful forelimbs, and delivering a killing bite with long, saber-like canines.",
+      "artwork": "/artwork/inostrancevia.webp",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "stegosaurus",
+      "kind": "creature",
+      "name": "Stegosaurus",
+      "scientificName": "Stegosaurus stenops",
+      "printedLevel": 2,
+      "diet": "Herbivore",
+      "period": "Jurassic",
+      "periodColor": "Logo Red",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Thyreophoran", "Stegosaur", "Stegosaurid"],
+      "tags": ["Armament", "Retaliation"],
+      "visualTags": ["Plated", "Tail Spikes", "Beaked", "Quadrupedal"],
+      "role": "Reactive defensive lane anchor that punishes predators for attacking it.",
+      "flavorText": "Stegosaurus carried two staggered rows of tall plates and four long spikes at the end of its tail. Fossil injuries support the tail’s use as a defensive weapon capable of inflicting serious wounds on attacking predators.",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "shantungosaurus",
+      "kind": "creature",
+      "name": "Shantungosaurus",
+      "scientificName": "Shantungosaurus giganteus",
+      "printedLevel": 3,
+      "diet": "Herbivore",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ornithopod", "Hadrosaurid"],
+      "tags": ["Gigantic"],
+      "visualTags": [],
+      "role": "Clean Level 3 herbivore endpoint that contributes scale without a dense rules package.",
+      "flavorText": "Shantungosaurus was among the largest known hadrosaurids, combining a deep duck-billed skull with a body that rivaled the length of many giant theropods.",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "competitive-exclusion-principle",
+      "kind": "event",
+      "eventType": "continuous",
+      "name": "Competitive Exclusion Principle",
+      "rules": "While your deck contains no cards, if there is exactly one Apex Predator on the board, that Creature contributes +4 additional Victory Levels.",
+      "note": "Retired from Deck 1 after playtesting showed that its payoff arrived too late and too inconsistently. Preserved here for future deck construction or rework.",
+      "artwork": "/artwork/competitive-exclusion-principle.webp",
+      "status": "Not playable · Work in progress"
+    }
+  ]
+}
