@@ -1,6 +1,6 @@
-# Lineage
+# Deep Time
 
-**[Play in your browser →](https://uatthescool.github.io/lineage-card-game/)**
+**[Play in your browser →](https://uatthescool.github.io/deeptime-card-game/)**
 
 Created by **Merrick McMorris**.
 

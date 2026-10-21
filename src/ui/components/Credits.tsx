@@ -60,15 +60,15 @@ export function Credits({ onClose }: { onClose: () => void }) {
         </header>
 
         <p className="credits-notice">
-          All artwork in this version of Lineage is temporary. Final card illustrations and Biome art will be
+          All artwork in this version of Deep Time is temporary. Final card illustrations and Biome art will be
           commissioned from artists and selected from fan submissions, and credited here.
         </p>
 
         <section className="credits-section">
           <h3>Game and card design</h3>
           <p>
-            Lineage was created by Merrick McMorris, who designed the game, its rules and cards, the card layout, frame
-            design, and colors, and the Biome concepts.
+            Deep Time was created by Merrick McMorris, who designed the game, its rules and cards, the card layout,
+            frame design, and colors, and the Biome concepts.
           </p>
         </section>
 

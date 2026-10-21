@@ -61,7 +61,11 @@ export function SetupScreen({
         <div className="eyebrow">
           A two-player card game of evolution · Rules revision {IMPLEMENTATION_REGISTER.version}
         </div>
-        <h1>Lineage</h1>
+        <h1>
+          Deep
+          <br />
+          <span>Time</span>
+        </h1>
         <p className="setup-copy">
           Build an ecosystem across five Niches, replace its occupants through shared traits, and reach 12 Victory
           Levels before your rival.
