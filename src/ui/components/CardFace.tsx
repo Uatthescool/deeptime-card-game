@@ -7,18 +7,19 @@ import { typeLabel } from "../inspection.ts";
 export function CardArtwork({ card }: { card: CardDefinition }) {
   const [failed, setFailed] = useState(false);
   const creature = card.kind === "creature" ? card : null;
+  const artwork = artworkPath(card);
   return (
     <div className="card-art-window">
-      {failed ? (
+      {failed || !artwork ? (
         <div className="artwork-pending" aria-label="Final artwork pending">
           <span>{creature ? creature.period : typeLabel(card)}</span>
           <b>{creature ? creature.gameplayTaxon : "Support"}</b>
-          <small>Artwork slot ready</small>
+          <small>Artwork coming soon</small>
         </div>
       ) : (
         <img
           className="card-art-image"
-          src={assetUrl(artworkPath(card))}
+          src={assetUrl(artwork)}
           alt={`Artwork for ${card.name}`}
           loading="lazy"
           decoding="async"

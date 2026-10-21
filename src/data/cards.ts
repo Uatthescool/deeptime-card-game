@@ -1,3 +1,4 @@
+import { PENDING_ARTWORK_KEYS } from "./art.ts";
 import registerJson from "./deck-1.json" with { type: "json" };
 import {
   DECK_2_INHERITED_SUPPORT_KEYS,
@@ -15,6 +16,7 @@ import { GENERAL_POOL_CANDIDATES } from "./general-pool.ts";
 import type { CardDefinition, CreatureCard, DeckKey, ImplementationRegister, SupportCard } from "./types.ts";
 
 export * from "./types.ts";
+export { AI_PLACEHOLDER_ARTWORK_KEYS, artSource, type ArtSource, PENDING_ARTWORK_KEYS } from "./art.ts";
 
 /**
  * Deck 1 is the canonical register: it also carries the shared Tag rules and
@@ -105,10 +107,12 @@ export const CARD_LIBRARY: ReadonlyMap<string, CardDefinition> = new Map(
   [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL].map((card) => [card.key, card]),
 );
 
-export const PENDING_ARTWORK_KEYS = new Set<string>();
-
-/** Site-root path of a card's artwork, e.g. "/artwork/stegosaurus.webp". Resolve with `assetUrl` before use. */
-export function artworkPath(card: CardDefinition): string {
+/**
+ * Site-root path of a card's artwork, e.g. "/artwork/stegosaurus.webp", or
+ * undefined while its artwork is pending. Resolve with `assetUrl` before use.
+ */
+export function artworkPath(card: CardDefinition): string | undefined {
+  if (PENDING_ARTWORK_KEYS.has(card.key)) return undefined;
   return card.artwork ?? `/artwork/${card.key}.webp`;
 }
 

@@ -1,8 +1,10 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 import {
+  AI_PLACEHOLDER_ARTWORK_KEYS,
+  artSource,
   artworkPath,
   countsAsAquatic,
   CREATURES,
@@ -377,22 +379,47 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
   );
 });
 
-test("every inspectable card resolves to a local artwork file", () => {
-  assert.equal(PENDING_ARTWORK_KEYS.size, 0);
+test("every card's artwork source is recorded and matches the files on disk", () => {
   const inspectableCards = [
     ...new Map([...Object.values(DECKS).flat(), ...GENERAL_POOL].map((card) => [card.key, card])).values(),
   ];
   assert.equal(inspectableCards.length, 110);
-  for (const card of inspectableCards) {
-    const artwork = artworkPath(card);
-    assert.equal(artwork, `/artwork/${card.key}.webp`);
+  const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
+  for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
+    assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
     assert.equal(
-      existsSync(new URL(`../../public${artwork}`, import.meta.url)),
-      true,
-      `Missing artwork for ${card.name}`,
+      PENDING_ARTWORK_KEYS.has(key) && AI_PLACEHOLDER_ARTWORK_KEYS.has(key),
+      false,
+      `${key} is in two categories`,
     );
   }
-  assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "inostrancevia")!), "/artwork/inostrancevia.webp");
+  const manifest = JSON.parse(
+    readFileSync(new URL("../../public/artwork/attribution-manifest.json", import.meta.url), "utf8"),
+  ) as { assets: Array<{ cardKey: string }> };
+  const credited = new Set(manifest.assets.map((asset) => asset.cardKey));
+
+  for (const card of inspectableCards) {
+    const artwork = artworkPath(card);
+    const fileExists = existsSync(new URL(`../../public/artwork/${card.key}.webp`, import.meta.url));
+    switch (artSource(card.key)) {
+      case "pending":
+        assert.equal(artwork, undefined);
+        assert.equal(fileExists, false, `${card.name} is pending, so its old artwork must not ship`);
+        assert.equal(credited.has(card.key), false);
+        break;
+      case "ai-placeholder":
+        assert.equal(artwork, `/artwork/${card.key}.webp`);
+        assert.equal(fileExists, true, `Missing AI placeholder artwork for ${card.name}`);
+        assert.equal(credited.has(card.key), false, `${card.name} is AI art but has a license credit`);
+        break;
+      case "licensed":
+        assert.equal(artwork, `/artwork/${card.key}.webp`);
+        assert.equal(fileExists, true, `Missing artwork for ${card.name}`);
+        assert.equal(credited.has(card.key), true, `${card.name} has licensed artwork with no credit`);
+        break;
+    }
+  }
+  assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "inostrancevia")!), undefined);
   assert.equal(artworkPath(DECK_2.find((card) => card.key === "stegosaurus")!), "/artwork/stegosaurus.webp");
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "eoraptor")!), "/artwork/eoraptor.webp");
 });

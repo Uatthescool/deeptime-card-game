@@ -25,7 +25,7 @@ type SetupScreenProps = {
   onCredits: () => void;
 };
 
-const featured = CARD_LIBRARY.get("tyrannosaurus-rex");
+const featured = CARD_LIBRARY.get("nautilus");
 
 export function SetupScreen({
   initial,

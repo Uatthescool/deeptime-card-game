@@ -86,11 +86,23 @@ The site is served at `https://<user>.github.io/<repository>/`. The workflow set
 
 ## Artwork
 
-Card art is temporary placeholder artwork reused under the licenses listed in `public/artwork/attribution-manifest.json`, viewable in-game under **Artwork credits**. See [Open items](#open-items) for images that still need a recorded source.
+All artwork is temporary. Final card illustrations and Biome art will be commissioned from artists or selected from fan submissions. The card layout, frame design, and colors are original.
+
+`src/data/art.ts` records where every card's art came from, and a test keeps it in agreement with the files and credits:
+
+| Source         | Cards | Notes                                                                                    |
+| -------------- | ----- | ---------------------------------------------------------------------------------------- |
+| Licensed       | 69    | Openly licensed images, credited in `public/artwork/attribution-manifest.json`           |
+| AI placeholder | 17    | Generated with ChatGPT's image generator, as are the Biome backgrounds and Nautilus face |
+| Pending        | 24    | No artwork yet; the card shows an "Artwork coming soon" frame                            |
+
+Credits for all of it are shown in-game under **Artwork credits**.
+
+**Adding new art:** put the image in `public/artwork/<card-key>.webp`, run `npm run images` to size it for the web, and move the card's key out of its current category in `src/data/art.ts`.
 
 ## Open items
 
-- **Artwork provenance.** 41 of the 110 card images, the three full card faces, and the five Biome backgrounds have no source or license recorded in the attribution manifest. Record them, or replace them, before wider distribution.
+- **Commissioned art.** 24 cards have no artwork, and 17 cards plus the Biome backgrounds use AI placeholders. Fan art contests need written submission terms (rights granted, originality, credit, prizes) before launch.
 - **Deck exhaustion.** The rules have no deck-out or stalemate condition. Once both decks are empty, a game can continue with no possible progress until a player concedes. Simulated games reach this state regularly.
 - **Placeholder Tags.** Shearing Bite, Retention, and Resonance are listed in the Tag registry but have no effect yet.
 - **Rule documents.** The Changes Register, Player Rulebook, and Design Ledger documents are not yet in this repository.
