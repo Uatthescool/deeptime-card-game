@@ -113,3 +113,7 @@ export {
   type GameActionType,
 } from "./actions.ts";
 export { checkInvariants } from "./invariants.ts";
+export { developmentGate, entryBlockers, explainAquaticOverrideLane, explainCreatureLane } from "./legality.ts";
+export { explainCard, explainPlacement } from "./explain.ts";
+export { explainHunt, explainHunter } from "./battle-math.ts";
+export { explainConcept, explainEvent } from "./queries.ts";

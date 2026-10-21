@@ -12,6 +12,9 @@ export default defineConfig({
   build: {
     target: "es2022",
     sourcemap: true,
+    // All card, deck, and Lesson data ships in the main bundle so the game needs no further loading
+    // (about 150 kB gzipped). Revisit with code splitting if it grows much past this.
+    chunkSizeWarningLimit: 650,
   },
   test: {
     environment: "node",

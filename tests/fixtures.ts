@@ -10,14 +10,14 @@ import {
   type PlayerId,
 } from "../src/engine/index.ts";
 
-/** Removes a card (by key) from a player's deck or hand. */
+/** Removes a card (by key) from a player's deck or hand, in place. */
 export function takeFromLibrary(state: GameState, playerId: PlayerId, key: string): CardInstance {
   const player = state.players[playerId];
-  const card = [...player.deck, ...player.hand].find((entry) => entry.definition.key === key);
-  if (!card) throw new Error(`Player ${playerId} has no ${key}.`);
-  player.deck = player.deck.filter((entry) => entry !== card);
-  player.hand = player.hand.filter((entry) => entry !== card);
-  return card;
+  for (const zone of [player.deck, player.hand]) {
+    const index = zone.findIndex((entry) => entry.definition.key === key);
+    if (index >= 0) return zone.splice(index, 1)[0]!;
+  }
+  throw new Error(`Player ${playerId} has no ${key}.`);
 }
 
 export function inPlay(card: CardInstance, enteredTurn = 0): CreatureInPlay {

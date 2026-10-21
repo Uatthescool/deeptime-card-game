@@ -9,6 +9,11 @@ import {
   canUseAquaticOverride,
   type CardInstance,
   conceptAllowance,
+  explainCard,
+  explainHunt,
+  explainHunter,
+  explainPlacement,
+  findCreature,
   type GameState,
   handCardByUid,
   hasLegalHunts,
@@ -35,7 +40,9 @@ import { BattleModal } from "./BattleModal.tsx";
 import { EventZone, NicheLane } from "./Board.tsx";
 import { CardBack, CardFace } from "./CardFace.tsx";
 import { type InspectionTarget, inspectionHandlers, type InspectorTab } from "../inspection.ts";
+import { type Explanation, huntBadge, type LaneBadge, placementBadge } from "../legality.ts";
 import { Inspector } from "./Inspector.tsx";
+import { LegalityPanel } from "./LegalityPanel.tsx";
 import {
   BiodiversityModal,
   CarnianPluvialChoiceModal,
@@ -109,6 +116,14 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
     setSelectedCardUid(null);
     setSelectedAttackerUid(null);
     setConfirmConcede(false);
+  }
+  // The Niche whose move the "why not?" panel explains; reset whenever the selection changes.
+  const [explainLane, setExplainLane] = useState<{ playerId: PlayerId; laneIndex: number } | null>(null);
+  const selectionKey = `${selectedCardUid}|${selectedAttackerUid}|${boardAction?.kind}`;
+  const [lastSelectionKey, setLastSelectionKey] = useState(selectionKey);
+  if (lastSelectionKey !== selectionKey) {
+    setLastSelectionKey(selectionKey);
+    setExplainLane(null);
   }
   // When a Hunt resolves or is canceled, the attacker selection is spent.
   const battleOpen = Boolean(game.pendingBattle);
@@ -267,8 +282,11 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
       }
       if (selectedAttackerUid && attackTargets.includes(lane.creature.card.uid)) {
         dispatch({ type: "previewHunt", attackerUid: selectedAttackerUid, defenderUid: lane.creature.card.uid });
+        return;
       }
     }
+    // Not a legal move here: explain why instead (the only way to ask on touch screens).
+    if (canExplainLane(playerId, laneIndex)) setExplainLane({ playerId, laneIndex });
   };
 
   const laneHighlighted = (playerId: PlayerId, laneIndex: number) => {
@@ -305,6 +323,80 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
   const facultativeActive =
     boardAction?.kind === "facultative-source" || boardAction?.kind === "facultative-destination";
   const aquaticActive = boardAction !== null && !facultativeActive;
+
+  // Legality explanations: badges on each Niche, the "why not?" panel, and hand-card reasons.
+  const placementVerdicts =
+    game.phase === "development" &&
+    selectedCard?.definition.kind === "creature" &&
+    (boardAction === null || boardAction.kind === "aquatic-override")
+      ? viewer.lanes.map((_, laneIndex) =>
+          explainPlacement(game, viewPlayer, selectedCard, laneIndex, {
+            aquaticOverride: boardAction?.kind === "aquatic-override",
+          }),
+        )
+      : null;
+  const huntVerdicts =
+    selectedAttackerUid && game.phase === "battle" && !game.pendingBattle
+      ? opponentState.lanes.map((lane) =>
+          lane.creature ? explainHunt(game, selectedAttackerUid, lane.creature.card.uid) : null,
+        )
+      : null;
+  const laneBadge = (playerId: PlayerId, laneIndex: number): LaneBadge | undefined => {
+    if (playerId === viewPlayer && placementVerdicts) {
+      return placementBadge(placementVerdicts[laneIndex]!, Boolean(viewer.lanes[laneIndex]!.creature));
+    }
+    const hunt = playerId !== viewPlayer ? huntVerdicts?.[laneIndex] : null;
+    return hunt ? huntBadge(hunt) : undefined;
+  };
+  const canExplainLane = (playerId: PlayerId, laneIndex: number) =>
+    playerId === viewPlayer ? Boolean(placementVerdicts) : Boolean(huntVerdicts?.[laneIndex]);
+  const cardVerdicts =
+    game.phase === "development" && !handHidden
+      ? new Map(viewer.hand.map((card) => [card.uid, explainCard(game, card)]))
+      : null;
+  const selectedAttacker = selectedAttackerUid ? findCreature(game, selectedAttackerUid) : null;
+
+  const explanation = ((): Explanation | null => {
+    if (explainLane?.playerId === viewPlayer && placementVerdicts && selectedCard) {
+      const verdict = placementVerdicts[explainLane.laneIndex]!;
+      const name = selectedCard.definition.name;
+      const occupant = viewer.lanes[explainLane.laneIndex]!.creature?.card.definition.name;
+      const niche = `Niche ${explainLane.laneIndex + 1}`;
+      const title = occupant
+        ? verdict.legal
+          ? `${name} can replace ${occupant}`
+          : `Why can't ${name} replace ${occupant}?`
+        : verdict.legal
+          ? `${name} can fill ${niche}`
+          : `Why can't ${name} fill ${niche}?`;
+      return { title, legal: verdict.legal, reasons: verdict.reasons, placement: verdict };
+    }
+    const hunt = explainLane && explainLane.playerId !== viewPlayer ? huntVerdicts?.[explainLane.laneIndex] : null;
+    if (hunt && selectedAttacker) {
+      const target = opponentState.lanes[explainLane!.laneIndex]!.creature!.card.definition.name;
+      const hunter = selectedAttacker.creature.card.definition.name;
+      return {
+        title: hunt.legal ? `${hunter} can Hunt ${target}` : `Why can't ${hunter} Hunt ${target}?`,
+        legal: hunt.legal,
+        reasons: hunt.reasons,
+      };
+    }
+    if (selectedAttacker && game.phase === "battle" && !game.pendingBattle) {
+      const reasons = explainHunter(game, selectedAttacker.creature.card.uid);
+      if (reasons.length) {
+        return { title: `Why can't ${selectedAttacker.creature.card.definition.name} Hunt?`, legal: false, reasons };
+      }
+    }
+    const cardVerdict = selectedCard ? cardVerdicts?.get(selectedCard.uid) : null;
+    if (selectedCard && cardVerdict && !cardVerdict.legal) {
+      return {
+        title: `Why can't you play ${selectedCard.definition.name}?`,
+        legal: false,
+        reasons: cardVerdict.reasons,
+      };
+    }
+    return null;
+  })();
 
   const boardActionPrompt: Record<NonNullable<BoardAction>["kind"], string> = {
     "facultative-source": "Choose the Creature with Facultative Quadrupedality.",
@@ -355,6 +447,8 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           onLaneClick={() => handleLaneClick(playerId, laneIndex)}
           onPin={pin}
           onPreview={preview}
+          badge={laneBadge(playerId, laneIndex)}
+          onExplain={canExplainLane(playerId, laneIndex) ? () => setExplainLane({ playerId, laneIndex }) : undefined}
         />
       ))}
     </div>
@@ -438,6 +532,14 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
             </div>
           </section>
 
+          {explanation && (
+            // Keep the sheet clear of the Niches being chosen: Hunts target the top row, placements the bottom.
+            <LegalityPanel
+              explanation={explanation}
+              className={`as-sheet ${selectedAttacker ? "over-own" : "over-opponent"}`}
+            />
+          )}
+
           <section className="hand-workspace">
             <section className="action-bar" aria-label="Turn controls and selected-card actions">
               <div className="phase-actions">
@@ -496,6 +598,10 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
                   game={game}
                   card={selectedCard}
                   targetCount={selectedTargetCount}
+                  blockedReason={(() => {
+                    const verdict = cardVerdicts?.get(selectedCard.uid);
+                    return verdict && !verdict.legal ? verdict.reasons[0]?.text : undefined;
+                  })()}
                   aquaticOverride={boardAction?.kind === "aquatic-override"}
                   onClose={() => setSelectedCardUid(null)}
                   onPlayEvent={() => {
@@ -607,15 +713,20 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
                 <div className="hand-scroll">
                   {viewer.hand.map((card) => {
                     const target = { definition: card.definition };
+                    const verdict = cardVerdicts?.get(card.uid);
+                    const blocked = verdict && !verdict.legal ? verdict.reasons[0]?.text : undefined;
                     return (
                       <button
-                        className="hand-card-button"
+                        className={`hand-card-button ${blocked ? "unplayable" : ""}`}
                         key={card.uid}
                         aria-pressed={selectedCardUid === card.uid}
+                        aria-description={blocked ? `Can't play now: ${blocked}` : undefined}
+                        title={blocked ? `Can't play now: ${blocked}` : undefined}
                         onClick={() => selectHandCard(card)}
                         {...inspectionHandlers(target, preview, pin)}
                       >
                         <CardFace card={card.definition} compact selected={selectedCardUid === card.uid} />
+                        {blocked && <span className="hand-card-note">Can't play now</span>}
                       </button>
                     );
                   })}
@@ -626,6 +737,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
         </section>
 
         <aside className={`side-rail ${inspectorOpen ? "open" : ""}`}>
+          {explanation && <LegalityPanel explanation={explanation} className="in-rail" />}
           <Inspector
             target={pinned ?? hover}
             activeTab={inspectorTab}
@@ -699,6 +811,8 @@ type SelectedCardPanelProps = {
   game: GameState;
   card: CardInstance;
   targetCount: number;
+  /** Why this card can't be played right now, if it can't. */
+  blockedReason: string | undefined;
   aquaticOverride: boolean;
   onClose: () => void;
   onPlayEvent: () => void;
@@ -709,6 +823,7 @@ function SelectedCardPanel({
   game,
   card,
   targetCount,
+  blockedReason,
   aquaticOverride,
   onClose,
   onPlayEvent,
@@ -719,7 +834,8 @@ function SelectedCardPanel({
   const targets = (noun: string, none: string) =>
     targetCount ? `Choose one of ${targetCount} highlighted ${noun}.` : none;
   const instruction =
-    definition.kind === "creature"
+    blockedReason ??
+    (definition.kind === "creature"
       ? aquaticOverride
         ? targets("Niches for the free override", "This Creature has no legal free override.")
         : allowances.rapidSpeciation
@@ -731,7 +847,7 @@ function SelectedCardPanel({
           ? targets("Niches on either side", "No legal Niche for Drought.")
           : definition.key === "wildfire"
             ? targets("unlocked Niches on your side", "No legal lane for Wildfire.")
-            : null;
+            : null);
   const boardPlayed =
     definition.kind === "creature" || definition.kind === "adaptation" || NICHE_EVENT_KEYS.has(definition.key);
 

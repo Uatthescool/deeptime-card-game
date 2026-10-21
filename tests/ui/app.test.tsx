@@ -7,8 +7,9 @@ import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vi
 import { applyAction, createGame, type GameAction, type GameState } from "../../src/engine/index.ts";
 import { App } from "../../src/ui/App.tsx";
 import { BattleModal } from "../../src/ui/components/BattleModal.tsx";
+import { GameScreen } from "../../src/ui/components/GameScreen.tsx";
 import { clearSavedGame, loadSavedGame, saveGame, savedGameSummary } from "../../src/ui/save.ts";
-import { elusiveHunt } from "../fixtures.ts";
+import { elusiveHunt, inPlay, takeFromLibrary } from "../fixtures.ts";
 
 beforeAll(() => {
   // jsdom lacks layout observers used by the Lesson view.
@@ -137,5 +138,51 @@ describe("BattleModal", () => {
     await user.click(screen.getByRole("button", { name: "Use these results" }));
     expect(log.at(-1)).toEqual({ type: "commitHunt" });
     expect(screen.getByText("Hunt resolved")).toBeInTheDocument();
+  });
+});
+
+describe("move legality explanations", () => {
+  /** Player 0's Development Phase: Velociraptor in Niche 2, Allosaurus and Compsognathus in hand. */
+  function placementGame(): GameState {
+    const state = createGame("Ada", "Grace", [null, null], ["deck-1", "deck-1"], { seed: 8 });
+    Object.assign(state, { activePlayer: 0, turnNumber: 5, phase: "development", handoff: null });
+    for (const player of state.players) {
+      player.lanes = player.lanes.map(() => ({
+        creature: null,
+        attachment: null,
+        engulfed: null,
+        wildfire: null,
+        drought: null,
+      }));
+      player.hand = [];
+      player.turnsStarted = 3;
+    }
+    state.players[0].lanes[1]!.creature = inPlay(takeFromLibrary(state, 0, "velociraptor"));
+    state.players[0].hand.push(takeFromLibrary(state, 0, "allosaurus"), takeFromLibrary(state, 0, "spinosaurus"));
+    return state;
+  }
+
+  test("pointing at a Niche explains the override, and unplayable cards say why", async () => {
+    const user = userEvent.setup();
+    render(<GameScreen initialGame={placementGame()} resumed={false} onExit={() => {}} />);
+
+    const spinosaurus = screen.getByRole("button", { name: /Spinosaurus/, description: /Can't play now/ });
+    expect(within(spinosaurus).getByText("Can't play now")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^Allosaurus, Archosaur/ }));
+    await user.hover(screen.getByRole("button", { name: /Velociraptor in Niche 2/ }));
+    const panels = screen.getAllByRole("region", { name: "Move explanation" });
+    const panel = panels[0]!;
+    expect(within(panel).getByText("Why can't Allosaurus replace Velociraptor?")).toBeInTheDocument();
+    expect(within(panel).getByText(/Jurassic vs\. Cretaceous/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Level 1 → 2 is a legal step/)).toBeInTheDocument();
+    expect(screen.getAllByText("2 of 4").length).toBeGreaterThan(0);
+
+    await user.hover(screen.getByRole("button", { name: /Your Niche 1, empty/ }));
+    expect(
+      within(screen.getAllByRole("region", { name: "Move explanation" })[0]!).getByText(
+        /Empty Niches take only Level 0 or 1/,
+      ),
+    ).toBeInTheDocument();
   });
 });

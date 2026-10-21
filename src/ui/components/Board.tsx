@@ -6,6 +6,7 @@ import {
   type PlayerId,
 } from "../../engine/index.ts";
 import { type InspectionTarget, inspectionHandlers, type PinHandler, type PreviewHandler } from "../inspection.ts";
+import type { LaneBadge } from "../legality.ts";
 
 /** Short status markers describing a Creature's temporary state this turn. */
 function creatureMarkers(creature: CreatureInPlay, turnNumber: number) {
@@ -101,6 +102,10 @@ type NicheLaneProps = {
   onLaneClick: () => void;
   onPin: PinHandler;
   onPreview: PreviewHandler;
+  /** Legality label shown while a card or hunter is selected. */
+  badge?: LaneBadge | undefined;
+  /** Called when the player points at or focuses this Niche, to explain the move there. */
+  onExplain?: (() => void) | undefined;
 };
 
 export function NicheLane({
@@ -113,6 +118,8 @@ export function NicheLane({
   onLaneClick,
   onPin,
   onPreview,
+  badge,
+  onExplain,
 }: NicheLaneProps) {
   const player = game.players[playerId];
   const lane = player.lanes[laneIndex]!;
@@ -217,7 +224,13 @@ export function NicheLane({
   const slotClass = `adaptation-slot ${slotTarget ? "occupied" : ""} ${lane.engulfed ? "engulfed" : ""} ${locked ? "lane-locked" : ""}`;
 
   return (
-    <div className="niche-lane">
+    <div className="niche-lane" onMouseEnter={onExplain} onFocusCapture={onExplain}>
+      {badge && (
+        <span className={`lane-badge ${badge.tone}`}>
+          <span className="sr-only">Niche {niche}: </span>
+          {badge.label}
+        </span>
+      )}
       {content}
       {slotTarget ? (
         <button

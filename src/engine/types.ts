@@ -267,14 +267,47 @@ export type GameState = {
   nextDrawEventId: number;
 };
 
+export type OverrideCategory = "diet" | "period" | "taxon" | "tag";
+
 export type OverrideCheck = {
   legal: boolean;
-  matches: { diet: boolean; period: boolean; taxon: boolean; tag: boolean };
+  matches: Record<OverrideCategory, boolean>;
   matchCount: number;
   levelLegal: boolean;
   convergentCategory: ConvergentCategory | null;
   convergentOptions: ConvergentCategory[];
+  /** Everything that makes the override illegal, in player-facing words. Empty when legal. */
   reasons: string[];
+  /** The same blockers as `reasons`, each with a stable code. */
+  blockers: Reason[];
+  /** A short player-facing explanation of each category's match and of the Level step. */
+  explanations: Record<OverrideCategory | "level", string> | null;
+};
+
+/** One reason a move is or is not allowed, in player-facing words. */
+export type Reason = {
+  /** Stable identifier for tests and analytics, e.g. "level-too-high". */
+  code: string;
+  text: string;
+};
+
+/** A card in hand that would make an otherwise illegal move legal. */
+export type LegalityHint = {
+  cardUid: string;
+  cardName: string;
+  text: string;
+};
+
+/** Whether a move is allowed, and why. `reasons` is empty exactly when `legal` is true. */
+export type Verdict = {
+  legal: boolean;
+  reasons: Reason[];
+};
+
+/** A Creature placement verdict, with the override breakdown when the Niche is occupied. */
+export type PlacementVerdict = Verdict & {
+  override: OverrideCheck | null;
+  hints: LegalityHint[];
 };
 
 export type BoardPosition = { playerId: PlayerId; laneIndex: number };

@@ -9,12 +9,12 @@ import {
   hasNoAdjacentFriendly,
   HAND_LIMIT,
   nicheIsLocked,
-  otherPlayer,
   playerHolds,
   adaptationSlotEmpty,
 } from "./core.ts";
+import { developmentGate, explainAquaticOverrideLane, explainCreatureLane } from "./legality.ts";
 import { checkOverride } from "./override.ts";
-import type { BoardPosition, CardInstance, ChoiceOption, GameState, PlayerId } from "./types.ts";
+import type { BoardPosition, CardInstance, ChoiceOption, GameState, PlayerId, Reason, Verdict } from "./types.ts";
 
 /**
  * Read-only legality queries. Nothing here mutates state; every transition
@@ -26,52 +26,12 @@ import type { BoardPosition, CardInstance, ChoiceOption, GameState, PlayerId } f
 // Creatures
 // ---------------------------------------------------------------------------
 
+/** Niches where `card` may be played now. Derived from {@link explainCreatureLane}, the source of truth. */
 export function legalCreatureLanes(state: GameState, playerId: PlayerId, card: CardInstance): number[] {
-  if (state.activePlayer !== playerId || !canActInDevelopment(state) || card.definition.kind !== "creature") return [];
-
-  const player = state.players[playerId];
-  if (!playerHolds(player, card.uid)) return [];
-  const creature = card.definition;
-  const lanes = player.lanes;
-
-  if (player.allowances.rapidSpeciation) {
-    return lanes.flatMap((lane, index) =>
-      !nicheIsLocked(state, playerId, index) &&
-      player.allowances.aquaticOverrideLockedLane !== index &&
-      lane.creature &&
-      checkOverride(state, playerId, creature, index, true).legal
-        ? [index]
-        : [],
-    );
-  }
-
-  if (!player.allowances.creaturePlayed) {
-    return lanes.flatMap((lane, index) => {
-      if (!creatureCanEnterNiche(state, playerId, index)) return [];
-      if (!lane.creature) return creature.printedLevel <= 1 && !player.allowances.filledEmpty ? [index] : [];
-      if (player.allowances.aquaticOverrideLockedLane === index) return [];
-      return checkOverride(state, playerId, creature, index).legal ? [index] : [];
-    });
-  }
-
-  // After the normal Creature play, Propulsion and Opportunist grant one more.
-  const opportunistActive =
-    creature.tags.includes("Opportunist") &&
-    state.players[otherPlayer(playerId)].event?.definition.eventType === "continuous";
-  if (creature.tags.includes("Propulsion") || opportunistActive) {
-    return lanes.flatMap((lane, index) => {
-      if (!creatureCanEnterNiche(state, playerId, index)) return [];
-      if (!lane.creature) return creature.printedLevel <= 1 ? [index] : [];
-      if (player.allowances.aquaticOverrideLockedLane === index) return [];
-      return opportunistActive &&
-        (creature.printedLevel === 1 || creature.printedLevel === 2) &&
-        checkOverride(state, playerId, creature, index).legal
-        ? [index]
-        : [];
-    });
-  }
-
-  return [];
+  if (state.activePlayer !== playerId || card.definition.kind !== "creature") return [];
+  return state.players[playerId].lanes.flatMap((_, index) =>
+    explainCreatureLane(state, playerId, card, index).legal ? [index] : [],
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -99,25 +59,12 @@ export function legalConnectedWaterwayDestinations(state: GameState, sourceLane:
   );
 }
 
+/** Niches where `card` may take the free Aquatic override. Derived from {@link explainAquaticOverrideLane}. */
 export function legalAquaticOverrideLanes(state: GameState, card: CardInstance): number[] {
-  const player = state.players[state.activePlayer];
-  if (
-    !canActInDevelopment(state) ||
-    player.biome.key !== "aquatic" ||
-    !player.biome.waterwaysConnected ||
-    player.biome.freeOverrideUsed ||
-    player.allowances.rapidSpeciation ||
-    card.definition.kind !== "creature" ||
-    !playerHolds(player, card.uid)
-  ) {
-    return [];
-  }
-  const creature = card.definition;
-  return player.lanes.flatMap((lane, index) => {
-    if (!lane.creature || nicheIsLocked(state, state.activePlayer, index)) return [];
-    if (player.allowances.overriddenLanes.includes(index)) return [];
-    return checkOverride(state, state.activePlayer, creature, index).legal ? [index] : [];
-  });
+  if (card.definition.kind !== "creature") return [];
+  return state.players[state.activePlayer].lanes.flatMap((_, index) =>
+    explainAquaticOverrideLane(state, card, index).legal ? [index] : [],
+  );
 }
 
 export function canUseAquaticOverride(state: GameState) {
@@ -201,15 +148,28 @@ export function legalAdaptationLanes(state: GameState, card: CardInstance): numb
 /** Events that are placed into a Niche rather than played to the Event Zone. */
 export const NICHE_EVENT_KEYS = new Set(["wildfire", "drought"]);
 
-export function canPlayEvent(state: GameState, card: CardInstance) {
+const EVENT_PLAYED: Reason = { code: "event-played", text: "You've already played an Event this turn." };
+
+/** Whether an Event can be played to the Event Zone (or resolved, if instantaneous), and why not. */
+export function explainEvent(state: GameState, card: CardInstance): Verdict {
   const player = state.players[state.activePlayer];
-  return (
-    canActInDevelopment(state) &&
-    card.definition.kind === "event" &&
-    !NICHE_EVENT_KEYS.has(card.definition.key) &&
-    playerHolds(player, card.uid) &&
-    !player.allowances.eventPlayed
-  );
+  const reasons = [...developmentGate(state, state.activePlayer)];
+  if (!reasons.length) {
+    if (card.definition.kind !== "event") reasons.push({ code: "not-an-event", text: "That card isn't an Event." });
+    else if (NICHE_EVENT_KEYS.has(card.definition.key)) {
+      reasons.push({
+        code: "niche-event",
+        text: `${card.definition.name} is played into a Niche, not the Event Zone.`,
+      });
+    } else if (!playerHolds(player, card.uid)) {
+      reasons.push({ code: "not-in-hand", text: "That card isn't in your hand." });
+    } else if (player.allowances.eventPlayed) reasons.push(EVENT_PLAYED);
+  }
+  return { legal: reasons.length === 0, reasons };
+}
+
+export function canPlayEvent(state: GameState, card: CardInstance) {
+  return explainEvent(state, card).legal;
 }
 
 function canPlayNicheEvent(state: GameState, card: CardInstance, key: string) {
@@ -345,58 +305,97 @@ export function abiogenesisModes(state: GameState) {
   };
 }
 
-/** Concepts with a mandatory choice may be played only when that choice can be made. */
-function conceptHasRequiredChoice(state: GameState, key: string) {
+/**
+ * Concepts with a mandatory choice may be played only when that choice can be
+ * made. Returns why it can't, or null when the choice is available.
+ */
+function missingRequiredChoice(state: GameState, key: string): Reason | null {
   const player = state.players[state.activePlayer];
+  const missing = (text: string): Reason => ({ code: `${key}-unavailable`, text });
   switch (key) {
     case "evolutionary-radiation":
-      return (
-        hasEnterableEmptyNiche(state, state.activePlayer) &&
+      return hasEnterableEmptyNiche(state, state.activePlayer) &&
         evolutionaryRadiationLevels(state, state.activePlayer).length > 0
-      );
+        ? null
+        : missing(
+            "Needs an empty Niche and a Level 0 or 1 Creature in hand whose Level isn't already on your side of the board.",
+          );
     case "whale-fall":
-      return player.hand.some((card) => card.definition.kind === "creature" && card.definition.printedLevel >= 2);
+      return player.hand.some((card) => card.definition.kind === "creature" && card.definition.printedLevel >= 2)
+        ? null
+        : missing("Needs a Level 2 or higher Creature in your hand to send to History.");
     case "natural-selection":
-      return (
-        player.hand.some((card) => card.definition.kind === "creature") &&
+      return player.hand.some((card) => card.definition.kind === "creature") &&
         player.deck.some((card) => card.definition.kind === "creature")
-      );
+        ? null
+        : missing("Needs a Creature in your hand to pay its cost and one in your deck to find.");
     case "dig-site-excavation":
-      return player.history.some((card) => card.definition.key !== "dig-site-excavation");
+      return player.history.some((card) => card.definition.key !== "dig-site-excavation")
+        ? null
+        : missing("Your History Pile has no card to excavate.");
     case "semelparity":
-      return (
-        player.hand.some(isLevelZeroCreature) ||
+      return player.hand.some(isLevelZeroCreature) ||
         player.lanes.some((lane) => lane.creature?.card.definition.printedLevel === 0)
-      );
+        ? null
+        : missing("Needs a Level 0 Creature in your hand or on your side of the board.");
     case "obligate-migration":
       return state.players.some(
         (side) => side.lanes.some((lane) => creatureCanMoveByEffect(lane)) && hasEnterableEmptyNiche(state, side.id),
-      );
+      )
+        ? null
+        : missing("Needs a Creature that can move and an empty Niche on the same side of the board.");
     case "abiogenesis": {
       const { canSearch, canPlace } = abiogenesisModes(state);
-      return canSearch || canPlace;
+      return canSearch || canPlace
+        ? null
+        : missing("Needs a Level 0 Creature in your deck, or one in your hand and an empty Niche.");
     }
     default:
-      return true;
+      return null;
   }
 }
 
-export function canPlayConcept(state: GameState, card: CardInstance) {
+/** Whether a Concept can be played now, and why not. */
+export function explainConcept(state: GameState, card: CardInstance): Verdict {
+  const fail = (code: string, text: string): Verdict => ({ legal: false, reasons: [{ code, text }] });
+  const gate = developmentGate(state, state.activePlayer);
+  if (gate.length) return { legal: false, reasons: gate };
   const player = state.players[state.activePlayer];
-  if (
-    !canActInDevelopment(state) ||
-    card.definition.kind !== "concept" ||
-    !playerHolds(player, card.uid) ||
-    player.allowances.conceptsPlayed >= conceptAllowance(state, state.activePlayer) ||
-    hasPendingConceptEffect(state, state.activePlayer)
-  ) {
-    return false;
+  if (card.definition.kind !== "concept") return fail("not-a-concept", "That card isn't a Concept.");
+  if (!playerHolds(player, card.uid)) return fail("not-in-hand", "That card isn't in your hand.");
+  const allowance = conceptAllowance(state, state.activePlayer);
+  if (player.allowances.conceptsPlayed >= allowance) {
+    return allowance === 1
+      ? fail("concept-limit", "You've already played a Concept this turn.")
+      : fail("concept-limit", "You've already played both Concepts Resourceful allows this turn.");
+  }
+  if (hasPendingConceptEffect(state, state.activePlayer)) {
+    return player.allowances.convergentEvolution
+      ? fail("concept-pending", "Convergent Evolution is waiting for this turn's next override; make it first.")
+      : player.allowances.rapidSpeciation
+        ? fail("concept-pending", "Rapid Speciation's override must be made first.")
+        : fail("concept-pending", "Finish resolving your current Concept first.");
   }
   if (card.definition.key === "rapid-speciation") {
-    return !player.allowances.creaturePlayed && hasRapidTarget(state, state.activePlayer);
+    if (player.allowances.creaturePlayed) {
+      return fail("rapid-after-creature", "Rapid Speciation must be played before your Creature play this turn.");
+    }
+    return hasRapidTarget(state, state.activePlayer)
+      ? { legal: true, reasons: [] }
+      : fail(
+          "rapid-no-target",
+          "Needs a Creature in your hand that could override one of yours exactly two Levels below it.",
+        );
   }
-  if (card.definition.key === "evolutionary-radiation" && player.turnsStarted <= 1) return false;
-  return conceptHasRequiredChoice(state, card.definition.key);
+  if (card.definition.key === "evolutionary-radiation" && player.turnsStarted <= 1) {
+    return fail("radiation-first-turn", "Evolutionary Radiation can't be played on your first turn.");
+  }
+  const missing = missingRequiredChoice(state, card.definition.key);
+  return missing ? { legal: false, reasons: [missing] } : { legal: true, reasons: [] };
+}
+
+export function canPlayConcept(state: GameState, card: CardInstance) {
+  return explainConcept(state, card).legal;
 }
 
 // ---------------------------------------------------------------------------

@@ -8,7 +8,16 @@ import {
   overrideTags,
   resolutionBlocked,
 } from "./core.ts";
-import type { BattleCoinPlan, BattlePreview, CreatureInPlay, FoundCreature, GameState, PlayerId } from "./types.ts";
+import type {
+  BattleCoinPlan,
+  BattlePreview,
+  CreatureInPlay,
+  FoundCreature,
+  GameState,
+  PlayerId,
+  Reason,
+  Verdict,
+} from "./types.ts";
 
 /** Pure battle calculations: Hunt legality, Battle Levels, and Battle Coin plans. */
 
@@ -20,57 +29,179 @@ function hasCrypticCamouflage(state: GameState, creature: CreatureInPlay, laneIn
   return state.players[creature.card.owner].lanes[laneIndex]?.attachment?.definition.key === "cryptic-camouflage";
 }
 
-export function creatureCanAttackTarget(
+type HuntOptions = { ignoreDiet?: boolean; ignoreEntryTurn?: boolean };
+
+const reason = (code: string, text: string): Reason => ({ code, text });
+
+/** Reasons this Creature can't initiate any Hunt right now, whatever the target. */
+export function hunterBlockers(
+  state: GameState,
+  attacker: CreatureInPlay,
+  attackerLane: number,
+  options: HuntOptions = {},
+): Reason[] {
+  const name = attacker.card.definition.name;
+  const definition = attacker.card.definition;
+  const blockers: Reason[] = [];
+  if (attacker.lastAttackTurn === state.turnNumber) {
+    blockers.push(reason("already-hunted", `${name} has already Hunted this turn.`));
+  }
+  if (attacker.cannotAttackOnTurn === state.turnNumber) {
+    blockers.push(reason("hunt-locked", `${name} can't Hunt this turn.`));
+  }
+  if (state.players[attacker.card.owner].lanes[attackerLane]?.engulfed) {
+    blockers.push(reason("engulfed", `${name} is holding an Engulfed Creature and can't Hunt until its slot clears.`));
+  }
+  if (hasCrypticCamouflage(state, attacker, attackerLane) && definition.diet === "Herbivore") {
+    blockers.push(reason("camouflage-herbivore", "Cryptic Camouflage keeps a Herbivore from Hunting."));
+  }
+  if (
+    attacker.enteredTurn === state.turnNumber &&
+    !options.ignoreEntryTurn &&
+    !definition.tags.includes("Ambush") &&
+    !definition.tags.includes("Charge")
+  ) {
+    blockers.push(
+      reason("entered-this-turn", `${name} entered play this turn; only Ambush or Charge Creatures Hunt right away.`),
+    );
+  }
+  return blockers;
+}
+
+/** Reasons this attacker can't Hunt this particular target, beyond the attacker's own readiness. */
+function targetBlockers(
   state: GameState,
   attacker: CreatureInPlay,
   attackerLane: number,
   target: CreatureInPlay,
   targetLane: number,
-  options: { ignoreDiet?: boolean; ignoreEntryTurn?: boolean } = {},
-) {
+  options: HuntOptions,
+): Reason[] {
   const attackerDef = attacker.card.definition;
   const targetDef = target.card.definition;
-  if (attacker.lastAttackTurn === state.turnNumber) return false;
-  if (attacker.cannotAttackOnTurn === state.turnNumber) return false;
-  if (state.players[attacker.card.owner].lanes[attackerLane]?.engulfed) return false;
-  if (hasCrypticCamouflage(state, attacker, attackerLane) && attackerDef.diet === "Herbivore") return false;
-  if (
-    attacker.enteredTurn === state.turnNumber &&
-    !options.ignoreEntryTurn &&
-    !attackerDef.tags.includes("Ambush") &&
-    !attackerDef.tags.includes("Charge")
-  ) {
-    return false;
+  const blockers: Reason[] = [];
+  if (attackerDef.tags.includes("Elusive") && targetDef.printedLevel >= 1) {
+    blockers.push(reason("elusive-attacker", `${attackerDef.name} is Elusive, so it can Hunt only Level 0 Creatures.`));
   }
-  if (attackerDef.tags.includes("Elusive") && targetDef.printedLevel >= 1) return false;
-  if (effectiveHasTag(targetDef, "Gigantic") && attackerDef.printedLevel <= 1) return false;
-  if (target.burrowedUntilTurn !== null && state.turnNumber < target.burrowedUntilTurn) return false;
+  if (effectiveHasTag(targetDef, "Gigantic") && attackerDef.printedLevel <= 1) {
+    blockers.push(
+      reason("gigantic-target", `${targetDef.name} is Gigantic: only Level 2 or higher Creatures can Hunt it.`),
+    );
+  }
+  if (target.burrowedUntilTurn !== null && state.turnNumber < target.burrowedUntilTurn) {
+    blockers.push(reason("burrowed", `${targetDef.name} is Burrowed until Turn ${target.burrowedUntilTurn}.`));
+  }
   if (
     state.activePlayer !== target.card.owner &&
     target.deimaticProtectedThroughTurn !== null &&
     state.turnNumber <= target.deimaticProtectedThroughTurn
   ) {
-    return false;
+    blockers.push(
+      reason(
+        "deimatic",
+        `${targetDef.name}'s Deimatic display protects it through Turn ${target.deimaticProtectedThroughTurn}.`,
+      ),
+    );
   }
   if (
     attacker.attackBarriers.some(
       (barrier) => barrier.targetUid === target.card.uid && barrier.expiresOnTurn === state.turnNumber,
     )
   ) {
-    return false;
+    blockers.push(
+      reason("cranial-display", `Cranial Display deters ${attackerDef.name} from Hunting ${targetDef.name} this turn.`),
+    );
   }
-  if (attackerDef.tags.includes("Charge") && attackerLane !== targetLane) return false;
-  if (options.ignoreDiet) return true;
-  if (attackerDef.tags.includes("Charge")) return true;
-  if (effectiveHasTag(attackerDef, "Territorial") && attackerLane === targetLane) return true;
-  if (activeSuperpredators(state) && (attackerDef.diet === "Carnivore" || attackerDef.diet === "Omnivore")) return true;
-  if (attackerDef.diet === "Herbivore") return false;
-  if (attackerDef.diet === "Omnivore") return targetDef.diet === "Herbivore";
-  return targetDef.diet === "Herbivore" || targetDef.diet === "Omnivore";
+  const charge = attackerDef.tags.includes("Charge");
+  if (charge && attackerLane !== targetLane) {
+    blockers.push(reason("charge-lane", "Charge Creatures Hunt only the Creature directly opposite them."));
+  }
+  const dietWaived =
+    options.ignoreDiet ||
+    charge ||
+    (effectiveHasTag(attackerDef, "Territorial") && attackerLane === targetLane) ||
+    (activeSuperpredators(state) && (attackerDef.diet === "Carnivore" || attackerDef.diet === "Omnivore"));
+  if (!dietWaived) {
+    if (attackerDef.diet === "Herbivore") {
+      blockers.push(
+        reason("herbivore-hunt", "Herbivores don't Hunt, except during a Stampede or with Charge or Territorial."),
+      );
+    } else if (attackerDef.diet === "Omnivore" && targetDef.diet !== "Herbivore") {
+      blockers.push(reason("diet-omnivore", "Omnivores can Hunt only Herbivores."));
+    } else if (attackerDef.diet === "Carnivore" && targetDef.diet === "Carnivore") {
+      blockers.push(reason("diet-carnivore", "Carnivores can Hunt only Herbivores or Omnivores."));
+    }
+  }
+  return blockers;
+}
+
+/** Every reason `attacker` can't Hunt `target`; empty when the Hunt is legal. */
+export function huntBlockers(
+  state: GameState,
+  attacker: CreatureInPlay,
+  attackerLane: number,
+  target: CreatureInPlay,
+  targetLane: number,
+  options: HuntOptions = {},
+): Reason[] {
+  return [
+    ...hunterBlockers(state, attacker, attackerLane, options),
+    ...targetBlockers(state, attacker, attackerLane, target, targetLane, options),
+  ];
+}
+
+export function creatureCanAttackTarget(
+  state: GameState,
+  attacker: CreatureInPlay,
+  attackerLane: number,
+  target: CreatureInPlay,
+  targetLane: number,
+  options: HuntOptions = {},
+) {
+  return huntBlockers(state, attacker, attackerLane, target, targetLane, options).length === 0;
+}
+
+function battleGate(state: GameState): Reason[] {
+  if (state.winner !== null) return [reason("game-over", "The game is over.")];
+  if (resolutionBlocked(state)) return [reason("pending-choice", "Finish the choice in progress first.")];
+  if (state.phase !== "battle") return [reason("wrong-phase", "Hunts happen in your Battle Phase.")];
+  return [];
+}
+
+/** Whether the active player's `attackerUid` may Hunt `defenderUid`, and why not. */
+export function explainHunt(state: GameState, attackerUid: string, defenderUid: string): Verdict {
+  const gate = battleGate(state);
+  if (gate.length) return { legal: false, reasons: gate };
+  const attacker = findCreature(state, attackerUid);
+  const defender = findCreature(state, defenderUid);
+  if (!attacker || attacker.playerId !== state.activePlayer) {
+    return { legal: false, reasons: [reason("not-your-creature", "Choose one of your own Creatures to Hunt with.")] };
+  }
+  if (!defender || defender.playerId === attacker.playerId) {
+    return { legal: false, reasons: [reason("not-an-opponent", "Hunts target an opposing Creature.")] };
+  }
+  const reasons = huntBlockers(state, attacker.creature, attacker.laneIndex, defender.creature, defender.laneIndex);
+  return { legal: reasons.length === 0, reasons };
+}
+
+/** Why the active player's Creature has no legal Hunt at all. Empty when it has at least one target. */
+export function explainHunter(state: GameState, attackerUid: string): Reason[] {
+  const gate = battleGate(state);
+  if (gate.length) return gate;
+  const attacker = findCreature(state, attackerUid);
+  if (!attacker || attacker.playerId !== state.activePlayer) {
+    return [reason("not-your-creature", "Choose one of your own Creatures to Hunt with.")];
+  }
+  if (legalAttackTargets(state, attackerUid).length) return [];
+  const own = hunterBlockers(state, attacker.creature, attacker.laneIndex);
+  if (own.length) return own;
+  const targets = state.players[otherPlayer(state.activePlayer)].lanes.filter((lane) => lane.creature);
+  if (!targets.length) return [reason("no-targets", "Your opponent has no Creatures to Hunt.")];
+  return [reason("no-legal-target", "No opposing Creature can be Hunted by this Creature. Point at one to see why.")];
 }
 
 export function legalAttackTargets(state: GameState, attackerUid: string): string[] {
-  if (state.phase !== "battle" || resolutionBlocked(state) || state.winner !== null) return [];
+  if (battleGate(state).length) return [];
   const found = findCreature(state, attackerUid);
   if (!found || found.playerId !== state.activePlayer) return [];
   const opponent = otherPlayer(state.activePlayer);

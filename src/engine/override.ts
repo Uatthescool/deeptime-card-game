@@ -1,6 +1,6 @@
-import type { CreatureCard } from "../data/cards.ts";
+import type { CreatureCard, Diet } from "../data/cards.ts";
 import { effectiveHasTag, hasIslandDwarfism, islandDwarfismBlocksEntry, nicheIsLocked, overrideTags } from "./core.ts";
-import type { ConvergentCategory, GameState, OverrideCheck, PlayerId } from "./types.ts";
+import type { ConvergentCategory, GameState, OverrideCheck, PlayerId, Reason } from "./types.ts";
 
 const CONVERGENT_EXCLUDED_TAGS = new Set([
   "Apex Predator",
@@ -19,15 +19,32 @@ function eligibleTagIntersection(a: CreatureCard, b: CreatureCard) {
   return [...aTags].some((tag) => bTags.has(tag) && !CONVERGENT_EXCLUDED_TAGS.has(tag));
 }
 
-const blocked = (reason: string): OverrideCheck => ({
+const blocked = (reason: Reason): OverrideCheck => ({
   legal: false,
   matches: { diet: false, period: false, taxon: false, tag: false },
   matchCount: 0,
   levelLegal: false,
   convergentCategory: null,
   convergentOptions: [],
-  reasons: [reason],
+  reasons: [reason.text],
+  blockers: [reason],
+  explanations: null,
 });
+
+/** Which Diets an incoming Creature may replace. Diet matching is directional. */
+function dietMatches(incoming: Diet, current: Diet) {
+  if (incoming === "Omnivore") return true;
+  if (incoming === "Carnivore") return current === "Carnivore" || current === "Omnivore";
+  return current === "Herbivore";
+}
+
+function dietExplanation(incoming: Diet, current: Diet, matched: boolean) {
+  if (incoming === "Omnivore") return "Omnivores can replace any Diet";
+  if (matched) return `${incoming} can replace ${current}`;
+  return incoming === "Carnivore"
+    ? "Carnivores can replace only Carnivores or Omnivores"
+    : "Herbivores can replace only Herbivores";
+}
 
 /**
  * Whether `incoming` may override the Creature in `laneIndex`. An override needs
@@ -44,20 +61,28 @@ export function checkOverride(
 ): OverrideCheck {
   const lane = state.players[playerId].lanes[laneIndex];
   const current = lane?.creature?.card.definition;
-  const reasons: string[] = [];
+  const blockers: Reason[] = [];
+  const block = (code: string, text: string) => blockers.push({ code, text });
   if (nicheIsLocked(state, playerId, laneIndex)) {
-    return blocked(lane?.drought ? "Drought locks this Niche." : "Wildfire locks this entire lane.");
+    return blocked(
+      lane?.drought
+        ? { code: "drought", text: "Drought locks this Niche." }
+        : { code: "wildfire", text: "Wildfire locks this entire lane." },
+    );
   }
-  if (!current || !lane?.creature) return blocked("The Niche is empty.");
+  if (!current || !lane?.creature) return blocked({ code: "empty-niche", text: "The Niche is empty." });
 
   if (lane.creature.cannotOverrideOnTurn === state.turnNumber) {
-    reasons.push("Raptorial prevents this Creature from being overridden this turn.");
+    block("raptorial", "Raptorial prevents this Creature from being overridden this turn.");
   }
   if (islandDwarfismBlocksEntry(state, playerId, laneIndex)) {
-    reasons.push("Island Dwarfism prevents a Creature from entering this adjacent Niche.");
+    block("island-dwarfism-adjacent", "Island Dwarfism prevents a Creature from entering this adjacent Niche.");
   }
   if (hasIslandDwarfism(lane) && effectiveHasTag(incoming, "Gigantic")) {
-    reasons.push("Island Dwarfism prevents a Creature with Gigantic from overriding this Creature.");
+    block(
+      "island-dwarfism-gigantic",
+      "Island Dwarfism prevents a Creature with Gigantic from overriding this Creature.",
+    );
   }
 
   const incomingTags = overrideTags(incoming);
@@ -71,19 +96,21 @@ export function checkOverride(
     (effectiveHasTag(current, "Gigantic") || effectiveHasTag(incoming, "Gigantic")),
   );
   const levelLegal = rapid ? difference === 2 : (difference >= 0 && difference <= 1) || airSacsJump;
-  if (!levelLegal) {
-    reasons.push(
-      rapid ? "Rapid Speciation requires exactly two Levels of progression." : "The Level progression is not legal.",
-    );
-  }
+  const step = `Level ${current.printedLevel} → ${incoming.printedLevel}`;
+  const levelText = rapid
+    ? levelLegal
+      ? `${step}, the two Levels Rapid Speciation requires`
+      : `Rapid Speciation needs exactly two Levels up; this is ${step}`
+    : airSacsJump
+      ? `${step}: Air Sacs allows a two-Level jump`
+      : levelLegal
+        ? `${step} is a legal step`
+        : difference < 0
+          ? `${step}: a Creature can't be replaced by a lower Level`
+          : `${step} skips too far; an override may rise at most one Level`;
+  if (!levelLegal) block("level", levelText + ".");
 
-  // Diet matching is directional.
-  let diet =
-    incoming.diet === "Omnivore"
-      ? true
-      : incoming.diet === "Carnivore"
-        ? current.diet === "Carnivore" || current.diet === "Omnivore"
-        : current.diet === "Herbivore";
+  let diet = dietMatches(incoming.diet, current.diet);
 
   const baseTaxon = incoming.gameplayTaxon === current.gameplayTaxon;
   const incomingAquatic = incoming.tags.includes("Aquatic");
@@ -93,7 +120,10 @@ export function checkOverride(
   const currentCountsAsAquatic = currentAquatic || currentSemiAquatic;
   const aquaticGateLegal = (!incomingAquatic || currentCountsAsAquatic) && (!currentAquatic || incomingCountsAsAquatic);
   if (!aquaticGateLegal) {
-    reasons.push("A printed Aquatic Creature can interact in an override only with a Creature that counts as Aquatic.");
+    block(
+      "aquatic-gate",
+      "A printed Aquatic Creature can interact in an override only with a Creature that counts as Aquatic.",
+    );
   }
 
   // The occupied Creature's bridge identity determines which category is supplied.
@@ -106,11 +136,40 @@ export function checkOverride(
   const transitional = (current.tags.includes("Transitional") || incoming.tags.includes("Transitional")) && baseTaxon;
   let period = incoming.period === current.period || livingFossil || transitional;
 
-  let tag = aquaticTagMatch || semiAquaticTagMatch || [...incomingTags].some((value) => currentTags.has(value));
+  const sharedTag = [...incomingTags].find((value) => currentTags.has(value));
+  let tag = aquaticTagMatch || semiAquaticTagMatch || Boolean(sharedTag);
+  let generalistTag = false;
   if (!tag && current.tags.includes("Generalist")) {
     const otherMatches = [diet, period, taxon].filter(Boolean).length;
-    if (otherMatches >= 2) tag = true;
+    if (otherMatches >= 2) tag = generalistTag = true;
   }
+
+  const explanations: NonNullable<OverrideCheck["explanations"]> = {
+    diet: dietExplanation(incoming.diet, current.diet, diet),
+    period:
+      incoming.period === current.period
+        ? `Both ${current.period}`
+        : livingFossil
+          ? "Living Fossil bridges Time Periods"
+          : transitional
+            ? "Transitional bridges Time Periods within a Primary Taxon"
+            : `${incoming.period} vs. ${current.period}`,
+    taxon: baseTaxon
+      ? `Both ${current.gameplayTaxon}`
+      : aquaticTaxonMatch
+        ? "Aquatic supplies the Primary Taxon match"
+        : `${incoming.gameplayTaxon} vs. ${current.gameplayTaxon}`,
+    tag: aquaticTagMatch
+      ? "Aquatic supplies the Tag match"
+      : semiAquaticTagMatch
+        ? "Semi-Aquatic supplies the Tag match"
+        : sharedTag
+          ? `Both have ${sharedTag}`
+          : generalistTag
+            ? "Generalist supplies the Tag match"
+            : "No shared Tag",
+    level: levelText,
+  };
 
   let convergentCategory: ConvergentCategory | null = null;
   let convergentOptions: ConvergentCategory[] = [];
@@ -130,11 +189,13 @@ export function checkOverride(
     else if (selected === "diet") diet = true;
     else if (selected === "period") period = true;
     convergentCategory = selected ?? null;
+    if (convergentCategory) explanations[convergentCategory] = "Supplied by Convergent Evolution";
   }
 
   const matches = { diet, period, taxon, tag };
   const matchCount = Object.values(matches).filter(Boolean).length;
-  if (matchCount < 3) reasons.push(`Only ${matchCount} of 4 override categories match.`);
+  if (matchCount < 3)
+    block("too-few-matches", `Only ${matchCount} of 4 override categories match; an override needs 3.`);
 
   return {
     legal:
@@ -149,6 +210,8 @@ export function checkOverride(
     levelLegal,
     convergentCategory,
     convergentOptions,
-    reasons,
+    reasons: blockers.map((blocker) => blocker.text),
+    blockers,
+    explanations,
   };
 }
