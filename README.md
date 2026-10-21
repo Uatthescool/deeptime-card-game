@@ -1,5 +1,7 @@
 # Lineage
 
+**[Play in your browser →](https://uatthescool.github.io/lineage-card-game/)**
+
 A two-player strategy card game of evolution, with life from the Cambrian to the present. Each player fills five Niches with Creatures, evolves them by overriding one Creature with another that shares enough traits, hunts the opposing ecosystem, and races to 12 Victory Levels.
 
 The game currently ships three complete 40-card decks, five Biomes that change each player's rules, a card browser, and **Learn Something**, a set of illustrated lessons on the science behind the cards.
