@@ -419,6 +419,15 @@ test("every card's artwork source is recorded and matches the files on disk", ()
         break;
     }
   }
+  for (const card of inspectableCards) {
+    if (card.kind !== "creature" || !card.cardFace) continue;
+    assert.equal(
+      existsSync(new URL(`../../public${card.cardFace}`, import.meta.url)),
+      true,
+      `Missing card face for ${card.name}`,
+    );
+    assert.notEqual(artSource(card.key), "pending", `${card.name} has a card face but its art is pending`);
+  }
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "inostrancevia")!), undefined);
   assert.equal(artworkPath(DECK_2.find((card) => card.key === "stegosaurus")!), "/artwork/stegosaurus.webp");
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "eoraptor")!), "/artwork/eoraptor.webp");

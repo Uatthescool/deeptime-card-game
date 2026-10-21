@@ -135,7 +135,7 @@ const amargasaurus: LessonDefinition = {
             { text: "neural spines", glossaryId: "neural-spine" },
             { text: ". Those bones are real; the outer shape reconstructed around them is not directly preserved." },
           ],
-          target: { xPercent: 36.4, yPercent: 19.7, label: "Reconstructed neck spines" },
+          target: { xPercent: 73.2, yPercent: 22.3, label: "Reconstructed neck spines" },
         },
         {
           id: "spinal-sail-tag",
