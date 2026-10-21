@@ -1,66 +1,98 @@
-# Prehistoric Card Game demo
+# Prehistoric Card Game
 
-Playable local-hotseat implementation of Revision 2.0 with three independently selectable 40-card singleton decks: Deck 1 Theropod Predators, Deck 2 Herbivore Development, and Deck 3 Aquatic Carnivores.
+A two-player strategy card game about building prehistoric ecosystems. Each player fills five Niches with Creatures, evolves them by overriding one Creature with another that shares enough traits, hunts the opposing ecosystem, and races to 12 Victory Levels.
 
-## Release contract
+The game currently ships three complete 40-card decks, five Biomes that change each player's rules, a card browser, and **Learn Something**, a set of illustrated lessons on the science behind the cards.
 
-- Canonical decks: Deck 1 and Deck 3 each contain 22 Creatures and 18 Supports; Deck 2 contains 23 Creatures and 17 Supports.
-- Sources of truth: `app/card-register.json` supplies Deck 1, shared Tag definitions, and the accepted-change ledger; `app/deck-2.ts` and `app/deck-3.ts` supply the other decks' unique records and new Supports.
-- Rules engine: `app/game-engine.ts` owns deterministic state transitions and is exercised by 90 engine tests.
-- Interface: `app/page.tsx` provides setup, the read-only **Inspect Deck** browser, strict click-to-pin card inspection, private hotseat handoff, game actions, projected Hunt resolution, the permanent card-inspection sidewall, and the opening-page **Learn Something** Lesson experience.
-- Presentation: every full Creature and Support card reserves the same exact 23:13 artwork slot. Production artwork is used when available; newly playable cards without final art use the deliberate pending treatment.
-- Lesson content: `app/lessons.ts` stores the structured Lesson states, glossary, Evidence, sources, and internal scientific-review date. The first complete vertical slice is the single-card Amargasaurus Lesson.
+| Deck | Identity                                                                     |
+| ---- | ---------------------------------------------------------------------------- |
+| 1    | **Theropod Predators**: Carnivore board control built around Apex Predators  |
+| 2    | **Herbivore Development**: armored Herbivores that grow toward Dreadnoughtus |
+| 3    | **Aquatic Carnivores**: marine hunters using the closed Aquatic ecosystem    |
 
-The authoritative continuity set for this checkpoint is:
+Play is local two-player on one device: hands stay hidden behind a handoff screen whenever the device passes between players. Games save automatically and survive a page refresh.
 
-1. `Prehistoric_Card_Game_Final_40_Card_Changes_Register.docx` — exact card records and locked implementation rulings.
-2. `Prehistoric_Card_Game_Player_Rulebook_Draft_1.0.docx` — player procedure and terminology.
-3. `Prehistoric_Card_Game_Design_Ledger_Draft_1.0.docx` — design principles, rationale, release history, interface contract, and open work.
+## Quick start
 
-When a rule changes, update the canonical register and engine tests in the same pass, then regenerate all three documents. Do not allow software-only wording to become an undocumented rule.
-
-## Revision 2.0 highlights
-
-- Changes Spinal Sail to protect Victory Level from Event and Tag decreases only, with the word “each” explicit in the final wording.
-- Makes printed Aquatic a closed override ecosystem. An occupied Aquatic card supplies Taxon—or Tag when the base Taxa already match—while an occupied Semi-Aquatic card supplies Tag to an incoming Aquatic or Semi-Aquatic card. Semi-Aquatic remains an unrestricted bridge and counts as Aquatic for Events and Concepts, but not Adaptations.
-- Makes Diet matching directional: incoming Omnivores match every Diet, incoming Carnivores match Carnivore or Omnivore, and incoming Herbivores match only Herbivore.
-- Removes Piscivore as a Diet, moves all former Piscivores to Carnivore, and restores normal equal-Level or +1-Level Aquatic override progression.
-- Suppresses Tropical Biodiversity when Cambrian Explosion creates a multi-draw Start Phase.
-- Lets Genetic Drift's mandatory discard resolve before its five card-by-card draw animations begin.
-- Reimplements Charge as same-turn Battle permission that ignores Diet only in the facing Niche and permanently lane-locks that Creature's Hunts.
-- Branches Sovereign by Diet: every bearer counts as Gigantic and receives Battle protection; Carnivore/Omnivore bearers gain Territorial, while Herbivores receive Victory protection.
-- Adds Deck 2 as a complete selectable Herbivore/board-development deck, including Dreadnoughtus as its exceptional Level 4 capstone.
-- Adds Armament, Herd, Nesting, Bastion, Deimatic, Graviportal, Overreach, Osteoderm, and the Resonance placeholder to the active Tag registry.
-- Implements Air Sacs, Thagomizer, Dental Battery, Facultative Quadrupedality, Genetic Mutations, and the board-wide counter-clockwise Stampede sequence.
-- Makes Deck 3 selectable and playable with its complete 22-Creature, 18-Support singleton manifest.
-- Implements Visual, Engulf, Filter Feeder, Dermal Armor, and Durophagy; Shearing Bite and Retention remain explicit placeholders.
-- Adds Drought, Island Dwarfism, and the instantaneous Geological Boundary Event with their finalized board and timing rules.
-- Updates Tyrannosaurus rex from placeholder Osteophagy to Durophagy; Sovereign continues to grant Gigantic and Territorial.
-
-## Local verification
-
-Prerequisite: Node.js `>=22.13.0` on Linux.
+Requires [Node.js](https://nodejs.org/) 20.19 or newer (22 LTS recommended).
 
 ```bash
-npm run lint
-npm test
+npm install
+npm run dev
 ```
 
-`npm test` runs 90 engine tests, the production build and artifact validation, and the rendered-interface checks. For interactive development, use `npm run dev`.
+Then open http://localhost:5173.
 
-## Project map
+| Command            | What it does                                                       |
+| ------------------ | ------------------------------------------------------------------ |
+| `npm run dev`      | Development server with instant reload                             |
+| `npm test`         | Rules, simulation, and interface tests                             |
+| `npm run check`    | Typecheck, lint, and test, the same gate CI runs                   |
+| `npm run build`    | Production build into `dist/`                                      |
+| `npm run preview`  | Serve the production build locally                                 |
+| `npm run playtest` | AI-vs-AI balance playtests (`-- --games=50 --decks=deck-1,deck-3`) |
+| `npm run images`   | Resize and recompress artwork after adding new images              |
+| `npm run format`   | Format all source files with Prettier                              |
 
-| Path | Purpose |
-| --- | --- |
-| `app/card-register.json` | Canonical Deck 1 register and shared rules ledger |
-| `app/deck-2.ts` | Canonical Deck 2 creature and new-Support records |
-| `app/deck-3.ts` | Canonical Deck 3 creature and new-Support records |
-| `app/game-data.ts` | Typed exports and UI-facing derived data |
-| `app/game-engine.ts` | State model, legality checks, actions, and resolution |
-| `app/lessons.ts` | Structured Learn Something Lessons, glossary definitions, Evidence, and sources |
-| `app/page.tsx` | Interactive hotseat playtest surface |
-| `app/globals.css` | Board, card, inspector, and responsive styling |
-| `tests/game-engine.test.ts` | Revision 2.0 rules-engine coverage |
-| `tests/rendered-html.test.mjs` | Built-page metadata and content checks |
+## Architecture
 
-Checkpoint deployments are immutable continuity milestones. Continue later work from the latest verified source revision.
+```
+src/
+  data/      Card, deck, Biome, and Lesson content (no logic beyond validation)
+  engine/    The rules engine: pure TypeScript, no browser or UI dependencies
+  ui/        React interface: screens, components, saving, and session state
+  styles/    Stylesheets
+tests/
+  engine/    Rules tests, determinism tests, and whole-game simulations
+  ui/        Interface tests run in a simulated browser
+tools/       Playtest balance tool and image optimizer
+```
+
+### The rules engine
+
+`src/engine` is the heart of the project and is built to be trustworthy:
+
+- **Pure and immutable.** Every move is a function `(state, input) → newState`. Inputs are never mutated, and an illegal request returns an unchanged copy instead of corrupting the game.
+- **Legality is enforced in the engine.** Each transition re-checks the matching legality query (`legalCreatureLanes`, `canPlayConcept`, …) before acting, so the interface can never perform an illegal move.
+- **Deterministic.** All randomness (shuffles, coin flips, random effects) comes from a seeded generator stored in the game state. The same seed and the same moves always reproduce the same game. Each game shows its seed in the log, and entering that seed under **Advanced** on the setup screen replays the same shuffle.
+- **One action vocabulary.** Every move is a serializable `GameAction` (`{ type: "playCreature", cardUid, laneIndex }`, …) applied through `applyAction`. The interface dispatches these, and the same actions can be recorded, replayed with `replay`, sent over a network, or chosen by an AI. `listLegalActions` lists every legal move in any state.
+- **Self-checking.** `checkInvariants` verifies structural soundness: every card exists exactly once, Niches are consistent, and the winner matches the phase. The simulation tests run it after every action of every simulated game.
+
+Modules, in dependency order: `core` (zones, board geometry, locks) → `override`, `victory`, `battle-math` → `queries` (read-only legality) → `turn` (turn flow) → `entry-effects`, `development`, `concepts`, `battle` (transitions) → `actions` (dispatch and legal-move generation).
+
+### Tests
+
+- **Rules** (`tests/engine/rules.test.ts`): 90 scenario tests covering card interactions and rulings.
+- **Determinism** (`tests/engine/determinism.test.ts`): seed reproducibility, replay, purity, and Battle Coins.
+- **Simulation** (`tests/engine/simulation.test.ts`): 54 complete games across every deck matchup and Biome, played by a random policy over `listLegalActions`. Invariants are checked after every action, and the suite fails if any game gets stuck or any listed action does nothing.
+- **Interface** (`tests/ui/app.test.tsx`): setup-to-first-turn flow, save and resume, the card browser, and the Hunt/coin modal.
+
+## Rules source of truth
+
+Card records live in `src/data`. Deck 1 and the shared Tag rules and rulings ledger are in `deck-1.json`; Decks 2 and 3 are in `deck-2.ts` and `deck-3.ts`. Card data is validated at startup, so a bad edit fails loudly.
+
+When a rule changes, update the card data, the engine, and a rules test in the same change. Don't let interface wording become an undocumented rule.
+
+## Deploying to GitHub Pages
+
+The site is static and deploys automatically through GitHub Actions:
+
+1. On GitHub, open **Settings → Pages** and set **Source** to **GitHub Actions**.
+2. Push to `main`. The **Deploy to GitHub Pages** workflow typechecks, lints, tests, builds, and publishes.
+
+The site is served at `https://<user>.github.io/<repository>/`. The workflow sets the correct base path automatically, including for a custom domain. Pull requests and other branches run the same checks through the **CI** workflow without deploying.
+
+## Artwork
+
+Card art is temporary placeholder artwork reused under the licenses listed in `public/artwork/attribution-manifest.json`, viewable in-game under **Artwork credits**. See [Open items](#open-items) for images that still need a recorded source.
+
+## Open items
+
+- **Artwork provenance.** 41 of the 110 card images, the three full card faces, and the five Biome backgrounds have no source or license recorded in the attribution manifest. Record them, or replace them, before wider distribution.
+- **Deck exhaustion.** The rules have no deck-out or stalemate condition. Once both decks are empty, a game can continue with no possible progress until a player concedes. Simulated games reach this state regularly.
+- **Placeholder Tags.** Shearing Bite, Retention, and Resonance are listed in the Tag registry but have no effect yet.
+- **Rule documents.** The Changes Register, Player Rulebook, and Design Ledger documents are not yet in this repository.
+
+## License
+
+All rights reserved. No license has been chosen for this project yet.

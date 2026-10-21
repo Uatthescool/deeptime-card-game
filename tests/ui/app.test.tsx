@@ -1,0 +1,141 @@
+// @vitest-environment jsdom
+import { act, cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { useState } from "react";
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+
+import { applyAction, createGame, type GameAction, type GameState } from "../../src/engine/index.ts";
+import { App } from "../../src/ui/App.tsx";
+import { BattleModal } from "../../src/ui/components/BattleModal.tsx";
+import { clearSavedGame, loadSavedGame, saveGame, savedGameSummary } from "../../src/ui/save.ts";
+import { elusiveHunt } from "../fixtures.ts";
+
+beforeAll(() => {
+  // jsdom lacks layout observers used by the Lesson view.
+  globalThis.ResizeObserver ??= class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+});
+
+beforeEach(() => window.localStorage.clear());
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
+
+async function dealGame(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: "Continue to Biomes" }));
+  await user.click(screen.getByRole("button", { name: "Choose Tropical" }));
+  await user.click(screen.getByRole("button", { name: "Confirm selection" }));
+  await user.click(screen.getByRole("button", { name: /choose my Biome/ }));
+  await user.click(screen.getByRole("button", { name: "Choose Cold" }));
+  await user.click(screen.getByRole("button", { name: "Confirm selection" }));
+  await user.click(screen.getByRole("button", { name: "Draw opening hands" }));
+  await act(() => vi.runAllTimersAsync());
+}
+
+describe("App", () => {
+  test("setup, private Biome selection, deal, and handoff lead to a playable hand", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<App />);
+    await dealGame(user);
+
+    const handoff = screen.getByRole("dialog", { name: "Private handoff" });
+    expect(within(handoff).getByText(/goes first/)).toBeInTheDocument();
+    expect(screen.getByText("Private hand sealed for handoff")).toBeInTheDocument();
+    await user.click(within(handoff).getByRole("button", { name: /begin my turn/ }));
+
+    // Tropical may ask to order the top two cards first.
+    const order = screen.queryByRole("dialog", { name: "Biodiversity draw ordering" });
+    if (order) await user.click(within(order).getAllByRole("button")[0]!);
+
+    expect(screen.getByText(/Choose a card to play/)).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { pressed: false }).length).toBeGreaterThan(0);
+  });
+
+  test("a game in progress is offered for resume after a reload", async () => {
+    const game = createGame("Ada", "Grace", ["arid", "aquatic"], ["deck-2", "deck-3"], { seed: 11 });
+    saveGame(applyAction(game, { type: "acknowledgeHandoff" }));
+    const user = userEvent.setup();
+    render(<App />);
+    expect(screen.getByText(/Ada vs\. Grace · Turn 1/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Resume" }));
+    const cover = screen.getByRole("dialog", { name: "Private handoff" });
+    expect(within(cover).getByText("Resume your game")).toBeInTheDocument();
+  });
+
+  test("the card browser and rules open from setup", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Inspect Cards" }));
+    expect(screen.getByRole("dialog", { name: "Inspect cards" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Deck 3: Aquatic Carnivores" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Return to setup" }));
+    expect(screen.queryByRole("dialog", { name: "Inspect cards" })).not.toBeInTheDocument();
+  });
+});
+
+describe("saved games", () => {
+  test("round-trip through storage and re-link card definitions", () => {
+    const game = applyAction(createGame("A", "B", [null, null], ["deck-1", "deck-2"], { seed: 9 }), {
+      type: "acknowledgeHandoff",
+    });
+    saveGame(game);
+    const loaded = loadSavedGame();
+    expect(loaded).toEqual(game);
+    expect(savedGameSummary()?.players).toEqual(["A", "B"]);
+  });
+
+  test("corrupt or incompatible saves are discarded instead of crashing", () => {
+    window.localStorage.setItem("pcg.savedGame", "{not json");
+    expect(loadSavedGame()).toBeNull();
+    window.localStorage.setItem("pcg.savedGame", JSON.stringify({ version: 999, game: {} }));
+    expect(loadSavedGame()).toBeNull();
+
+    const game = createGame("A", "B", [null, null], ["deck-1", "deck-1"], { seed: 4 });
+    game.players[0].deck.pop(); // a card vanishes: fails the invariant check
+    saveGame(game);
+    expect(loadSavedGame()).toBeNull();
+    expect(savedGameSummary()).toBeNull();
+  });
+
+  test("finished games are not kept", () => {
+    const game = createGame("A", "B", [null, null], ["deck-1", "deck-1"], { seed: 4 });
+    saveGame(game);
+    saveGame(applyAction(game, { type: "concede" }));
+    expect(savedGameSummary()).toBeNull();
+    clearSavedGame();
+  });
+});
+
+describe("BattleModal", () => {
+  function Harness({ initial, log }: { initial: GameState; log: GameAction[] }) {
+    const [state, setState] = useState(initial);
+    const dispatch = (action: GameAction) => {
+      log.push(action);
+      setState((current) => applyAction(current, action));
+    };
+    return state.pendingBattle ? <BattleModal game={state} dispatch={dispatch} /> : <p>Hunt resolved</p>;
+  }
+
+  test("Commit flips the coins in the engine, then the stored results resolve the Hunt", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const log: GameAction[] = [];
+    render(<Harness initial={elusiveHunt()} log={log} />);
+
+    expect(screen.getByText(/Commit Hunt will flip 1 Battle Coin/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Commit Hunt" }));
+    expect(log).toEqual([{ type: "flipBattleCoins" }]);
+    expect(screen.queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Flipping…" })).toBeDisabled();
+
+    await act(() => vi.advanceTimersByTimeAsync(900));
+    await user.click(screen.getByRole("button", { name: "Use these results" }));
+    expect(log.at(-1)).toEqual({ type: "commitHunt" });
+    expect(screen.getByText("Hunt resolved")).toBeInTheDocument();
+  });
+});

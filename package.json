@@ -1,45 +1,51 @@
 {
   "name": "prehistoric-card-game",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "description": "A two-player strategy card game about building prehistoric ecosystems.",
+  "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=20.19"
   },
   "scripts": {
-    "install:ci": "bash scripts/install-ci.sh",
-    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
-    "build": "bash scripts/build-verified.sh",
-    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "node --experimental-strip-types --test tests/game-engine.test.ts && npm run build && node --test tests/rendered-html.test.mjs",
-    "playtest:hidden": "node --experimental-strip-types scripts/run-hidden-playtests.ts",
-    "validate:artifact": "bash scripts/validate-artifact.sh",
-    "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "playtest": "vite-node tools/playtest.ts",
+    "images": "vite-node tools/optimize-images.ts"
   },
   "dependencies": {
-    "drizzle-orm": "0.45.2",
-    "next": "16.2.6",
-    "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
-    "@tailwindcss/postcss": "4.2.1",
-    "@types/node": "22.19.19",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.2",
-    "@vitejs/plugin-rsc": "0.5.26",
-    "drizzle-kit": "0.31.10",
-    "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
-    "react-server-dom-webpack": "19.2.6",
-    "tailwindcss": "4.2.1",
-    "typescript": "5.9.3",
-    "vinext": "0.0.50",
-    "vite": "8.0.13",
-    "wrangler": "4.92.0"
-  },
-  "type": "module",
-  "displayName": "Prehistoric Card Game Prototype"
+    "@eslint/js": "10.0.1",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.8",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "eslint": "10.13.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.13.0",
+    "jsdom": "30.1.3",
+    "prettier": "3.9.10",
+    "sharp": "0.35.5",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "vite": "8.3.5",
+    "vite-node": "6.0.0",
+    "vitest": "5.0.5"
+  }
 }
