@@ -371,7 +371,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
     <main className={`game-page mobile-${mobileView}`}>
       <header className="game-header">
         <div>
-          <div className="eyebrow">Prehistoric Card Game</div>
+          <div className="eyebrow">Lineage</div>
           <h1>
             {game.players[0].name} vs. {game.players[1].name}
           </h1>

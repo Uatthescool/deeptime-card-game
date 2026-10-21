@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "title": "Prehistoric Card Game — Three-Deck Playable Implementation Register",
+  "title": "Lineage — Three-Deck Playable Implementation Register",
   "deck": {
     "size": 40,
     "identity": "Carnivore / Predator Board-Control Midrange",
