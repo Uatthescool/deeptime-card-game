@@ -152,6 +152,7 @@ export function SetupScreen({
           </div>
         </form>
         <div className="setup-foot">
+          <span>Created by Merrick McMorris</span>
           <span>2 players · one device</span>
           <span>Choose any 40-card deck independently</span>
           <span>Hands hidden on handoff</span>

@@ -2,6 +2,8 @@
 
 **[Play in your browser →](https://uatthescool.github.io/lineage-card-game/)**
 
+Created by **Merrick McMorris**.
+
 A two-player strategy card game of evolution, with life from the Cambrian to the present. Each player fills five Niches with Creatures, evolves them by overriding one Creature with another that shares enough traits, hunts the opposing ecosystem, and races to 12 Victory Levels.
 
 The game currently ships three complete 40-card decks, five Biomes that change each player's rules, a card browser, and **Learn Something**, a set of illustrated lessons on the science behind the cards.
@@ -86,7 +88,7 @@ The site is served at `https://<user>.github.io/<repository>/`. The workflow set
 
 ## Artwork
 
-All artwork is temporary. Final card illustrations and Biome art will be commissioned from artists or selected from fan submissions. The card layout, frame design, and colors are original.
+All artwork is temporary. Final card illustrations and Biome art will be commissioned from artists or selected from fan submissions. The card layout, frame design, colors, and Biome concepts are original designs by Merrick McMorris.
 
 `src/data/art.ts` records where every card's art came from, and a test keeps it in agreement with the files and credits:
 
@@ -109,4 +111,4 @@ Credits for all of it are shown in-game under **Artwork credits**.
 
 ## License
 
-All rights reserved. No license has been chosen for this project yet.
+© 2026 Merrick McMorris. All rights reserved. No license has been chosen for this project yet.

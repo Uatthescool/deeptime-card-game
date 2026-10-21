@@ -67,7 +67,8 @@ export function Credits({ onClose }: { onClose: () => void }) {
         <section className="credits-section">
           <h3>Game and card design</h3>
           <p>
-            The card layout, frame design, colors, and Biome concepts are original designs by the creator of Lineage.
+            Lineage was created by Merrick McMorris, who designed the game, its rules and cards, the card layout, frame
+            design, and colors, and the Biome concepts.
           </p>
         </section>
 
@@ -75,8 +76,8 @@ export function Credits({ onClose }: { onClose: () => void }) {
           <h3>AI-generated placeholder art</h3>
           <p>
             The five Biome backgrounds, the Nautilus card face, and the artwork for the cards below were generated with
-            ChatGPT’s image generator from the creator’s direction. They are stand-ins until commissioned art replaces
-            them.
+            ChatGPT’s image generator from Merrick McMorris’s designs and direction. They are stand-ins until
+            commissioned art replaces them.
           </p>
           <p className="credits-names">{cardNames(AI_PLACEHOLDER_ARTWORK_KEYS).join(" · ")}</p>
         </section>
