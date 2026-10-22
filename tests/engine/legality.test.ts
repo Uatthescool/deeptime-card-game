@@ -189,3 +189,51 @@ describe("explanation wording", () => {
     ]);
   });
 });
+
+describe("Filter Feeders Hunt and are Hunted as Herbivores", () => {
+  /** Theropods (Deck 1) facing the ocean (Deck 3) in the Battle Phase, with empty boards. */
+  function predatorsVsOcean(): GameState {
+    const state = createGame("A", "B", [null, null], ["deck-1", "deck-3"], { seed: 5 });
+    Object.assign(state, { activePlayer: 0, turnNumber: 5, phase: "battle", handoff: null });
+    for (const player of state.players) {
+      player.lanes = player.lanes.map(() => ({
+        creature: null,
+        attachment: null,
+        engulfed: null,
+        wildfire: null,
+        drought: null,
+      }));
+    }
+    return state;
+  }
+  const codes = (state: GameState, attacker: string, target: string) =>
+    explainHunt(state, attacker, target).reasons.map((item) => item.code);
+
+  test("Carnivores of Level 2 or higher may Hunt a Filter Feeder, but not other Carnivores", () => {
+    const state = predatorsVsOcean();
+    const hunter = inPlay(takeFromLibrary(state, 0, "allosaurus"));
+    state.players[0].lanes[1]!.creature = hunter;
+    const whale = inPlay(takeFromLibrary(state, 1, "blue-whale"));
+    state.players[1].lanes[0]!.creature = whale;
+    const shark = inPlay(takeFromLibrary(state, 1, "megalodon"));
+    state.players[1].lanes[2]!.creature = shark;
+
+    expect(explainHunt(state, hunter.card.uid, whale.card.uid).legal).toBe(true);
+    expect(codes(state, hunter.card.uid, shark.card.uid)).toContain("diet-carnivore");
+
+    // Gigantic still turns away small hunters.
+    const small = inPlay(takeFromLibrary(state, 0, "compsognathus"));
+    state.players[0].lanes[3]!.creature = small;
+    expect(codes(state, small.card.uid, whale.card.uid)).toEqual(["gigantic-target"]);
+  });
+
+  test("a Filter Feeder can't Hunt, even a Herbivore", () => {
+    const state = predatorsVsOcean();
+    state.activePlayer = 1;
+    const fish = inPlay(takeFromLibrary(state, 1, "leedsichthys"));
+    state.players[1].lanes[0]!.creature = fish;
+    const hoatzin = inPlay(takeFromLibrary(state, 0, "hoatzin"));
+    state.players[0].lanes[0]!.creature = hoatzin;
+    expect(codes(state, fish.card.uid, hoatzin.card.uid)).toEqual(["filter-feeder-hunt"]);
+  });
+});

@@ -67,6 +67,11 @@ export function effectiveHasTag(creature: CreatureCard, tag: string) {
   return tag === "Territorial" && creature.diet !== "Herbivore";
 }
 
+/** The Diet a Creature Hunts and is Hunted as: Filter Feeders count as Herbivores in Hunting checks. */
+export function huntingDiet(creature: CreatureCard): CreatureCard["diet"] {
+  return creature.tags.includes("Filter Feeder") ? "Herbivore" : creature.diet;
+}
+
 /** The Tag set a Creature contributes to an override comparison. */
 export function overrideTags(creature: CreatureCard) {
   const tags = new Set(creature.tags);

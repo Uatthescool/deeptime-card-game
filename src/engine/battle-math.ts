@@ -4,6 +4,7 @@ import {
   effectiveHasTag,
   findCreature,
   hasNoAdjacentFriendly,
+  huntingDiet,
   otherPlayer,
   overrideTags,
   resolutionBlocked,
@@ -117,19 +118,27 @@ function targetBlockers(
   if (charge && attackerLane !== targetLane) {
     blockers.push(reason("charge-lane", "Charge Creatures Hunt only the Creature directly opposite them."));
   }
+  // Filter Feeders Hunt, and are Hunted, as Herbivores.
+  const attackerDiet = huntingDiet(attackerDef);
+  const targetDiet = huntingDiet(targetDef);
   const dietWaived =
     options.ignoreDiet ||
     charge ||
     (effectiveHasTag(attackerDef, "Territorial") && attackerLane === targetLane) ||
-    (activeSuperpredators(state) && (attackerDef.diet === "Carnivore" || attackerDef.diet === "Omnivore"));
+    (activeSuperpredators(state) && (attackerDiet === "Carnivore" || attackerDiet === "Omnivore"));
   if (!dietWaived) {
-    if (attackerDef.diet === "Herbivore") {
+    if (attackerDiet === "Herbivore") {
       blockers.push(
-        reason("herbivore-hunt", "Herbivores don't Hunt, except during a Stampede or with Charge or Territorial."),
+        attackerDef.diet === "Herbivore"
+          ? reason("herbivore-hunt", "Herbivores don't Hunt, except during a Stampede or with Charge or Territorial.")
+          : reason(
+              "filter-feeder-hunt",
+              `${attackerDef.name} is a Filter Feeder, which Hunts as a Herbivore: it can't Hunt without Charge or Territorial.`,
+            ),
       );
-    } else if (attackerDef.diet === "Omnivore" && targetDef.diet !== "Herbivore") {
+    } else if (attackerDiet === "Omnivore" && targetDiet !== "Herbivore") {
       blockers.push(reason("diet-omnivore", "Omnivores can Hunt only Herbivores."));
-    } else if (attackerDef.diet === "Carnivore" && targetDef.diet === "Carnivore") {
+    } else if (attackerDiet === "Carnivore" && targetDiet === "Carnivore") {
       blockers.push(reason("diet-carnivore", "Carnivores can Hunt only Herbivores or Omnivores."));
     }
   }
