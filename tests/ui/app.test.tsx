@@ -8,6 +8,7 @@ import { applyAction, createGame, type GameAction, type GameState } from "../../
 import { App } from "../../src/ui/App.tsx";
 import { BattleModal } from "../../src/ui/components/BattleModal.tsx";
 import { GameScreen } from "../../src/ui/components/GameScreen.tsx";
+import { WinnerOverlay } from "../../src/ui/components/Modals.tsx";
 import { clearSavedGame, loadSavedGame, saveGame, savedGameSummary } from "../../src/ui/save.ts";
 import { elusiveHunt, inPlay, takeFromLibrary } from "../fixtures.ts";
 
@@ -184,5 +185,21 @@ describe("move legality explanations", () => {
         /Empty Niches take only Level 0 or 1/,
       ),
     ).toBeInTheDocument();
+  });
+});
+
+describe("game over", () => {
+  test("a draw shows both totals instead of a winner", () => {
+    const state = createGame("Ada", "Grace", [null, null], ["deck-1", "deck-1"], { seed: 3 });
+    Object.assign(state, {
+      phase: "game-over",
+      handoff: null,
+      drawn: true,
+      winReason: "Both decks ran out with the Victory totals tied at 0.",
+    });
+    render(<WinnerOverlay game={state} onRestart={() => {}} />);
+    expect(screen.getByRole("heading", { name: "It's a draw" })).toBeInTheDocument();
+    expect(screen.getByText("0–0")).toBeInTheDocument();
+    expect(screen.getByText(/tied at 0/)).toBeInTheDocument();
   });
 });

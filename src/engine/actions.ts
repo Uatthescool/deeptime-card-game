@@ -10,7 +10,7 @@ import {
 } from "./battle.ts";
 import { legalAttackTargets } from "./battle-math.ts";
 import { chooseConceptOption, getConceptChoiceOptions, playConcept } from "./concepts.ts";
-import { otherPlayer } from "./core.ts";
+import { isGameOver, otherPlayer } from "./core.ts";
 import {
   activateCarnianPluvialEpisode,
   chooseCarnianPluvialOption,
@@ -176,7 +176,7 @@ export function replay(state: GameState, actions: readonly GameAction[]): GameSt
  * that never happens.
  */
 export function listLegalActions(state: GameState): GameAction[] {
-  if (state.winner !== null) return [];
+  if (isGameOver(state)) return [];
   if (state.handoff) return [{ type: "acknowledgeHandoff" }];
   if (state.pendingBiodiversity) {
     return state.pendingBiodiversity.cardUids.map((cardUid) => ({ type: "chooseBiodiversityTop", cardUid }));

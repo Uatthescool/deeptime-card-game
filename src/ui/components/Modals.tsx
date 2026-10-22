@@ -367,15 +367,15 @@ export function HandoffOverlay({
 }
 
 export function WinnerOverlay({ game, onRestart }: { game: GameState; onRestart: () => void }) {
-  if (game.winner === null) return null;
-  const winner = game.players[game.winner];
+  if (game.phase !== "game-over") return null;
   const totals = victoryTotals(game);
+  const winner = game.winner === null ? null : game.players[game.winner];
   return (
     <Dialog label="Game over" className="winner-overlay">
       <div className="winner-card">
-        <div className="eyebrow">Ecosystem established</div>
-        <div className="winner-score">{totals[game.winner]}</div>
-        <h2>{winner.name} wins</h2>
+        <div className="eyebrow">{winner ? "Ecosystem established" : "Ecosystems in balance"}</div>
+        <div className="winner-score">{winner ? totals[game.winner!] : `${totals[0]}–${totals[1]}`}</div>
+        <h2>{winner ? `${winner.name} wins` : "It's a draw"}</h2>
         <p>{game.winReason}</p>
         <button className="primary-button full" onClick={onRestart}>
           Start another game

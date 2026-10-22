@@ -14,6 +14,7 @@ import {
   otherPlayer,
   resolutionBlocked,
   sendCardToHistory,
+  isGameOver,
 } from "./core.ts";
 import { canPerformFullHandMulligan, hasAnyLegalTurnAction } from "./queries.ts";
 import { hasLegalHunts } from "./battle-math.ts";
@@ -180,6 +181,46 @@ function declareWinner(state: GameState, winner: PlayerId, reason: string, logMe
   addLog(state, logMessage);
 }
 
+/** The last turn of the round in progress. Turn 1 is the first player's, so every round ends on an even turn. */
+const endOfRound = (turnNumber: number) => (turnNumber % 2 === 0 ? turnNumber : turnNumber + 1);
+
+/**
+ * Deck exhaustion: once both decks are empty, the game ends at the end of that
+ * round, so both players have taken the same number of turns. The higher
+ * Victory total wins; equal totals are a draw. Called at the end of each turn.
+ */
+function resolveExhaustion(state: GameState) {
+  if ((state.finalTurn ?? null) === null && state.players.every((player) => player.deck.length === 0)) {
+    state.finalTurn = endOfRound(state.turnNumber);
+    addLog(
+      state,
+      state.finalTurn === state.turnNumber
+        ? "Both decks are empty: the game ends now, and the higher Victory total wins."
+        : `Both decks are empty: Turn ${state.finalTurn} is the final turn, and then the higher Victory total wins.`,
+    );
+  }
+  if (state.finalTurn === null || state.finalTurn === undefined || state.turnNumber < state.finalTurn) return false;
+
+  const totals = victoryTotals(state);
+  if (totals[0] === totals[1]) {
+    state.drawn = true;
+    state.winReason = `Both decks ran out with the Victory totals tied at ${totals[0]}.`;
+    state.phase = "game-over";
+    state.handoff = null;
+    addLog(state, `The game is a draw: both decks ran out with ${totals[0]} Victory Levels each.`);
+    return true;
+  }
+  const winner: PlayerId = totals[0] > totals[1] ? 0 : 1;
+  const loser = otherPlayer(winner);
+  declareWinner(
+    state,
+    winner,
+    `Both decks ran out; ${state.players[winner].name} led ${totals[winner]} to ${totals[loser]} in Victory Levels.`,
+    `${state.players[winner].name} won with the higher Victory total after both decks ran out.`,
+  );
+  return true;
+}
+
 function beginTurn(state: GameState) {
   const player = state.players[state.activePlayer];
   const expiring = (aura: GameState["periodAuras"][number]) =>
@@ -292,7 +333,7 @@ export function chooseBiodiversityTop(original: GameState, cardUid: string): Gam
  * multi-step sequence (Stampede, Nesting turn end, mandatory Battle skip).
  */
 export function finishResolution(state: GameState): GameState {
-  if (state.winner !== null || resolutionBlocked(state)) return state;
+  if (isGameOver(state) || resolutionBlocked(state)) return state;
   if (resolveVictoryThreshold(state)) return state;
   if (state.pendingStampede) return continueStampede(state);
   if (state.endTurnAfterEntryEffects) {
@@ -352,7 +393,7 @@ export function continueStampede(state: GameState): GameState {
 
 export function endTurn(original: GameState): GameState {
   const state = clone(original);
-  if (resolutionBlocked(state) || state.winner !== null) return state;
+  if (resolutionBlocked(state) || isGameOver(state)) return state;
   const active = state.players[state.activePlayer];
   active.allowances.convergentEvolution = false;
   active.allowances.rapidSpeciation = false;
@@ -380,6 +421,7 @@ export function endTurn(original: GameState): GameState {
     }
   }
   if (resolveVictoryThreshold(state)) return state;
+  if (resolveExhaustion(state)) return state;
   addLog(state, `${active.name} ended Turn ${state.turnNumber}.`);
   const next = otherPlayer(state.activePlayer);
   state.activePlayer = next;
@@ -412,8 +454,7 @@ export function advanceToBattle(original: GameState): GameState {
 
 /** Enters the Battle Phase, or ends the turn directly when no Hunt is possible. */
 export function advanceToBattleOrEndTurn(original: GameState): GameState {
-  if (original.phase !== "development" || resolutionBlocked(original) || original.winner !== null)
-    return clone(original);
+  if (original.phase !== "development" || resolutionBlocked(original) || isGameOver(original)) return clone(original);
   const battleState = advanceToBattle(original);
   if (battleState.phase !== "battle" || hasLegalHunts(battleState, battleState.activePlayer)) return battleState;
   addLog(battleState, `${battleState.players[battleState.activePlayer].name} had no legal Hunts.`);
@@ -438,7 +479,7 @@ export function performFullHandMulligan(original: GameState): GameState {
 
 export function concedeByExtinction(original: GameState): GameState {
   const state = clone(original);
-  if (state.winner !== null) return state;
+  if (isGameOver(state)) return state;
   const loser = state.activePlayer;
   const winner = otherPlayer(loser);
   const reason = `${state.players[loser].name} conceded by Extinction.`;

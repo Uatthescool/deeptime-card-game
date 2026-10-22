@@ -338,7 +338,12 @@ export function resolutionBlocked(state: GameState) {
   );
 }
 
+/** True once the game has ended, by a win or a draw. */
+export function isGameOver(state: GameState) {
+  return state.phase === "game-over";
+}
+
 /** True when the active player may take an ordinary Development Phase action. */
 export function canActInDevelopment(state: GameState) {
-  return state.phase === "development" && !resolutionBlocked(state) && state.winner === null;
+  return state.phase === "development" && !resolutionBlocked(state) && !isGameOver(state);
 }

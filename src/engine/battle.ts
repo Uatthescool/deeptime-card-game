@@ -14,6 +14,7 @@ import {
   nextTurnForPlayer,
   sendCardToHistory,
   sendCreatureToHistory,
+  isGameOver,
 } from "./core.ts";
 import { flipCoin } from "./rng.ts";
 import { finishResolution } from "./turn.ts";
@@ -68,7 +69,7 @@ export function canUseTemperateReroll(state: GameState, playerId: PlayerId) {
   const battle = state.pendingBattle;
   return Boolean(
     battle &&
-    state.winner === null &&
+    !isGameOver(state) &&
     (battle.attackerPlayer === playerId || battle.defenderPlayer === playerId) &&
     player.biome.key === "temperate" &&
     player.biome.seasonCounters > 0 &&

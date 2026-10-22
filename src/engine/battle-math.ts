@@ -7,6 +7,7 @@ import {
   otherPlayer,
   overrideTags,
   resolutionBlocked,
+  isGameOver,
 } from "./core.ts";
 import type {
   BattleCoinPlan,
@@ -162,7 +163,7 @@ export function creatureCanAttackTarget(
 }
 
 function battleGate(state: GameState): Reason[] {
-  if (state.winner !== null) return [reason("game-over", "The game is over.")];
+  if (isGameOver(state)) return [reason("game-over", "The game is over.")];
   if (resolutionBlocked(state)) return [reason("pending-choice", "Finish the choice in progress first.")];
   if (state.phase !== "battle") return [reason("wrong-phase", "Hunts happen in your Battle Phase.")];
   return [];
@@ -214,7 +215,7 @@ export function legalAttackTargets(state: GameState, attackerUid: string): strin
 
 /** Whether the player could initiate any Hunt if they entered the Battle Phase now. */
 export function hasLegalHunts(state: GameState, playerId: PlayerId = state.activePlayer) {
-  if (state.activePlayer !== playerId || state.winner !== null) return false;
+  if (state.activePlayer !== playerId || isGameOver(state)) return false;
   if (state.players[playerId].allowances.skipBattlePhase) return false;
   const battleState = clone(state);
   battleState.phase = "battle";

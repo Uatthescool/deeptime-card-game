@@ -17,7 +17,7 @@ import { elusiveHunt } from "../fixtures.ts";
 function playScripted(state: GameState, steps: number) {
   const actions: GameAction[] = [];
   let current = state;
-  for (let step = 0; step < steps && current.winner === null; step += 1) {
+  for (let step = 0; step < steps && current.phase !== "game-over"; step += 1) {
     const legal = listLegalActions(current);
     if (!legal.length) break;
     // A fixed, non-random policy: take the middle option.
@@ -60,7 +60,7 @@ describe("seeded randomness", () => {
 describe("purity", () => {
   test("transitions never mutate their input", () => {
     let state = createGame("A", "B", ["temperate", "tropical"], ["deck-2", "deck-1"], { seed: 5 });
-    for (let step = 0; step < 300 && state.winner === null; step += 1) {
+    for (let step = 0; step < 300 && state.phase !== "game-over"; step += 1) {
       const legal = listLegalActions(state);
       if (!legal.length) break;
       const snapshot = structuredClone(state);

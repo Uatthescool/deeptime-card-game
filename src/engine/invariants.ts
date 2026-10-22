@@ -56,9 +56,11 @@ export function checkInvariants(state: GameState): string[] {
       }
     });
   }
-  if ((state.winner !== null) !== (state.phase === "game-over")) {
-    problems.push(`Winner is ${state.winner} but phase is ${state.phase}.`);
+  const decided = state.winner !== null || Boolean(state.drawn);
+  if (decided !== (state.phase === "game-over")) {
+    problems.push(`Winner is ${state.winner}, drawn is ${Boolean(state.drawn)}, but phase is ${state.phase}.`);
   }
+  if (state.winner !== null && state.drawn) problems.push("The game has both a winner and a draw.");
   if (state.handoff && state.phase !== "handoff")
     problems.push(`A handoff is pending during the ${state.phase} phase.`);
   return problems;

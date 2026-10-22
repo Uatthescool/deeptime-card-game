@@ -260,6 +260,10 @@ export type GameState = {
   pendingEngulf: { holderPlayer: PlayerId; holderLane: number; defeatedOwner: PlayerId; defeatedUid: string } | null;
   periodAuras: Array<{ owner: PlayerId; period: Period; expiresAtTurnStart: number }>;
   winner: PlayerId | null;
+  /** True when the game ended with tied Victory totals after both decks ran out. */
+  drawn?: boolean;
+  /** Once both decks are empty: the last turn of the game, ending the current round. */
+  finalTurn?: number | null;
   winReason: string | null;
   log: string[];
   seedLabel: string;

@@ -471,7 +471,12 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           </h1>
         </div>
         <div className="turn-summary">
-          <span>Turn {game.turnNumber}</span>
+          <span>
+            Turn {game.turnNumber}
+            {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
+              <em className="final-round">{game.turnNumber >= game.finalTurn ? " · Final turn" : " · Final round"}</em>
+            )}
+          </span>
           <strong>
             {viewer.name}’s {PHASE_NAMES[game.phase]}
           </strong>
@@ -801,7 +806,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           )}
         </>
       )}
-      {game.winner !== null && <WinnerOverlay game={game} onRestart={onExit} />}
+      {game.phase === "game-over" && <WinnerOverlay game={game} onRestart={onExit} />}
       {currentDraw && <DrawPresentation game={game} event={currentDraw} />}
     </main>
   );

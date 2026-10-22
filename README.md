@@ -105,7 +105,6 @@ Credits for all of it are shown in-game under **Artwork credits**.
 ## Open items
 
 - **Commissioned art.** 24 cards have no artwork, and 17 cards plus the Biome backgrounds use AI placeholders. Fan art contests need written submission terms (rights granted, originality, credit, prizes) before launch.
-- **Deck exhaustion.** The rules have no deck-out or stalemate condition. Once both decks are empty, a game can continue with no possible progress until a player concedes. Simulated games reach this state regularly.
 - **Placeholder Tags.** Shearing Bite, Retention, and Resonance are listed in the Tag registry but have no effect yet.
 - **Rule documents.** The Changes Register, Player Rulebook, and Design Ledger documents are not yet in this repository.
 

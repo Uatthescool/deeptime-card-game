@@ -18,13 +18,8 @@ import {
  */
 
 const BIOMES: Array<BiomeKey | null> = [null, "tropical", "temperate", "cold", "arid", "aquatic"];
+/** Far more actions than any real game needs; the deck exhaustion rule guarantees every game ends. */
 const MAX_ACTIONS = 3000;
-/**
- * The rules have no deck-out or stalemate condition, so once both decks are
- * empty a game can continue indefinitely with nothing left to play. The
- * simulation stops such games after this many further turns.
- */
-const EXHAUSTED_TURNS = 10;
 
 function policyRandom(seed: number) {
   let value = seed >>> 0 || 1;
@@ -47,12 +42,7 @@ function simulate(seed: number, decks: [DeckKey, DeckKey], biomes: [BiomeKey | n
   const random = policyRandom(seed * 7919);
   let state: GameState = createGame("North", "South", biomes, decks, { seed });
   const history: GameAction[] = [];
-  let exhaustedSince: number | null = null;
-  for (let step = 0; step < MAX_ACTIONS && state.winner === null; step += 1) {
-    if (exhaustedSince === null && state.players.every((player) => player.deck.length === 0)) {
-      exhaustedSince = state.turnNumber;
-    }
-    if (exhaustedSince !== null && state.turnNumber > exhaustedSince + EXHAUSTED_TURNS) break;
+  for (let step = 0; step < MAX_ACTIONS && state.phase !== "game-over"; step += 1) {
     const legal = listLegalActions(state);
     if (!legal.length) {
       throw new Error(`Game ${seed} is stuck on turn ${state.turnNumber} (${state.phase}) with no legal action.`);
@@ -69,7 +59,7 @@ function simulate(seed: number, decks: [DeckKey, DeckKey], biomes: [BiomeKey | n
     history.push(action);
     state = next;
   }
-  return { state, history, exhausted: exhaustedSince !== null && state.winner === null };
+  return { state, history };
 }
 
 const matchups: Array<[DeckKey, DeckKey]> = DECK_KEYS.flatMap((a) =>
@@ -81,7 +71,7 @@ const MATCHUP_TIMEOUT_MS = 120_000;
 
 describe("simulated games", () => {
   test.each(matchups)(
-    "%s vs %s plays to completion without breaking invariants",
+    "%s vs %s always ends without breaking invariants",
     { timeout: MATCHUP_TIMEOUT_MS },
     (deckA, deckB) => {
       for (let game = 0; game < 6; game += 1) {
@@ -90,8 +80,8 @@ describe("simulated games", () => {
           BIOMES[game % BIOMES.length]!,
           BIOMES[(game + 3) % BIOMES.length]!,
         ];
-        const { state, exhausted } = simulate(seed, [deckA, deckB], biomes);
-        expect(state.winner !== null || exhausted, `game ${seed} ends in a win or a deck-exhausted stall`).toBe(true);
+        const { state } = simulate(seed, [deckA, deckB], biomes);
+        expect(state.phase, `game ${seed} reaches a win or a draw`).toBe("game-over");
       }
     },
   );

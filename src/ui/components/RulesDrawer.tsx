@@ -19,6 +19,10 @@ export function RulesDrawer({ onClose }: { onClose: () => void }) {
           Build an ecosystem across your five Niches. The first player whose Creatures total 12 or more Victory Levels
           wins; if both reach 12 at once, the higher total wins.
         </p>
+        <p>
+          If both decks run out, the game ends at the end of that round, so both players have had the same number of
+          turns. The higher Victory total wins; equal totals are a draw.
+        </p>
       </section>
       <section>
         <h3>Turn</h3>

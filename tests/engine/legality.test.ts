@@ -49,7 +49,7 @@ describe("explanations agree with the legal-move list", () => {
           [DECK_KEYS[game % 3]!, DECK_KEYS[(game + 1) % 3]!],
           { seed: 3000 + game },
         );
-        for (let step = 0; step < 300 && state.winner === null; step += 1) {
+        for (let step = 0; step < 300 && state.phase !== "game-over"; step += 1) {
           const legal = listLegalActions(state);
           if (!legal.length) break;
           const active = state.activePlayer;

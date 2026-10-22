@@ -4846,3 +4846,9 @@ header + .legality-reasons {
   white-space: nowrap;
   pointer-events: none;
 }
+
+.turn-summary .final-round {
+  color: #f0b46a;
+  font-style: normal;
+  font-weight: 800;
+}

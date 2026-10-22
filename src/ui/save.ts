@@ -9,7 +9,7 @@ type SaveFile = { version: number; savedAt: string; game: GameState };
 export type SavedGameSummary = { savedAt: Date; players: [string, string]; turnNumber: number };
 
 export function saveGame(game: GameState) {
-  if (game.winner !== null) {
+  if (game.phase === "game-over") {
     clearSavedGame();
     return;
   }
@@ -47,7 +47,7 @@ export function loadSavedGame(): GameState | null {
   if (!file || file.version !== GAME_STATE_VERSION || file.game?.version !== GAME_STATE_VERSION) return null;
   try {
     const game = relinkDefinitions(file.game);
-    if (!game || game.winner !== null || checkInvariants(game).length) {
+    if (!game || game.phase === "game-over" || checkInvariants(game).length) {
       clearSavedGame();
       return null;
     }

@@ -5,6 +5,7 @@ import {
   otherPlayer,
   playerHolds,
   resolutionBlocked,
+  isGameOver,
 } from "./core.ts";
 import { checkOverride } from "./override.ts";
 import type { CardInstance, GameState, OverrideCheck, PlacementVerdict, PlayerId, Reason } from "./types.ts";
@@ -23,7 +24,7 @@ function verdict(reasons: Reason[], override: OverrideCheck | null = null): Plac
 
 /** Reasons the player can't take any Development Phase action right now. */
 export function developmentGate(state: GameState, playerId: PlayerId): Reason[] {
-  if (state.winner !== null) return [reason("game-over", "The game is over.")];
+  if (isGameOver(state)) return [reason("game-over", "The game is over.")];
   if (state.activePlayer !== playerId) return [reason("not-your-turn", "It isn't your turn.")];
   if (resolutionBlocked(state)) return [reason("pending-choice", "Finish the choice in progress first.")];
   if (state.phase !== "development") {
