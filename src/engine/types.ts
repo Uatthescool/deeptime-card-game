@@ -101,6 +101,8 @@ export type PlayerState = {
   event: EventInstance | null;
   returnQueue: string[];
   fullHandMulliganUsed: boolean;
+  /** How many of this player's turns in a row have ended with a full hand (see the full-hand forfeit). */
+  fullHandTurns?: number;
   turnsStarted: number;
   herdTriggeredTurn: number | null;
   overreachTriggeredTurn: number | null;

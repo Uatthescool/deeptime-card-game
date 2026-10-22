@@ -9,7 +9,9 @@ import {
   emptyAllowances,
   emptyLane,
   findCreature,
+  FULL_HAND_FORFEIT_TURNS,
   HAND_LIMIT,
+  handStalled,
   LANE_COUNT,
   otherPlayer,
   resolutionBlocked,
@@ -183,6 +185,29 @@ function declareWinner(state: GameState, winner: PlayerId, reason: string, logMe
   state.phase = "game-over";
   state.handoff = null;
   addLog(state, logMessage);
+}
+
+/**
+ * Full-hand forfeit: a full hand blocks every draw, so a player who kept one
+ * could stop their deck from ever running out and stall the game forever.
+ * Ending two of your own turns in a row with a full hand, while your deck
+ * still has cards, loses the game. Called at the end of each turn.
+ */
+function resolveFullHandForfeit(state: GameState) {
+  const player = state.players[state.activePlayer];
+  player.fullHandTurns = handStalled(player) ? (player.fullHandTurns ?? 0) + 1 : 0;
+  if (player.fullHandTurns === 1) {
+    addLog(state, `${player.name} ended the turn with a full hand; doing so again next turn forfeits the game.`);
+  }
+  if (player.fullHandTurns < FULL_HAND_FORFEIT_TURNS) return false;
+  const winner = otherPlayer(state.activePlayer);
+  declareWinner(
+    state,
+    winner,
+    `${player.name} ended two turns in a row with a full hand and forfeited.`,
+    `${state.players[winner].name} won: ${player.name} forfeited by ending two turns in a row with a full hand.`,
+  );
+  return true;
 }
 
 /** The last turn of the round in progress. Turn 1 is the first player's, so every round ends on an even turn. */
@@ -425,6 +450,7 @@ export function endTurn(original: GameState): GameState {
     }
   }
   if (resolveVictoryThreshold(state)) return state;
+  if (resolveFullHandForfeit(state)) return state;
   if (resolveExhaustion(state)) return state;
   addLog(state, `${active.name} ended Turn ${state.turnNumber}.`);
   const next = otherPlayer(state.activePlayer);

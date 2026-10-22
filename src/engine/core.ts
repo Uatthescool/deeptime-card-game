@@ -14,6 +14,8 @@ import type {
 export const LANE_COUNT = 5;
 export const HAND_LIMIT = 10;
 export const VICTORY_THRESHOLD = 12;
+/** Ending this many of your own turns in a row with a full hand forfeits the game. */
+export const FULL_HAND_FORFEIT_TURNS = 2;
 export const PERIOD_SEQUENCE = PERIODS;
 
 const LOG_LIMIT = 100;
@@ -180,6 +182,17 @@ export function allCreatures(state: GameState) {
 export function handCardByUid(state: GameState, playerId: PlayerId, uid: string | null) {
   if (!uid) return null;
   return state.players[playerId].hand.find((card) => card.uid === uid) ?? null;
+}
+
+/** A full hand with cards still to draw: ending a turn like this counts toward the full-hand forfeit. */
+export function handStalled(player: PlayerState) {
+  return player.hand.length >= HAND_LIMIT && player.deck.length > 0;
+}
+
+/** True when ending the current turn as things stand would forfeit the game for the active player. */
+export function endingTurnForfeits(state: GameState) {
+  const player = state.players[state.activePlayer];
+  return handStalled(player) && (player.fullHandTurns ?? 0) + 1 >= FULL_HAND_FORFEIT_TURNS;
 }
 
 export function playerHolds(player: PlayerState, uid: string) {

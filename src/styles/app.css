@@ -4992,3 +4992,10 @@ header + .legality-reasons {
   font-size: 0.85rem;
   font-weight: 700;
 }
+
+/* Full-hand forfeit warning */
+.turn-summary .forfeit-warning {
+  color: #ff9a7a;
+  font-style: normal;
+  font-weight: 800;
+}

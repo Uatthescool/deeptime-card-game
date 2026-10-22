@@ -10,6 +10,7 @@ import {
   canUseAquaticOverride,
   type CardInstance,
   conceptAllowance,
+  endingTurnForfeits,
   explainCard,
   explainHunt,
   explainHunter,
@@ -328,6 +329,9 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
     clearSelection();
   };
 
+  // A second full-hand turn in a row forfeits: say so before the person ends this one.
+  const forfeitWarning =
+    !computerTurn && game.activePlayer === viewPlayer && game.phase !== "game-over" && endingTurnForfeits(game);
   const conceptLimit = conceptAllowance(game, viewPlayer);
   const legalHuntsAvailable = hasLegalHunts(game, viewPlayer);
   const facultativeSources = legalFacultativeSources(game);
@@ -490,6 +494,15 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
             {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
               <em className="final-round">{game.turnNumber >= game.finalTurn ? " · Final turn" : " · Final round"}</em>
             )}
+            {forfeitWarning && (
+              <em
+                className="forfeit-warning"
+                role="alert"
+                title="Your second turn in a row with a full hand: play a card or Mulligan, or ending the turn forfeits the game."
+              >
+                {" · Full hand: play a card or forfeit"}
+              </em>
+            )}
           </span>
           <strong>
             {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
@@ -587,10 +600,14 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
                       }}
                     >
                       {allowances.skipBattlePhase
-                        ? "End Turn · Battle skipped"
+                        ? forfeitWarning
+                          ? "Forfeit · Battle skipped"
+                          : "End Turn · Battle skipped"
                         : legalHuntsAvailable
                           ? "Enter Battle Phase"
-                          : "End Turn"}
+                          : forfeitWarning
+                            ? "End Turn and forfeit"
+                            : "End Turn"}
                     </button>
                   )}
                   {game.phase === "battle" && (
@@ -671,7 +688,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
                       clearSelection();
                     }}
                   >
-                    End turn
+                    {forfeitWarning ? "End turn and forfeit" : "End turn"}
                   </button>
                   <button
                     className="quiet-button"

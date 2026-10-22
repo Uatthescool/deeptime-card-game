@@ -10,6 +10,8 @@ import {
   getConceptChoiceOptions,
   getHerdOptions,
   getNestingOptions,
+  otherPlayer,
+  VICTORY_THRESHOLD,
   victoryTotals,
 } from "../../engine/index.ts";
 import { CardBack, CardFace } from "./CardFace.tsx";
@@ -370,11 +372,21 @@ export function WinnerOverlay({ game, onRestart }: { game: GameState; onRestart:
   if (game.phase !== "game-over") return null;
   const totals = victoryTotals(game);
   const winner = game.winner === null ? null : game.players[game.winner];
+  // A win by reaching the threshold shows the winning total; any other ending (a draw, a concession, a forfeit) shows both.
+  const established = game.winner !== null && totals[game.winner] >= VICTORY_THRESHOLD;
   return (
     <Dialog label="Game over" className="winner-overlay">
       <div className="winner-card">
-        <div className="eyebrow">{winner ? "Ecosystem established" : "Ecosystems in balance"}</div>
-        <div className="winner-score">{winner ? totals[game.winner!] : `${totals[0]}–${totals[1]}`}</div>
+        <div className="eyebrow">
+          {established ? "Ecosystem established" : winner ? "Game over" : "Ecosystems in balance"}
+        </div>
+        <div className="winner-score">
+          {established
+            ? totals[game.winner!]
+            : game.winner === null
+              ? `${totals[0]}–${totals[1]}`
+              : `${totals[game.winner]}–${totals[otherPlayer(game.winner)]}`}
+        </div>
         <h2>{winner ? `${winner.name} wins` : "It's a draw"}</h2>
         <p>{game.winReason}</p>
         <button className="primary-button full" onClick={onRestart}>

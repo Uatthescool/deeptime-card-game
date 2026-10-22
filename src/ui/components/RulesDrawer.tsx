@@ -23,6 +23,10 @@ export function RulesDrawer({ onClose }: { onClose: () => void }) {
           If both decks run out, the game ends at the end of that round, so both players have had the same number of
           turns. The higher Victory total wins; equal totals are a draw.
         </p>
+        <p>
+          A full hand (10 cards) blocks your draws. If you end two of your turns in a row with a full hand while your
+          deck still has cards, you forfeit.
+        </p>
       </section>
       <section>
         <h3>Turn</h3>

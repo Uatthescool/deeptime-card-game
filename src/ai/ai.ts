@@ -11,6 +11,7 @@ import {
   otherPlayer,
   type PlayerId,
   HAND_LIMIT,
+  handStalled,
   victoryTotals,
   VICTORY_THRESHOLD,
 } from "../engine/index.ts";
@@ -74,10 +75,12 @@ export function evaluate(state: GameState, me: PlayerId): number {
   // Once both decks are empty the Victory totals decide the game, so they matter even more.
   const victoryWeight = typeof state.finalTurn === "number" ? 14 : 7;
   const closeToWinning = (total: number) => Math.max(0, total - (VICTORY_THRESHOLD - 3)) * 4;
-  // Cards in hand help up to a point; a full hand blocks every draw.
+  // Cards in hand help up to a point; a full hand blocks every draw, and a second full-hand turn forfeits.
   const hand = (playerId: PlayerId) => {
-    const size = state.players[playerId].hand.length;
-    return Math.min(size, 8) * 1.2 - (size >= HAND_LIMIT ? 3 : 0);
+    const player = state.players[playerId];
+    const size = player.hand.length;
+    const stalled = handStalled(player) ? ((player.fullHandTurns ?? 0) > 0 ? 25 : 3) : 0;
+    return Math.min(size, 8) * 1.2 - stalled;
   };
   const event = (playerId: PlayerId) => (state.players[playerId].event ? 2 : 0);
   return (
