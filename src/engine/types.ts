@@ -233,6 +233,11 @@ export type PendingConvergentChoice = {
   source?: "normal" | "aquatic";
 };
 
+export type Difficulty = "easy" | "normal";
+
+/** The seat the computer plays, and how well. */
+export type ComputerSeat = { seat: PlayerId; difficulty: Difficulty };
+
 export type GameState = {
   version: typeof GAME_STATE_VERSION;
   /** The seed this game was created from; identifies the game for replays and bug reports. */
@@ -267,6 +272,8 @@ export type GameState = {
   winReason: string | null;
   log: string[];
   seedLabel: string;
+  /** The computer opponent, if one plays this game; absent or null when two people share the device. */
+  computer?: ComputerSeat | null;
   drawEvents: DrawEvent[];
   nextDrawEventId: number;
 };

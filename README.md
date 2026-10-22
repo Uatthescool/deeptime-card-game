@@ -14,7 +14,7 @@ The game currently ships three complete 40-card decks, five Biomes that change e
 | 2    | **Herbivore Development**: armored Herbivores that grow toward Dreadnoughtus |
 | 3    | **Aquatic Carnivores**: marine hunters using the closed Aquatic ecosystem    |
 
-Play is local two-player on one device: hands stay hidden behind a handoff screen whenever the device passes between players. Games save automatically and survive a page refresh.
+Play against the computer (Easy or Normal), or two players on one device, with hands hidden behind a handoff screen whenever the device passes between players. Games save automatically and survive a page refresh.
 
 ## Quick start
 
@@ -42,11 +42,13 @@ Then open http://localhost:5173.
 
 ```
 src/
+  ai/        The computer opponent: move choice and a Web Worker to run it
   data/      Card, deck, Biome, and Lesson content (no logic beyond validation)
   engine/    The rules engine: pure TypeScript, no browser or UI dependencies
   ui/        React interface: screens, components, saving, and session state
   styles/    Stylesheets
 tests/
+  ai/        Computer-opponent games, strength checks, and a fair-play test
   engine/    Rules tests, determinism tests, and whole-game simulations
   ui/        Interface tests run in a simulated browser
 tools/       Playtest balance tool and image optimizer
@@ -64,12 +66,22 @@ tools/       Playtest balance tool and image optimizer
 
 Modules, in dependency order: `core` (zones, board geometry, locks) → `override`, `victory`, `battle-math` → `queries` (read-only legality) → `turn` (turn flow) → `entry-effects`, `development`, `concepts`, `battle` (transitions) → `actions` (dispatch and legal-move generation).
 
+### The computer opponent
+
+`src/ai` plays a seat using only the engine's legal moves. It never cheats: before each decision it re-deals everything it couldn't know (the opponent's hand, the order of both decks, the random number generator) and plans on that imagined game, and it judges Hunts by weighing every Battle Coin outcome by its probability rather than peeking. A test checks this directly: scrambling the hidden information never changes its choice.
+
+- **Normal** follows each move through its follow-up choices and plans two Development moves ahead.
+- **Easy** judges each move by its first step only and sometimes misses or misjudges a move.
+
+In testing, Normal beats Easy about 9 games in 10, and both beat random play about 9 in 10. Decisions run in a Web Worker, so the page stays responsive while the computer thinks, and each move is paced so a person can follow it.
+
 ### Tests
 
 - **Rules** (`tests/engine/rules.test.ts`): 90 scenario tests covering card interactions and rulings.
 - **Determinism** (`tests/engine/determinism.test.ts`): seed reproducibility, replay, purity, and Battle Coins.
 - **Simulation** (`tests/engine/simulation.test.ts`): 54 complete games across every deck matchup and Biome, played by a random policy over `listLegalActions`. Invariants are checked after every action, and the suite fails if any game gets stuck or any listed action does nothing.
-- **Interface** (`tests/ui/app.test.tsx`): setup-to-first-turn flow, save and resume, the card browser, and the Hunt/coin modal.
+- **Computer opponent** (`tests/ai/ai.test.ts`): full computer games with every move checked for legality, strength against random play and between difficulties, and the fair-play test.
+- **Interface** (`tests/ui/app.test.tsx`): setup-to-first-turn flow (against a person and against the computer), save and resume, the card browser, and the Hunt/coin modal.
 
 ## Rules source of truth
 

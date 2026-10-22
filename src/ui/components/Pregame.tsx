@@ -2,11 +2,13 @@ import { biomeByKey, BIOMES, type BiomeKey } from "../../data/biomes.ts";
 import { DECK_LABELS, type DeckKey } from "../../data/cards.ts";
 import type { PlayerId } from "../../engine/index.ts";
 import { CardBack } from "./CardFace.tsx";
+import type { Opponent } from "./SetupScreen.tsx";
 
 export type PregameState = {
   players: [string, string];
   decks: [DeckKey, DeckKey];
   seed: number | null;
+  opponent: Opponent;
   chooser: PlayerId;
   choices: [BiomeKey | null, BiomeKey | null];
   selected: BiomeKey | null;
@@ -111,8 +113,10 @@ export function BiomePregame({ state, onSelect, onConfirm, onContinue, onDeal, o
           <h1>{state.players[state.chooser]}, choose a Biome.</h1>
         </div>
         <p>
-          Your Biome changes the rules for your side of the ecosystem. Both selections are revealed before either
-          opening hand is drawn.
+          Your Biome changes the rules for your side of the ecosystem.{" "}
+          {state.opponent === "person"
+            ? "Both selections are revealed before either opening hand is drawn."
+            : "The computer chooses its own without seeing yours; both are revealed before the opening hands are drawn."}
         </p>
       </header>
       <section className="biome-panel-grid">

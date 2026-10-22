@@ -23,6 +23,7 @@ import {
   GAME_STATE_VERSION,
   type BiomeState,
   type CardInstance,
+  type ComputerSeat,
   type GameState,
   type PlayerId,
   type PlayerState,
@@ -71,6 +72,8 @@ function drawOpeningHand(rng: RngHolder, player: PlayerState) {
 export type CreateGameOptions = {
   /** Fixes the game's randomness. Omit for a fresh random game. */
   seed?: number;
+  /** A seat for the computer opponent. */
+  computer?: ComputerSeat | null;
 };
 
 export function createGame(
@@ -142,6 +145,7 @@ export function createGame(
       "Both players drew legal five-card opening hands from their selected 40-card decks.",
     ],
     seedLabel: seedLabel(seed),
+    computer: options.computer ?? null,
     drawEvents: [],
     nextDrawEventId: 1,
   };

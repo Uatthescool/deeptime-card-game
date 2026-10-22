@@ -1,5 +1,6 @@
 import { type CSSProperties, useEffect, useState } from "react";
 
+import { DIFFICULTY_NAMES } from "../../ai/ai.ts";
 import { biomeByKey, type BiomeKey } from "../../data/biomes.ts";
 import {
   canActivateCarnianPluvialEpisode,
@@ -14,6 +15,7 @@ import {
   explainHunter,
   explainPlacement,
   findCreature,
+  type GameAction,
   type GameState,
   handCardByUid,
   hasLegalHunts,
@@ -35,6 +37,7 @@ import {
   victoryTotals,
 } from "../../engine/index.ts";
 import { assetUrl } from "../assets.ts";
+import { useComputerOpponent } from "../useComputerOpponent.ts";
 import { useGameSession } from "../useGameSession.ts";
 import { BattleModal } from "./BattleModal.tsx";
 import { EventZone, NicheLane } from "./Board.tsx";
@@ -91,8 +94,15 @@ type GameScreenProps = {
 };
 
 export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
-  const { game, dispatch, currentDraw } = useGameSession(initialGame);
-  const [resumeCover, setResumeCover] = useState(resumed && !initialGame.handoff);
+  const { game, dispatch: dispatchAny, currentDraw } = useGameSession(initialGame);
+  const computerTurn = useComputerOpponent(game, dispatchAny);
+  // The person's own moves; ignored while the computer is the one to move.
+  const dispatch = (action: GameAction) => {
+    if (!computerTurn) dispatchAny(action);
+  };
+  const computer = game.computer ?? null;
+  // Against the computer nobody passes the device, so there is no hand to cover on resume.
+  const [resumeCover, setResumeCover] = useState(resumed && !initialGame.handoff && !initialGame.computer);
   const [selectedCardUid, setSelectedCardUid] = useState<string | null>(null);
   const [selectedAttackerUid, setSelectedAttackerUid] = useState<string | null>(null);
   const [boardAction, setBoardAction] = useState<BoardAction>(null);
@@ -172,7 +182,8 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
     setSelectedAttackerUid(null);
   };
 
-  const viewPlayer = game.activePlayer;
+  // Two people take turns at the device; against the computer the screen always belongs to the person.
+  const viewPlayer = computer ? otherPlayer(computer.seat) : game.activePlayer;
   const opponent = otherPlayer(viewPlayer);
   const viewer = game.players[viewPlayer];
   const opponentState = game.players[opponent];
@@ -219,6 +230,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
   const attackTargets = selectedAttackerUid ? legalAttackTargets(game, selectedAttackerUid) : [];
 
   const handleLaneClick = (playerId: PlayerId, laneIndex: number) => {
+    if (computerTurn) return;
     const lane = game.players[playerId].lanes[laneIndex]!;
     const own = playerId === viewPlayer;
     if (own && boardAction?.kind === "facultative-source" && legalFacultativeSources(game).includes(laneIndex)) {
@@ -319,7 +331,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
   const conceptLimit = conceptAllowance(game, viewPlayer);
   const legalHuntsAvailable = hasLegalHunts(game, viewPlayer);
   const facultativeSources = legalFacultativeSources(game);
-  const handHidden = Boolean(game.handoff) || resumeCover;
+  const handHidden = !computer && (Boolean(game.handoff) || resumeCover);
   const facultativeActive =
     boardAction?.kind === "facultative-source" || boardAction?.kind === "facultative-destination";
   const aquaticActive = boardAction !== null && !facultativeActive;
@@ -351,7 +363,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
   const canExplainLane = (playerId: PlayerId, laneIndex: number) =>
     playerId === viewPlayer ? Boolean(placementVerdicts) : Boolean(huntVerdicts?.[laneIndex]);
   const cardVerdicts =
-    game.phase === "development" && !handHidden
+    game.phase === "development" && !handHidden && !computerTurn
       ? new Map(viewer.hand.map((card) => [card.uid, explainCard(game, card)]))
       : null;
   const selectedAttacker = selectedAttackerUid ? findCreature(game, selectedAttackerUid) : null;
@@ -456,6 +468,8 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
 
   const selectHandCard = (card: CardInstance) => {
     pin({ definition: card.definition });
+    // While the computer moves, cards can be inspected but not played.
+    if (computerTurn) return;
     setSelectedCardUid(selectedCardUid === card.uid ? null : card.uid);
     setSelectedAttackerUid(null);
     if (boardAction?.kind !== "aquatic-override") setBoardAction(null);
@@ -478,7 +492,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
             )}
           </span>
           <strong>
-            {viewer.name}’s {PHASE_NAMES[game.phase]}
+            {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
           </strong>
         </div>
         <div className="header-controls">
@@ -515,7 +529,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
               style={biomeBoardStyle(opponentState.biome.key)}
               aria-label={`${opponentState.name}'s ${opponentState.biome.key ? biomeByKey(opponentState.biome.key).name : "standard"} ecosystem`}
             >
-              {ribbon(opponent, "Opponent")}
+              {ribbon(opponent, computer ? `Computer · ${DIFFICULTY_NAMES[computer.difficulty]}` : "Opponent")}
               {lanes(opponent)}
             </div>
 
@@ -533,7 +547,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
               aria-label={`${viewer.name}'s ${viewer.biome.key ? biomeByKey(viewer.biome.key).name : "standard"} ecosystem`}
             >
               {lanes(viewPlayer)}
-              {ribbon(viewPlayer, "Active player")}
+              {ribbon(viewPlayer, computer ? "You" : "Active player")}
             </div>
           </section>
 
@@ -546,133 +560,149 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           )}
 
           <section className="hand-workspace">
-            <section className="action-bar" aria-label="Turn controls and selected-card actions">
-              <div className="phase-actions">
-                {game.phase === "development" && (
+            {computerTurn ? (
+              <section className="action-bar computer-turn" aria-label="Computer's turn" aria-live="polite">
+                <div className="computer-status">
+                  <span className="thinking-dots" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <div>
+                    <small>{game.players[computer!.seat].name} is playing</small>
+                    <strong>{game.log.at(-1) ?? "Thinking…"}</strong>
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <section className="action-bar" aria-label="Turn controls and selected-card actions">
+                <div className="phase-actions">
+                  {game.phase === "development" && (
+                    <button
+                      className="primary-button"
+                      disabled={allowances.rapidSpeciation || boardAction !== null}
+                      onClick={() => {
+                        dispatch({ type: "advanceToBattle" });
+                        setSelectedCardUid(null);
+                      }}
+                    >
+                      {allowances.skipBattlePhase
+                        ? "End Turn · Battle skipped"
+                        : legalHuntsAvailable
+                          ? "Enter Battle Phase"
+                          : "End Turn"}
+                    </button>
+                  )}
+                  {game.phase === "battle" && (
+                    <p>
+                      {selectedAttackerUid
+                        ? attackTargets.length
+                          ? "Choose a highlighted target."
+                          : "No legal target."
+                        : "Choose a ready hunter."}
+                    </p>
+                  )}
+                  {viewer.event?.definition.key === "carnian-pluvial-episode" && (
+                    <button
+                      className="quiet-button"
+                      disabled={!canActivateCarnianPluvialEpisode(game)}
+                      onClick={() => dispatch({ type: "activateCarnianPluvial" })}
+                    >
+                      {allowances.carnianPluvialUsed ? "Carnian used" : "Use Carnian Pluvial"}
+                    </button>
+                  )}
+                  {game.phase === "development" && facultativeSources.length > 0 && (
+                    <button
+                      className="quiet-button"
+                      disabled={aquaticActive}
+                      onClick={() => startBoardAction(facultativeActive ? null : { kind: "facultative-source" })}
+                    >
+                      {facultativeActive ? "Cancel movement" : "Use Facultative Movement"}
+                    </button>
+                  )}
+                  {canPerformFullHandMulligan(game) && (
+                    <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
+                      Mulligan
+                    </button>
+                  )}
+                </div>
+
+                {selectedCard ? (
+                  <SelectedCardPanel
+                    game={game}
+                    card={selectedCard}
+                    targetCount={selectedTargetCount}
+                    blockedReason={(() => {
+                      const verdict = cardVerdicts?.get(selectedCard.uid);
+                      return verdict && !verdict.legal ? verdict.reasons[0]?.text : undefined;
+                    })()}
+                    aquaticOverride={boardAction?.kind === "aquatic-override"}
+                    onClose={() => setSelectedCardUid(null)}
+                    onPlayEvent={() => {
+                      dispatch({ type: "playEvent", cardUid: selectedCard.uid });
+                      clearSelection();
+                    }}
+                    onPlayConcept={() => {
+                      dispatch({ type: "playConcept", cardUid: selectedCard.uid });
+                      clearSelection();
+                    }}
+                  />
+                ) : (
+                  <div className="selected-action-empty">
+                    <small>Selected card</small>
+                    <span>{boardAction ? boardActionPrompt[boardAction.kind] : "None"}</span>
+                  </div>
+                )}
+
+                <BiomeControl
+                  game={game}
+                  active={aquaticActive}
+                  onReposition={() => startBoardAction({ kind: "waterway-source" })}
+                  onOverride={() => startBoardAction({ kind: "aquatic-override" })}
+                  onCancel={() => startBoardAction(null)}
+                />
+
+                <div className="turn-end-actions">
                   <button
-                    className="primary-button"
-                    disabled={allowances.rapidSpeciation || boardAction !== null}
+                    className="quiet-button"
+                    disabled={boardAction !== null}
                     onClick={() => {
-                      dispatch({ type: "advanceToBattle" });
-                      setSelectedCardUid(null);
+                      dispatch({ type: "endTurn" });
+                      clearSelection();
                     }}
                   >
-                    {allowances.skipBattlePhase
-                      ? "End Turn · Battle skipped"
-                      : legalHuntsAvailable
-                        ? "Enter Battle Phase"
-                        : "End Turn"}
+                    End turn
                   </button>
-                )}
-                {game.phase === "battle" && (
-                  <p>
-                    {selectedAttackerUid
-                      ? attackTargets.length
-                        ? "Choose a highlighted target."
-                        : "No legal target."
-                      : "Choose a ready hunter."}
-                  </p>
-                )}
-                {viewer.event?.definition.key === "carnian-pluvial-episode" && (
                   <button
                     className="quiet-button"
-                    disabled={!canActivateCarnianPluvialEpisode(game)}
-                    onClick={() => dispatch({ type: "activateCarnianPluvial" })}
+                    disabled={!selectedCardUid && !selectedAttackerUid}
+                    onClick={clearSelection}
                   >
-                    {allowances.carnianPluvialUsed ? "Carnian used" : "Use Carnian Pluvial"}
+                    Cancel
                   </button>
-                )}
-                {game.phase === "development" && facultativeSources.length > 0 && (
-                  <button
-                    className="quiet-button"
-                    disabled={aquaticActive}
-                    onClick={() => startBoardAction(facultativeActive ? null : { kind: "facultative-source" })}
-                  >
-                    {facultativeActive ? "Cancel movement" : "Use Facultative Movement"}
-                  </button>
-                )}
-                {canPerformFullHandMulligan(game) && (
-                  <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
-                    Mulligan
-                  </button>
-                )}
-              </div>
-
-              {selectedCard ? (
-                <SelectedCardPanel
-                  game={game}
-                  card={selectedCard}
-                  targetCount={selectedTargetCount}
-                  blockedReason={(() => {
-                    const verdict = cardVerdicts?.get(selectedCard.uid);
-                    return verdict && !verdict.legal ? verdict.reasons[0]?.text : undefined;
-                  })()}
-                  aquaticOverride={boardAction?.kind === "aquatic-override"}
-                  onClose={() => setSelectedCardUid(null)}
-                  onPlayEvent={() => {
-                    dispatch({ type: "playEvent", cardUid: selectedCard.uid });
-                    clearSelection();
-                  }}
-                  onPlayConcept={() => {
-                    dispatch({ type: "playConcept", cardUid: selectedCard.uid });
-                    clearSelection();
-                  }}
-                />
-              ) : (
-                <div className="selected-action-empty">
-                  <small>Selected card</small>
-                  <span>{boardAction ? boardActionPrompt[boardAction.kind] : "None"}</span>
-                </div>
-              )}
-
-              <BiomeControl
-                game={game}
-                active={aquaticActive}
-                onReposition={() => startBoardAction({ kind: "waterway-source" })}
-                onOverride={() => startBoardAction({ kind: "aquatic-override" })}
-                onCancel={() => startBoardAction(null)}
-              />
-
-              <div className="turn-end-actions">
-                <button
-                  className="quiet-button"
-                  disabled={boardAction !== null}
-                  onClick={() => {
-                    dispatch({ type: "endTurn" });
-                    clearSelection();
-                  }}
-                >
-                  End turn
-                </button>
-                <button
-                  className="quiet-button"
-                  disabled={!selectedCardUid && !selectedAttackerUid}
-                  onClick={clearSelection}
-                >
-                  Cancel
-                </button>
-                {confirmConcede ? (
-                  <span className="concede-confirm">
-                    <button className="text-button danger" onClick={() => dispatch({ type: "concede" })}>
-                      Confirm concede
+                  {confirmConcede ? (
+                    <span className="concede-confirm">
+                      <button className="text-button danger" onClick={() => dispatch({ type: "concede" })}>
+                        Confirm concede
+                      </button>
+                      <button className="text-button" onClick={() => setConfirmConcede(false)}>
+                        Keep playing
+                      </button>
+                    </span>
+                  ) : (
+                    <button className="text-button" onClick={() => setConfirmConcede(true)}>
+                      Concede
                     </button>
-                    <button className="text-button" onClick={() => setConfirmConcede(false)}>
-                      Keep playing
-                    </button>
-                  </span>
-                ) : (
-                  <button className="text-button" onClick={() => setConfirmConcede(true)}>
-                    Concede
-                  </button>
-                )}
-              </div>
-              {game.pendingCranialDisplay && (
-                <div className="mandatory-control-prompt" role="alert">
-                  <strong>Cranial Display</strong>
-                  <span>Choose a highlighted opposing Creature.</span>
+                  )}
                 </div>
-              )}
-            </section>
+                {game.pendingCranialDisplay && (
+                  <div className="mandatory-control-prompt" role="alert">
+                    <strong>Cranial Display</strong>
+                    <span>Choose a highlighted opposing Creature.</span>
+                  </div>
+                )}
+              </section>
+            )}
 
             <section className="hand-zone">
               <div className="section-heading">
@@ -771,7 +801,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
       </div>
 
       {showRules && <RulesDrawer onClose={() => setShowRules(false)} />}
-      {game.handoff && (
+      {game.handoff && !computer && (
         <HandoffOverlay
           title={game.handoff.title}
           detail={game.handoff.detail}
@@ -787,7 +817,8 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           onContinue={() => setResumeCover(false)}
         />
       )}
-      {!resumeCover && (
+      {/* The computer makes its own choices out of sight; only the Hunt itself is shown to the person. */}
+      {!resumeCover && !computerTurn && (
         <>
           {game.pendingBiodiversity && <BiodiversityModal game={game} dispatch={dispatch} />}
           {game.pendingFilterFeeder && <FilterFeederModal game={game} dispatch={dispatch} />}
@@ -797,17 +828,25 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           {(game.pendingHerd || game.pendingNesting) && <EntryChoiceModal game={game} dispatch={dispatch} />}
           {game.pendingConceptChoice && <ConceptChoiceModal game={game} dispatch={dispatch} />}
           {game.pendingCarnianPluvial && <CarnianPluvialChoiceModal game={game} dispatch={dispatch} />}
-          {game.pendingBattle && (
-            <BattleModal
-              key={`${game.pendingBattle.attackerUid}-${game.pendingBattle.defenderUid}`}
-              game={game}
-              dispatch={dispatch}
-            />
-          )}
         </>
       )}
+      {!resumeCover && game.pendingBattle && (
+        <BattleModal
+          key={`${game.pendingBattle.attackerUid}-${game.pendingBattle.defenderUid}`}
+          game={game}
+          // A person may reroll their own coin during the computer's Hunt, so rerolls bypass the turn guard.
+          dispatch={(action) => (action.type === "rerollBattleCoin" ? dispatchAny(action) : dispatch(action))}
+          controller={computer ? otherPlayer(computer.seat) : null}
+        />
+      )}
       {game.phase === "game-over" && <WinnerOverlay game={game} onRestart={onExit} />}
-      {currentDraw && <DrawPresentation game={game} event={currentDraw} />}
+      {currentDraw && (
+        <DrawPresentation
+          game={game}
+          event={currentDraw}
+          faceVisible={currentDraw.playerId === viewPlayer && (Boolean(computer) || !game.handoff)}
+        />
+      )}
     </main>
   );
 }

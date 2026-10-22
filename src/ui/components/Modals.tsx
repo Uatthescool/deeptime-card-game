@@ -405,16 +405,25 @@ function findDrawnCard(game: GameState, event: DrawEvent) {
 }
 
 /** A brief animation of a drawn card. The face is shown only to the player who drew it. */
-export function DrawPresentation({ game, event }: { game: GameState; event: DrawEvent }) {
+export function DrawPresentation({
+  game,
+  event,
+  faceVisible,
+}: {
+  game: GameState;
+  event: DrawEvent;
+  faceVisible: boolean;
+}) {
   const card = findDrawnCard(game, event);
-  const visible = event.playerId === game.activePlayer && !game.handoff;
   return (
     <div className="draw-presentation" role="status" aria-live="polite">
       <section className="drawn-card-stage">
         <small>
           {game.players[event.playerId].name} draws · {event.reason}
         </small>
-        <div className="drawn-card-motion">{card && visible ? <CardFace card={card.definition} /> : <CardBack />}</div>
+        <div className="drawn-card-motion">
+          {card && faceVisible ? <CardFace card={card.definition} /> : <CardBack />}
+        </div>
       </section>
     </div>
   );

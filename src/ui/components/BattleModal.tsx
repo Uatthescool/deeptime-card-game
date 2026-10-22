@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { canRerollBattleCoin, type CoinGroup, type GameState } from "../../engine/index.ts";
+import { canRerollBattleCoin, type CoinGroup, type GameState, type PlayerId } from "../../engine/index.ts";
 import { Dialog } from "./Dialog.tsx";
 import type { Dispatch } from "./Modals.tsx";
 
@@ -8,7 +8,14 @@ const FLIP_MS = 850;
 
 type Flip = { group: CoinGroup; index: number } | "all" | null;
 
-export function BattleModal({ game, dispatch }: { game: GameState; dispatch: Dispatch }) {
+type BattleModalProps = {
+  game: GameState;
+  dispatch: Dispatch;
+  /** The seat the person at the device plays, when the other is the computer; null when two people share it. */
+  controller: PlayerId | null;
+};
+
+export function BattleModal({ game, dispatch, controller }: BattleModalProps) {
   const battle = game.pendingBattle!;
   const [flipping, setFlipping] = useState<Flip>(null);
   const timer = useRef<number | undefined>(undefined);
@@ -19,6 +26,19 @@ export function BattleModal({ game, dispatch }: { game: GameState; dispatch: Dis
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setFlipping(null), FLIP_MS);
   };
+  const controls = (playerId: PlayerId) => controller === null || controller === playerId;
+  const watching = !controls(battle.attackerPlayer);
+
+  // Coins the computer flips or rerolls animate just like the person's own (which animate as they click).
+  const coinKey = JSON.stringify(battle.coins);
+  const seenCoins = useRef(coinKey);
+  const clicked = useRef(false);
+  useEffect(() => {
+    if (coinKey === seenCoins.current) return;
+    seenCoins.current = coinKey;
+    if (!clicked.current && coinKey !== "null") animate("all");
+    clicked.current = false;
+  }, [coinKey]);
 
   const attacker = game.players[battle.attackerPlayer].lanes[battle.attackerLane]!.creature!;
   const defender = game.players[battle.defenderPlayer].lanes[battle.defenderLane]!.creature!;
@@ -31,6 +51,7 @@ export function BattleModal({ game, dispatch }: { game: GameState; dispatch: Dis
       dispatch({ type: "commitHunt" });
       return;
     }
+    clicked.current = true;
     dispatch({ type: "flipBattleCoins" });
     animate("all");
   };
@@ -66,11 +87,15 @@ export function BattleModal({ game, dispatch }: { game: GameState; dispatch: Dis
     <Dialog label="Hunt preview" className="battle-overlay">
       <div className="battle-modal">
         <div className="eyebrow">{isStampede ? "Stampede Hunt" : "Hunt preview"}</div>
-        <h2>Review projected Battle Levels.</h2>
+        <h2>
+          {watching ? `${game.players[battle.attackerPlayer].name} is Hunting.` : "Review projected Battle Levels."}
+        </h2>
         <p>
-          {isStampede
-            ? "This Hunt is the next mandatory step of Stampede. Resolve it to continue the counter-clockwise sequence."
-            : "No Hunt has been committed. Canceling will consume no attack and change no game state."}
+          {watching
+            ? `${attacker.card.definition.name} Hunts your ${defender.card.definition.name}.`
+            : isStampede
+              ? "This Hunt is the next mandatory step of Stampede. Resolve it to continue the counter-clockwise sequence."
+              : "No Hunt has been committed. Canceling will consume no attack and change no game state."}
         </p>
         <div className="battle-versus">
           <div>
@@ -132,17 +157,20 @@ export function BattleModal({ game, dispatch }: { game: GameState; dispatch: Dis
                           <small>REVERSE</small>
                         </div>
                       </div>
-                      {!flipping && canRerollBattleCoin(game, group.owner, group.id, index) && (
-                        <button
-                          className="coin-reroll-button"
-                          onClick={() => {
-                            dispatch({ type: "rerollBattleCoin", playerId: group.owner, group: group.id, index });
-                            animate({ group: group.id, index });
-                          }}
-                        >
-                          Reroll · {game.players[group.owner].name}
-                        </button>
-                      )}
+                      {!flipping &&
+                        controls(group.owner) &&
+                        canRerollBattleCoin(game, group.owner, group.id, index) && (
+                          <button
+                            className="coin-reroll-button"
+                            onClick={() => {
+                              clicked.current = true;
+                              dispatch({ type: "rerollBattleCoin", playerId: group.owner, group: group.id, index });
+                              animate({ group: group.id, index });
+                            }}
+                          >
+                            Reroll · {game.players[group.owner].name}
+                          </button>
+                        )}
                     </div>
                   ))}
                 </div>
@@ -158,17 +186,22 @@ export function BattleModal({ game, dispatch }: { game: GameState; dispatch: Dis
           </div>
         )}
         <div className="modal-actions">
-          {!coins && !isStampede && (
+          {watching && (
+            <p className="computer-deciding">
+              {flipping ? "Flipping…" : coins ? "Resolving the Hunt…" : "Committing the Hunt…"}
+            </p>
+          )}
+          {!watching && !coins && !isStampede && (
             <button className="quiet-button" onClick={() => dispatch({ type: "cancelHunt" })}>
               Cancel
             </button>
           )}
-          {!coins && (
+          {!watching && !coins && (
             <button className="primary-button" onClick={commit}>
               {isStampede ? "Resolve Hunt" : "Commit Hunt"}
             </button>
           )}
-          {coins && (
+          {!watching && coins && (
             <button
               className="primary-button"
               disabled={Boolean(flipping)}

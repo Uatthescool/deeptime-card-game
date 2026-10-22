@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import type { BiomeKey } from "../data/biomes.ts";
+import { BIOMES, type BiomeKey } from "../data/biomes.ts";
 import { createGame, type GameState } from "../engine/index.ts";
 import { Credits } from "./components/Credits.tsx";
 import { DeckBrowser } from "./components/DeckBrowser.tsx";
@@ -33,6 +33,7 @@ export function App() {
     players: ["Player One", "Player Two"],
     decks: ["deck-1", "deck-1"],
     seed: null,
+    opponent: "person",
   });
   const [savedGame, setSavedGame] = useState(savedGameSummary);
   const [deal, setDeal] = useState<OpeningDeal | null>(null);
@@ -74,18 +75,21 @@ export function App() {
           if (!pregame.selected) return;
           const picked: PregameState["choices"] = [...pregame.choices];
           picked[pregame.chooser] = pregame.selected;
+          if (pregame.opponent !== "person") {
+            // The computer picks its Biome sight unseen, as a second person would.
+            picked[1] = BIOMES[Math.floor(Math.random() * BIOMES.length)]!.key;
+            update({ choices: picked, selected: null, stage: "reveal" });
+            return;
+          }
           update({ choices: picked, selected: null, stage: pregame.chooser === 0 ? "handoff" : "reveal" });
         }}
         onContinue={() => update({ chooser: 1, selected: null, stage: "select" })}
         onBack={toSetup}
         onDeal={() => {
-          const game = createGame(
-            pregame.players[0],
-            pregame.players[1],
-            pregame.choices,
-            pregame.decks,
-            pregame.seed === null ? {} : { seed: pregame.seed },
-          );
+          const game = createGame(pregame.players[0], pregame.players[1], pregame.choices, pregame.decks, {
+            ...(pregame.seed === null ? {} : { seed: pregame.seed }),
+            computer: pregame.opponent === "person" ? null : { seat: 1, difficulty: pregame.opponent },
+          });
           setScreen({ kind: "game", game, resumed: false, gameId: game.seed + Date.now() });
           setDeal({ players: pregame.players, decks: pregame.decks, choices: pregame.choices, dealt: 0 });
         }}

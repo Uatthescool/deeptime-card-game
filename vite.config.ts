@@ -16,6 +16,8 @@ export default defineConfig({
     // (about 150 kB gzipped). Revisit with code splitting if it grows much past this.
     chunkSizeWarningLimit: 650,
   },
+  // The computer opponent thinks in a module Web Worker.
+  worker: { format: "es" },
   test: {
     environment: "node",
     include: ["tests/**/*.test.{ts,tsx}"],

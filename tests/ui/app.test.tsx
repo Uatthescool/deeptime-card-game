@@ -120,7 +120,11 @@ describe("BattleModal", () => {
       log.push(action);
       setState((current) => applyAction(current, action));
     };
-    return state.pendingBattle ? <BattleModal game={state} dispatch={dispatch} /> : <p>Hunt resolved</p>;
+    return state.pendingBattle ? (
+      <BattleModal game={state} dispatch={dispatch} controller={null} />
+    ) : (
+      <p>Hunt resolved</p>
+    );
   }
 
   test("Commit flips the coins in the engine, then the stored results resolve the Hunt", async () => {
@@ -201,5 +205,47 @@ describe("game over", () => {
     expect(screen.getByRole("heading", { name: "It's a draw" })).toBeInTheDocument();
     expect(screen.getByText("0–0")).toBeInTheDocument();
     expect(screen.getByText(/tied at 0/)).toBeInTheDocument();
+  });
+});
+
+/** Lets the computer finish its moves; each move is a separate React update, so the clock advances in steps. */
+async function letComputerPlay() {
+  for (let step = 0; step < 80; step += 1) await act(() => vi.advanceTimersByTimeAsync(1_000));
+}
+
+describe("against the computer", () => {
+  test("setup to first move: the computer picks its own Biome and nobody passes the device", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<App />);
+    await user.click(screen.getByRole("radio", { name: /Computer · Easy/ }));
+    await user.click(screen.getByRole("button", { name: "Continue to Biomes" }));
+    // Cold: no start-of-turn choice for the person, so play runs straight to their Development Phase.
+    await user.click(screen.getByRole("button", { name: "Choose Cold" }));
+    await user.click(screen.getByRole("button", { name: "Confirm selection" }));
+    expect(screen.getByText("The ecosystems are set.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Draw opening hands" }));
+    await letComputerPlay();
+
+    expect(screen.queryByRole("dialog", { name: "Private handoff" })).not.toBeInTheDocument();
+    expect(screen.getByText("Computer · Easy")).toBeInTheDocument();
+    // Whoever went first, play reaches the person's own turn with their hand on show.
+    expect(screen.getByText(/Player One’s (Development|Battle) Phase/)).toBeInTheDocument();
+    expect(screen.queryByText("Private hand sealed for handoff")).not.toBeInTheDocument();
+    expect(loadSavedGame()?.computer).toEqual({ seat: 1, difficulty: "easy" });
+  });
+
+  test("on the computer's turn the person can watch but not move", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    let game = createGame("Ada", "Computer", [null, null], ["deck-1", "deck-1"], { seed: 31 });
+    game = { ...game, computer: { seat: game.handoff!.to, difficulty: "normal" } };
+    game = applyAction(game, { type: "acknowledgeHandoff" });
+    render(<GameScreen initialGame={game} resumed={false} onExit={() => {}} />);
+
+    expect(screen.getByRole("region", { name: "Computer's turn" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "End turn" })).not.toBeInTheDocument();
+    await letComputerPlay();
+    expect(screen.getByRole("button", { name: "End turn" })).toBeInTheDocument();
+    expect(screen.getByText(/Ada’s Development Phase/)).toBeInTheDocument();
   });
 });

@@ -8,11 +8,26 @@ import {
   type DeckKey,
   IMPLEMENTATION_REGISTER,
 } from "../../data/cards.ts";
-import { parseSeedLabel } from "../../engine/index.ts";
+import { DIFFICULTY_NAMES } from "../../ai/ai.ts";
+import { type Difficulty, parseSeedLabel } from "../../engine/index.ts";
 import type { SavedGameSummary } from "../save.ts";
 import { CardFace } from "./CardFace.tsx";
 
-export type SetupChoices = { players: [string, string]; decks: [DeckKey, DeckKey]; seed: number | null };
+/** Who plays the second seat: another person at the same device, or the computer at a difficulty. */
+export type Opponent = "person" | Difficulty;
+
+export type SetupChoices = {
+  players: [string, string];
+  decks: [DeckKey, DeckKey];
+  seed: number | null;
+  opponent: Opponent;
+};
+
+const OPPONENTS: Array<{ value: Opponent; label: string; detail: string }> = [
+  { value: "person", label: "Another person", detail: "Pass the device between turns" },
+  { value: "easy", label: `Computer · ${DIFFICULTY_NAMES.easy}`, detail: "Learning the game" },
+  { value: "normal", label: `Computer · ${DIFFICULTY_NAMES.normal}`, detail: "A real contest" },
+];
 
 type SetupScreenProps = {
   initial: SetupChoices;
@@ -39,6 +54,8 @@ export function SetupScreen({
 }: SetupScreenProps) {
   const [names, setNames] = useState(initial.players);
   const [decks, setDecks] = useState(initial.decks);
+  const [opponent, setOpponent] = useState<Opponent>(initial.opponent);
+  const vsComputer = opponent !== "person";
   const [seedText, setSeedText] = useState("");
   const seed = seedText.trim() ? parseSeedLabel(seedText) : null;
   const seedInvalid = Boolean(seedText.trim()) && seed === null;
@@ -50,9 +67,10 @@ export function SetupScreen({
 
   const start = () =>
     onStart({
-      players: [names[0].trim() || "Player One", names[1].trim() || "Player Two"],
+      players: [names[0].trim() || "Player One", vsComputer ? "Computer" : names[1].trim() || "Player Two"],
       decks,
       seed,
+      opponent,
     });
 
   return (
@@ -96,18 +114,40 @@ export function SetupScreen({
             if (!seedInvalid) start();
           }}
         >
+          <fieldset className="opponent-choice">
+            <legend>Opponent</legend>
+            {OPPONENTS.map((option) => (
+              <label key={option.value} className={opponent === option.value ? "selected" : ""}>
+                <input
+                  type="radio"
+                  name="opponent"
+                  value={option.value}
+                  checked={opponent === option.value}
+                  onChange={() => setOpponent(option.value)}
+                />
+                <strong>{option.label}</strong>
+                <small>{option.detail}</small>
+              </label>
+            ))}
+          </fieldset>
           <div className="setup-grid">
             {([0, 1] as const).map((index) => (
               <label key={index}>
-                <span>Player {index === 0 ? "one" : "two"}</span>
-                <input
-                  value={names[index]}
-                  onChange={(event) => setName(index, event.target.value)}
-                  maxLength={24}
-                  autoComplete="off"
-                />
+                <span>
+                  {index === 0 ? (vsComputer ? "You" : "Player one") : vsComputer ? "Computer" : "Player two"}
+                </span>
+                {index === 1 && vsComputer ? (
+                  <input value="Computer" readOnly aria-readonly="true" tabIndex={-1} className="computer-name" />
+                ) : (
+                  <input
+                    value={names[index]}
+                    onChange={(event) => setName(index, event.target.value)}
+                    maxLength={24}
+                    autoComplete="off"
+                  />
+                )}
                 <select
-                  aria-label={`Player ${index === 0 ? "one" : "two"} deck`}
+                  aria-label={`${index === 0 ? (vsComputer ? "Your" : "Player one") : vsComputer ? "Computer" : "Player two"} deck`}
                   value={decks[index]}
                   onChange={(event) => setDeck(index, event.target.value as DeckKey)}
                 >
@@ -157,9 +197,9 @@ export function SetupScreen({
         </form>
         <div className="setup-foot">
           <span>Created by Merrick McMorris</span>
-          <span>2 players · one device</span>
+          <span>{vsComputer ? "1 player vs. the computer" : "2 players · one device"}</span>
           <span>Choose any 40-card deck independently</span>
-          <span>Hands hidden on handoff</span>
+          <span>{vsComputer ? "The computer never sees your hand" : "Hands hidden on handoff"}</span>
           <button className="link-button" type="button" onClick={onCredits}>
             Artwork credits
           </button>
