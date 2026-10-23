@@ -82,6 +82,8 @@ export type ConceptCard = {
 export type SupportCard = EventCard | AdaptationCard | ConceptCard;
 export type CardDefinition = CreatureCard | SupportCard;
 
+export type TagCombo = { with: string; rule: string };
+
 export type ImplementationRegister = {
   version: string;
   title: string;
@@ -95,6 +97,8 @@ export type ImplementationRegister = {
   };
   rulesChanges: Array<{ title: string; rule: string }>;
   tagRules: Record<string, string>;
+  /** Combos: extra effects a Tag has only while the Creature also has the partner Tag (`with`). */
+  tagCombos: Record<string, TagCombo[]>;
   creatures: CreatureCard[];
   supports: SupportCard[];
   generalPool: CardDefinition[];

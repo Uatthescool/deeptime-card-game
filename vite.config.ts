@@ -1,5 +1,7 @@
 /// <reference types="vitest/config" />
 import react from "@vitejs/plugin-react";
+import { availableParallelism } from "node:os";
+
 import { defineConfig } from "vite";
 
 // GitHub Pages serves a project site from /<repository>/. The deploy workflow
@@ -20,6 +22,9 @@ export default defineConfig({
   worker: { format: "es" },
   test: {
     environment: "node",
+    // The simulation suites keep a core busy for minutes each; leaving headroom stops them from starving
+    // other test workers past Vitest's fixed 60-second start timeout.
+    maxWorkers: Math.max(2, Math.floor(availableParallelism() / 2)),
     include: ["tests/**/*.test.{ts,tsx}"],
     setupFiles: ["tests/setup.ts"],
   },

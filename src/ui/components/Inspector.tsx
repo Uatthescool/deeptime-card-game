@@ -1,4 +1,4 @@
-import { type CreatureCard, expandedTagNames, TAG_RULES } from "../../data/cards.ts";
+import { type CreatureCard, expandedTagNames, TAG_RULES, tagCombos } from "../../data/cards.ts";
 import type { GameState, PlayerId } from "../../engine/index.ts";
 import {
   type InspectionTarget,
@@ -24,6 +24,12 @@ export function CardTagRules({ card }: { card: CreatureCard }) {
               {inherited && <small>from Sovereign</small>}
             </h3>
             <p>{TAG_RULES[tag] ?? "No inherent effect is currently assigned."}</p>
+            {tagCombos(card, tag).map((combo) => (
+              <p key={combo.with} className={`tag-combo ${combo.active ? "active" : ""}`}>
+                <b>Combo · {combo.with}</b>
+                {combo.active && <span className="tag-combo-state">Active</span>} {combo.rule}
+              </p>
+            ))}
           </article>
         );
       })}

@@ -4999,3 +4999,34 @@ header + .legality-reasons {
   font-style: normal;
   font-weight: 800;
 }
+
+/* Tag Combos */
+.keyword-list p.tag-combo {
+  border-left: 2px solid rgba(255, 255, 255, 0.18);
+  padding-left: 0.45rem;
+  color: #9fab9f;
+}
+.keyword-list p.tag-combo.active {
+  border-left-color: #dca456;
+  color: #e7dccb;
+}
+.tag-combo b {
+  margin-right: 0.3rem;
+  font-weight: 800;
+}
+.tag-combo-state {
+  margin-right: 0.3rem;
+  border-radius: 1rem;
+  padding: 0.08rem 0.32rem;
+  background: #b77a38;
+  color: #1a291f;
+  font:
+    800 0.48rem Arial,
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tag-glossary dd.tag-combo {
+  margin-top: 0.15rem;
+  color: #50584f;
+}

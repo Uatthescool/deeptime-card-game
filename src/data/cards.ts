@@ -26,6 +26,13 @@ export const IMPLEMENTATION_REGISTER = registerJson as unknown as Implementation
 export const CREATURES = IMPLEMENTATION_REGISTER.creatures;
 export const SUPPORTS = IMPLEMENTATION_REGISTER.supports;
 export const TAG_RULES = IMPLEMENTATION_REGISTER.tagRules;
+export const TAG_COMBOS = IMPLEMENTATION_REGISTER.tagCombos;
+
+/** The Combos on `tag`, each marked active when `card` also has its partner Tag. */
+export function tagCombos(card: CreatureCard, tag: string) {
+  const tags = expandedTagNames(card);
+  return (TAG_COMBOS[tag] ?? []).map((combo) => ({ ...combo, active: tags.includes(combo.with) }));
+}
 
 const byLevelThenName = (a: CreatureCard, b: CreatureCard) =>
   a.printedLevel - b.printedLevel || a.name.localeCompare(b.name);
@@ -176,6 +183,12 @@ export function validateCardData(): string[] {
       if (GENERAL_POOL.some((candidate) => candidate.key === card.key)) {
         problems.push(`${card.name} is in ${DECK_LABELS[key]} and also in the General Pool.`);
       }
+    }
+  }
+  for (const [tag, combos] of Object.entries(TAG_COMBOS)) {
+    expect(tag in TAG_RULES, `A Combo is listed for "${tag}", which has no Tag rule.`);
+    for (const combo of combos) {
+      expect(combo.with in TAG_RULES, `The ${tag} Combo names "${combo.with}", which has no Tag rule.`);
     }
   }
   for (const key of DECK_3_INHERITED_SUPPORT_KEYS) {

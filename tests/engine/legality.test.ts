@@ -227,13 +227,54 @@ describe("Filter Feeders Hunt and are Hunted as Herbivores", () => {
     expect(codes(state, small.card.uid, whale.card.uid)).toEqual(["gigantic-target"]);
   });
 
-  test("a Filter Feeder can't Hunt, even a Herbivore", () => {
+  test("Combo with Gigantic: a Filter Feeder Hunts Herbivores of Level 1 or below, and nothing else", () => {
     const state = predatorsVsOcean();
     state.activePlayer = 1;
+    state.players[0].deck.push(
+      ...createGame("C", "D", [null, null], ["deck-2", "deck-2"], { seed: 1 }).players[0].deck,
+    );
     const fish = inPlay(takeFromLibrary(state, 1, "leedsichthys"));
     state.players[1].lanes[0]!.creature = fish;
-    const hoatzin = inPlay(takeFromLibrary(state, 0, "hoatzin"));
-    state.players[0].lanes[0]!.creature = hoatzin;
-    expect(codes(state, fish.card.uid, hoatzin.card.uid)).toEqual(["filter-feeder-hunt"]);
+    const place = (laneIndex: number, key: string) => {
+      const creature = inPlay(takeFromLibrary(state, 0, key));
+      state.players[0].lanes[laneIndex]!.creature = creature;
+      return creature.card.uid;
+    };
+    const hoatzin = place(0, "hoatzin");
+    const ankylosaurus = place(1, "ankylosaurus");
+    const stegosaurus = place(2, "stegosaurus");
+    const compy = place(3, "compsognathus");
+    expect(explainHunt(state, fish.card.uid, hoatzin).legal).toBe(true);
+    expect(explainHunt(state, fish.card.uid, ankylosaurus).legal).toBe(true);
+    expect(codes(state, fish.card.uid, stegosaurus)).toEqual(["filter-feeder-hunt"]);
+    expect(codes(state, fish.card.uid, compy)).toEqual(["filter-feeder-hunt"]);
   });
+});
+
+test("a Filter Feeder without Gigantic can't Hunt at all", () => {
+  const state = createGame("A", "B", [null, null], ["deck-1", "deck-3"], { seed: 5 });
+  Object.assign(state, { activePlayer: 1, turnNumber: 5, phase: "battle", handoff: null });
+  for (const player of state.players) {
+    player.lanes = player.lanes.map(() => ({
+      creature: null,
+      attachment: null,
+      engulfed: null,
+      wildfire: null,
+      drought: null,
+    }));
+  }
+  const card = takeFromLibrary(state, 1, "leedsichthys");
+  // A small filter feeder: the same card without Gigantic.
+  const definition = card.definition as { tags: string[] };
+  card.definition = {
+    ...card.definition,
+    tags: definition.tags.filter((tag) => tag !== "Gigantic"),
+  } as typeof card.definition;
+  const fish = inPlay(card);
+  state.players[1].lanes[0]!.creature = fish;
+  const compy = inPlay(takeFromLibrary(state, 0, "compsognathus"));
+  state.players[0].lanes[0]!.creature = compy;
+  expect(explainHunt(state, fish.card.uid, compy.card.uid).reasons.map((item) => item.code)).toEqual([
+    "filter-feeder-hunt",
+  ]);
 });

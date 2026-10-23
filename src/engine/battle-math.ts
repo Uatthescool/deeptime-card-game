@@ -118,12 +118,15 @@ function targetBlockers(
   if (charge && attackerLane !== targetLane) {
     blockers.push(reason("charge-lane", "Charge Creatures Hunt only the Creature directly opposite them."));
   }
-  // Filter Feeders Hunt, and are Hunted, as Herbivores.
+  // Filter Feeders are Hunted as Herbivores. Combo with Gigantic: it may Hunt Herbivores of Level 1 or below.
   const attackerDiet = huntingDiet(attackerDef);
   const targetDiet = huntingDiet(targetDef);
+  const giganticFilterFeeder = attackerDef.tags.includes("Filter Feeder") && effectiveHasTag(attackerDef, "Gigantic");
+  const filterFeederPrey = giganticFilterFeeder && targetDiet === "Herbivore" && targetDef.printedLevel <= 1;
   const dietWaived =
     options.ignoreDiet ||
     charge ||
+    filterFeederPrey ||
     (effectiveHasTag(attackerDef, "Territorial") && attackerLane === targetLane) ||
     (activeSuperpredators(state) && (attackerDiet === "Carnivore" || attackerDiet === "Omnivore"));
   if (!dietWaived) {
@@ -133,7 +136,9 @@ function targetBlockers(
           ? reason("herbivore-hunt", "Herbivores don't Hunt, except during a Stampede or with Charge or Territorial.")
           : reason(
               "filter-feeder-hunt",
-              `${attackerDef.name} is a Filter Feeder, which Hunts as a Herbivore: it can't Hunt without Charge or Territorial.`,
+              giganticFilterFeeder
+                ? `${attackerDef.name} is a Gigantic Filter Feeder: it can Hunt only Herbivores of Level 1 or below, unless it has Charge or Territorial.`
+                : `${attackerDef.name} is a Filter Feeder, which Hunts as a Herbivore: it can't Hunt without Charge or Territorial.`,
             ),
       );
     } else if (attackerDiet === "Omnivore" && targetDiet !== "Herbivore") {

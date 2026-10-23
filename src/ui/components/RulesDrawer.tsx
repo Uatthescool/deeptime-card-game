@@ -1,5 +1,5 @@
 import { BIOMES } from "../../data/biomes.ts";
-import { IMPLEMENTATION_REGISTER, TAG_RULES } from "../../data/cards.ts";
+import { IMPLEMENTATION_REGISTER, TAG_COMBOS, TAG_RULES } from "../../data/cards.ts";
 
 export function RulesDrawer({ onClose }: { onClose: () => void }) {
   return (
@@ -91,6 +91,11 @@ export function RulesDrawer({ onClose }: { onClose: () => void }) {
             <div key={tag}>
               <dt>{tag}</dt>
               <dd>{rule}</dd>
+              {(TAG_COMBOS[tag] ?? []).map((combo) => (
+                <dd key={combo.with} className="tag-combo">
+                  <b>Combo · {combo.with}:</b> {combo.rule}
+                </dd>
+              ))}
             </div>
           ))}
         </dl>
