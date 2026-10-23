@@ -5,7 +5,8 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage", "node_modules"] },
+  // design/work holds local card-making tools and reports/ holds simulation output; neither is in git.
+  { ignores: ["dist", "coverage", "node_modules", "design/work", "reports"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

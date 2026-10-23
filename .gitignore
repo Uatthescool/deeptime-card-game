@@ -23,3 +23,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Prototype card images (some contain art that is not cleared for use)
+design/prototype-cards/
+design/work/

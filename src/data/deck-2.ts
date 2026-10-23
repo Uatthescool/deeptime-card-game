@@ -122,7 +122,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Triassic",
-    periodColor: "Slate Gray",
+    periodColor: "Amber Orange",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Plateosaurid"],
     tags: ["Transitional", "Armament"],

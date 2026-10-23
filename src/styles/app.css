@@ -2350,7 +2350,7 @@ button:disabled {
   --period-color: #b64e80;
 }
 .period-ordovician {
-  --period-color: #c78335;
+  --period-color: #c69867;
 }
 .period-jurassic {
   --period-color: #a83d36;
@@ -2359,13 +2359,13 @@ button:disabled {
   --period-color: #78a934;
 }
 .period-triassic {
-  --period-color: #616d72;
+  --period-color: #c78335;
 }
 .period-carboniferous {
   --period-color: #263a58;
 }
 .period-permian {
-  --period-color: #c69867;
+  --period-color: #616d72;
 }
 .period-quaternary {
   --period-color: #d9e2e4;
