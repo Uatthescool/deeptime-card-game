@@ -25,6 +25,8 @@ export default defineConfig({
     // The simulation suites keep a core busy for minutes each; leaving headroom stops them from starving
     // other test workers past Vitest's fixed 60-second start timeout.
     maxWorkers: Math.max(2, Math.floor(availableParallelism() / 2)),
+    // Worker threads start in well under a second; forked processes sometimes missed that timeout on Windows.
+    pool: "threads",
     include: ["tests/**/*.test.{ts,tsx}"],
     setupFiles: ["tests/setup.ts"],
   },

@@ -306,6 +306,7 @@
       "visualTags": [],
       "role": "Defensive aquatic starter that trades Propulsion for temporary protection.",
       "flavorText": "Although their body plan has endured for roughly 445 million years, horseshoe crabs are not evolutionarily frozen: their lineage underwent at least three whole-genome duplications.",
+      "cardFace": "/card-faces/horseshoe-crab.webp",
       "status": "Locked"
     },
     {
@@ -374,6 +375,7 @@
       "visualTags": ["Feathered", "Wings"],
       "role": "Transitional aerial bridge; Transitional can supply the Time Period match when Primary Taxon also matches.",
       "flavorText": "The Chicago Archaeopteryx preserves long tertial feathers that would have filled the aerodynamic gap between wing and body, strengthening evidence that this early bird was capable of powered flight.",
+      "cardFace": "/card-faces/archaeopteryx.webp",
       "status": "Locked"
     },
     {
@@ -408,6 +410,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Early-dinosaur bridge; Theropod is intentionally omitted because herrerasaurid placement remains disputed.",
       "flavorText": "Although often described as an early theropod, Herrerasaurus occupies a disputed branch: competing analyses place herrerasaurs either within Theropoda or separately near the base of Saurischia.",
+      "cardFace": "/card-faces/herrerasaurus.webp",
       "status": "Locked"
     },
     {
@@ -425,6 +428,7 @@
       "visualTags": [],
       "role": "Aquatic side-line foundation; it ordinarily overrides into Dimetrodon through Permian, Carnivore, and Small Game Hunter.",
       "flavorText": "Juvenile Diplocaulus had short projections at the rear of the skull that lengthened dramatically with maturity. Hydrodynamic models suggest the adult’s boomerang-shaped head generated lift and high underwater maneuverability, although its actual biological function remains uncertain.",
+      "cardFace": "/card-faces/diplocaulus.webp",
       "status": "Locked"
     },
     {
@@ -544,6 +548,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Raptorial control predator with a direct Jurassic route into Torvosaurus.",
       "flavorText": "Dilophosaurus carried two tall crests formed from enlarged nasal and lacrimal bones. Their function remains unknown, but display or recognition is plausible; its grasping forelimbs could seize and hold prey beneath its chest after the mouth made first contact.",
+      "cardFace": "/card-faces/dilophosaurus.webp",
       "status": "Locked"
     },
     {
@@ -561,6 +566,7 @@
       "visualTags": [],
       "role": "Permian Synapsid endpoint; naturally accessible from Diplocaulus and a Convergent Evolution route into Spinosaurus through Spinal Sail.",
       "flavorText": "Dimetrodon was a non-mammalian synapsid, making it more closely related to mammals than to dinosaurs; it lived tens of millions of years before the first dinosaurs appeared.",
+      "cardFace": "/card-faces/dimetrodon.webp",
       "status": "Locked"
     },
     {
@@ -578,6 +584,7 @@
       "visualTags": [],
       "role": "Triassic Level 2 bridge combining Transitional compatibility with Bruiser access to larger predators.",
       "flavorText": "Named for Gojira—the monster known as Godzilla—Gojirasaurus was one of the largest known Triassic neotheropods, showing that large body size had already evolved among early theropods before the Jurassic. Its holotype was skeletally immature and had not yet reached full size.",
+      "cardFace": "/card-faces/gojirasaurus.webp",
       "status": "Locked"
     },
     {
@@ -595,6 +602,7 @@
       "visualTags": [],
       "role": "Aggressive lane-locked predator that may immediately challenge the opposing Creature when it fills a Niche.",
       "flavorText": "Carnotaurus means “meat-eating bull,” named for the thick horns above its eyes. Its tiny arms could contribute little to a hunt, while powerful legs and massive tail muscles could drive explosive, straight-line charges.",
+      "cardFace": "/card-faces/carnotaurus.webp",
       "status": "Locked"
     },
     {
@@ -646,6 +654,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Aquatic-oriented finisher with direct Baryonyx access and a convergent route from Dimetrodon.",
       "flavorText": "Spinosaurus had a deep, flexible tail that could generate thrust in water, yet whether it chased fish underwater or hunted while wading along river margins remains debated.",
+      "cardFace": "/card-faces/spinosaurus.webp",
       "status": "Locked"
     }
   ],
@@ -832,6 +841,7 @@
       "visualTags": ["Plated", "Tail Spikes", "Beaked", "Quadrupedal"],
       "role": "Reactive defensive lane anchor that punishes predators for attacking it.",
       "flavorText": "Stegosaurus carried two staggered rows of tall plates and four long spikes at the end of its tail. Fossil injuries support the tail’s use as a defensive weapon capable of inflicting serious wounds on attacking predators.",
+      "cardFace": "/card-faces/stegosaurus.webp",
       "status": "Not playable · Work in progress"
     },
     {
@@ -849,6 +859,7 @@
       "visualTags": [],
       "role": "Clean Level 3 herbivore endpoint that contributes scale without a dense rules package.",
       "flavorText": "Shantungosaurus was among the largest known hadrosaurids, combining a deep duck-billed skull with a body that rivaled the length of many giant theropods.",
+      "cardFace": "/card-faces/shantungosaurus.webp",
       "status": "Not playable · Work in progress"
     },
     {
