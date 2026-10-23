@@ -78,6 +78,27 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Return to setup" }));
     expect(screen.queryByRole("dialog", { name: "Inspect cards" })).not.toBeInTheDocument();
   });
+
+  test("clicking a card with a finished face in the card browser shows it enlarged", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Inspect Cards" }));
+    const browserCard = (name: string) =>
+      screen.getAllByRole("article", { name: new RegExp(`^${name},`) })[0]!.closest("button")!;
+
+    await user.click(browserCard("Spinosaurus"));
+    const enlarged = screen.getByRole("dialog", { name: "Spinosaurus card" });
+    expect(within(enlarged).getByRole("img", { name: "Spinosaurus card" })).toHaveAttribute(
+      "src",
+      expect.stringContaining("/card-faces/spinosaurus.webp"),
+    );
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "Spinosaurus card" })).not.toBeInTheDocument();
+
+    // Cards still waiting on a licence decision have no finished face, so they only pin in the inspector.
+    await user.click(browserCard("Livyatan"));
+    expect(screen.queryByRole("dialog", { name: /card$/ })).not.toBeInTheDocument();
+  });
 });
 
 describe("saved games", () => {

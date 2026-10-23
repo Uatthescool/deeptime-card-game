@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   type CardDefinition,
+  cardFacePath,
   DECK_1,
   DECK_2,
   DECK_2_DECK,
@@ -13,7 +14,7 @@ import {
   type DeckKey,
   GENERAL_POOL,
 } from "../../data/cards.ts";
-import { CardFace } from "./CardFace.tsx";
+import { CardFace, CardLightbox } from "./CardFace.tsx";
 import { type InspectionTarget, inspectionHandlers, type InspectorTab } from "../inspection.ts";
 import { Inspector } from "./Inspector.tsx";
 
@@ -54,6 +55,9 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
   const [pinned, setPinned] = useState<InspectionTarget | null>(null);
   const [hover, setHover] = useState<InspectionTarget | null>(null);
   const [tab, setTab] = useState<InspectorTab>("card");
+  // A clicked card with a finished face is also shown enlarged in the middle of the screen.
+  const [enlarged, setEnlarged] = useState<CardDefinition | null>(null);
+  const closeEnlarged = useCallback(() => setEnlarged(null), []);
   const target = pinned ?? hover ?? { definition: DECK_1[0]! };
 
   const pin = (next: InspectionTarget) => {
@@ -77,7 +81,10 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
               className={`deck-browser-card ${selected ? "selected" : ""}`}
               key={card.key}
               aria-pressed={selected}
-              onClick={() => pin(inspection)}
+              onClick={() => {
+                pin(inspection);
+                if (cardFacePath(card)) setEnlarged(card);
+              }}
               {...inspectionHandlers(
                 inspection,
                 (next) => {
@@ -146,6 +153,7 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
           <Inspector target={target} activeTab={tab} onTabChange={setTab} onClose={onClose} pinned={Boolean(pinned)} />
         </aside>
       </div>
+      {enlarged && <CardLightbox card={enlarged} onClose={closeEnlarged} />}
     </div>
   );
 }

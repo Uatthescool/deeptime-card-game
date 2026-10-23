@@ -324,6 +324,7 @@
       "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
       "role": "Flexible Archosaur foundation and bridge Creature.",
       "flavorText": "Microraptor bore long flight feathers on its arms, legs, and tail, forming multiple aerodynamic surfaces for gliding. Fossil gut contents from different specimens include birds, fish, lizards, and mammals, revealing a remarkably adaptable predator.",
+      "cardFace": "/card-faces/microraptor.webp",
       "status": "Locked"
     },
     {
@@ -341,6 +342,7 @@
       "visualTags": [],
       "role": "Aggressive starter that pressures Level 0 utility Creatures and rewards successful kills.",
       "flavorText": "The Compsognathus holotype preserves the lizard Schoenesmahl dyspepsia in its abdomen—a holotype within another holotype. The find directly confirms small-vertebrate prey, although there is no direct evidence that Compsognathus hunted or fed in groups.",
+      "cardFace": "/card-faces/compsognathus.webp",
       "status": "Locked"
     },
     {
@@ -358,6 +360,7 @@
       "visualTags": [],
       "role": "Resourceful non-carnivore starter that broadens the deck’s development package while remaining a vulnerable Level 0 foundation.",
       "flavorText": "The last surviving member of an ancient bird lineage, the hoatzin ferments leaves in an enlarged crop using foregut microbes, much like a ruminant. Its chicks escape predators by dropping into water, swimming, and climbing back through vegetation with clawed wings before they can fly.",
+      "cardFace": "/card-faces/hoatzin.webp",
       "status": "Locked"
     },
     {
@@ -393,6 +396,7 @@
       "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
       "role": "Immediate small-prey pressure and early disruption.",
       "flavorText": "Quill knobs along a Velociraptor forearm show that long wing feathers anchored to the ulna, although the animal could not fly. The famous Fighting Dinosaurs fossil preserves one locked in combat with Protoceratops—a small, feathered predator far removed from its oversized screen portrayals.",
+      "cardFace": "/card-faces/velociraptor.webp",
       "status": "Locked"
     },
     {
@@ -446,6 +450,7 @@
       "visualTags": [],
       "role": "Aquatic specialist and principal lower-level route toward the spinosaur line.",
       "flavorText": "Natovenator’s backward-swept ribs formed a low, streamlined body like those of diving birds, while its long neck and many small teeth likely helped it pursue fish beneath the water.",
+      "cardFace": "/card-faces/natovenator.webp",
       "status": "Locked"
     },
     {
@@ -463,6 +468,7 @@
       "visualTags": [],
       "role": "Flexible Triassic Carnivore bridge; Generalist supplies the third match for Level 2 Triassic Carnivores, while broader routes require Support help.",
       "flavorText": "One of the largest predatory cynodonts, Cynognathus grew rapidly and could exceed 100 kilograms, combining a powerful skull and serrated, blade-like teeth with increasingly mammal-like anatomy.",
+      "cardFace": "/card-faces/cynognathus.webp",
       "status": "Locked"
     },
     {
@@ -480,6 +486,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Large opportunistic predator and a clean route into Torvosaurus through Bruiser.",
       "flavorText": "Allosaurus carried recurved, serrated teeth replaced roughly every 100 days. At one Morrison Formation quarry, abundant theropod bite marks likely record repeated scavenging and possible cannibalism by Allosaurus; they do not prove cooperative feeding, but show that competition around carcasses could be intense.",
+      "cardFace": "/card-faces/allosaurus.webp",
       "status": "Locked"
     },
     {
@@ -497,6 +504,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Semi-aquatic mid-route predator connecting the lower aquatic package to Spinosaurus. Its Diet is Carnivore, not Piscivore.",
       "flavorText": "Fish scales preserved in its stomach prove that Baryonyx ate fish, while young Iguanodon bones reveal a broader carnivorous diet. Its long, crocodile-like jaws seized slippery prey, while powerful forelimbs bore thumb claws more than 30 centimetres long.",
+      "cardFace": "/card-faces/baryonyx.webp",
       "status": "Locked"
     },
     {
@@ -514,6 +522,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Large-prey disruption specialist and flexible Level 2 bridge.",
       "flavorText": "One of the largest known dromaeosaurids, Utahraptor reached roughly six metres long and around half a tonne. It was built more for power than speed and armed with enormous sickle claws likely used to grip and subdue large prey.",
+      "cardFace": "/card-faces/utahraptor.webp",
       "status": "Locked"
     },
     {
@@ -531,6 +540,7 @@
       "visualTags": [],
       "role": "Coordinated follow-up attacker and natural route into Tyrannosaurus rex.",
       "flavorText": "Meaning “beautiful feathered tyrant,” Yutyrannus was a nine-metre predator whose long plumage likely insulated it in the cool forests of Early Cretaceous China and whose prominent crest crowned its deep skull. Three individuals of different ages were reportedly found together, suggesting some level of social behavior.",
+      "cardFace": "/card-faces/yutyrannus.webp",
       "status": "Locked"
     },
     {
@@ -620,6 +630,7 @@
       "visualTags": ["Raptorial Claws"],
       "role": "Heavy Jurassic finisher and primary top-end route from Allosaurus.",
       "flavorText": "Reaching roughly ten meters in length, Torvosaurus was among the Jurassic’s largest land predators. Its deep jaws carried large, recurved, blade-shaped teeth edged with coarse serrations.",
+      "cardFace": "/card-faces/torvosaurus.webp",
       "status": "Locked"
     },
     {
@@ -637,6 +648,7 @@
       "visualTags": [],
       "role": "Flagship boss Creature whose Durophagy converts victories over hard-defended prey into card flow.",
       "flavorText": "Biomechanical models estimate that an adult T. rex could bite with nearly 7,800 pounds of force, while its thick teeth concentrated enough pressure to fracture and pulverize bone. Bone fragments preserved in coprolites provide direct evidence of osteophagy: it swallowed and digested the crushed remains.",
+      "cardFace": "/card-faces/tyrannosaurus-rex.webp",
       "status": "Locked"
     },
     {

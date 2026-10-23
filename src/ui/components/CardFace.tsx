@@ -1,8 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { artworkPath, type CardDefinition } from "../../data/cards.ts";
+import { artworkPath, cardFacePath, type CardDefinition } from "../../data/cards.ts";
 import { assetUrl } from "../assets.ts";
 import { typeLabel } from "../inspection.ts";
+import { Dialog } from "./Dialog.tsx";
+
+/** A finished card face shown as large as the screen allows; a click anywhere or Escape closes it. */
+export function CardLightbox({ card, onClose }: { card: CardDefinition; onClose: () => void }) {
+  const face = cardFacePath(card);
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+  if (!face) return null;
+
+  return (
+    <Dialog label={`${card.name} card`} className="card-lightbox">
+      <div className="card-lightbox-backdrop" onClick={onClose} aria-hidden="true" />
+      <img className="card-lightbox-face" src={assetUrl(face)} alt={`${card.name} card`} onClick={onClose} />
+      <button className="quiet-button card-lightbox-close" onClick={onClose}>
+        Close
+      </button>
+    </Dialog>
+  );
+}
 
 export function CardArtwork({ card }: { card: CardDefinition }) {
   const [failed, setFailed] = useState(false);

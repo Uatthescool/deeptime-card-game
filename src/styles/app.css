@@ -4521,6 +4521,55 @@ button.event-slot small {
   font-weight: 800;
 }
 
+.card-lightbox {
+  z-index: 140;
+  padding: 0;
+  background: rgba(5, 10, 7, 0.82);
+  animation: card-lightbox-fade 160ms ease-out;
+}
+.card-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  cursor: zoom-out;
+}
+.card-lightbox-face {
+  position: relative;
+  display: block;
+  /* As large as the screen allows, keeping the card's 1024 × 1434 shape. */
+  height: min(94dvh, calc(94vw * 1434 / 1024));
+  aspect-ratio: 1024 / 1434;
+  border-radius: 2.6%/1.9%;
+  box-shadow:
+    0 2.5rem 6rem rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  cursor: zoom-out;
+  animation: card-lightbox-rise 220ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.card-lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #f4ede0;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(12, 24, 18, 0.6);
+}
+@keyframes card-lightbox-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes card-lightbox-rise {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(1.5rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-lightbox,
+  .card-lightbox-face {
+    animation: none;
+  }
+}
 .credits-overlay {
   place-items: start center;
   overflow-y: auto;

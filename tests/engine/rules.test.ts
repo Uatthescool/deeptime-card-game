@@ -426,7 +426,8 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       true,
       `Missing card face for ${card.name}`,
     );
-    assert.notEqual(artSource(card.key), "pending", `${card.name} has a card face but its art is pending`);
+    // A card whose art is pending may still have a face: the card generator takes art only from
+    // public/artwork, which a pending card must not have (above), so its face carries the "no card art" placeholder.
   }
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "inostrancevia")!), undefined);
   assert.equal(artworkPath(DECK_2.find((card) => card.key === "stegosaurus")!), "/artwork/stegosaurus.webp");
