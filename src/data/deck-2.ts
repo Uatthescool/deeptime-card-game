@@ -500,6 +500,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     role: "Exceptional terrestrial Level 4 monument. Sovereign supplies Gigantic and protects the Victory Level of this Herbivore branch.",
     flavorText:
       "Dreadnoughtus is represented by one of the more complete skeletons known for a giant titanosaur. Its holotype was still growing, underscoring the extraordinary scale its lineage could attain.",
+    cardFace: "/card-faces/dreadnoughtus.webp",
   }),
 ];
 

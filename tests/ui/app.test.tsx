@@ -95,8 +95,8 @@ describe("App", () => {
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "Spinosaurus card" })).not.toBeInTheDocument();
 
-    // Cards still waiting on a licence decision have no finished face, so they only pin in the inspector.
-    await user.click(browserCard("Livyatan"));
+    // Support cards have no finished face yet, so they only pin in the inspector.
+    await user.click(browserCard("Wildfire"));
     expect(screen.queryByRole("dialog", { name: /card$/ })).not.toBeInTheDocument();
   });
 });

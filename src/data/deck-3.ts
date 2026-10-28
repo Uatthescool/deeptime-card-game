@@ -91,6 +91,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     role: "A first-encounter ambusher that connects the low curve to both Ambush and Raptorial development lines.",
     flavorText:
       "Dollocaris was a small Jurassic predator with enormous compound eyes and three pairs of grasping appendages. Richly preserved specimens reveal details of its eyes, nervous system, and internal organs, providing an unusually complete view of this extinct arthropod.",
+    cardFace: "/card-faces/dollocaris.webp",
   }),
   creature({
     key: "black-swallower",
@@ -209,6 +210,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     role: "Specialized will double the eventual numerical effect of Shearing Bite; until that effect is finalized, both Tags remain mechanically inert here.",
     flavorText:
       "Edestus carried opposing rows of constantly renewed teeth that projected from its jaws like curved blades. Wear on the teeth suggests that prey was sheared through with repeated slicing strokes, creating one of the strangest feeding apparatuses ever evolved among vertebrates.",
+    cardFace: "/card-faces/edestus.webp",
   }),
   creature({
     key: "hyneria",
@@ -225,6 +227,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     role: "Focused Level 1 bridge connecting Devonian and Ambush foundations to the deck's Apex Predator progression.",
     flavorText:
       "Hyneria was a large predatory tristichopterid from Late Devonian waterways. Its deep skull, robust body, and formidable teeth identify it as one of the leading vertebrate predators in its freshwater ecosystem, with an ambush-oriented hunting role inferred from its build and habitat.",
+    cardFace: "/card-faces/hyneria.webp",
   }),
   creature({
     key: "dunkleosteus",
@@ -283,6 +286,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     role: "Large arthropod predator whose grasping appendages and robust feeding structures connect Raptorial and Durophagy routes.",
     flavorText:
       "Jaekelopterus was a giant predatory eurypterid whose largest known claw implies a body around 2.5 meters long. Its powerful grasping appendages, acute vision, and crushing mouthparts equipped it to tackle large, armored prey.",
+    cardFace: "/card-faces/jaekelopterus.webp",
   }),
   creature({
     key: "ptychodus",
@@ -387,6 +391,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     role: "Specialized doubles Diver from +1 to +2 Battle Level while attacking printed Aquatic prey.",
     flavorText:
       "Livyatan was a giant raptorial sperm whale armed with massive functional teeth in both jaws, some exceeding 35 centimeters. Its powerful skull was built to seize and tear open enormous marine prey, probably including other whales.",
+    cardFace: "/card-faces/livyatan.webp",
   }),
   creature({
     key: "blue-whale",
