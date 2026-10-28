@@ -99,7 +99,8 @@ export const TUTORIALS: TutorialDefinition[] = [
         title: "The Primary Taxon",
         body: [
           "On every card, one taxon is bold and underlined: the Primary Taxon. Here it is Mollusk.",
-          "In play, a Creature can override another in a Niche, taking its place, when the two match on enough of Diet, Period, Primary Taxon and Tags. Sharing a Primary Taxon counts as one of those matches.",
+          "It marks a broad branch of the tree of life, chosen at a similar level on every card: big groups such as mollusks, cartilaginous fishes and archosaurs.",
+          "It also plays a part in the game, which the How to Play tutorials will cover.",
         ],
       },
       {
