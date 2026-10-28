@@ -8,8 +8,14 @@ export type TutorialGroup = "science" | "play";
 /** A paragraph, or a term with its explanation (shown as a list). */
 export type TutorialCopy = string | { term: string; text: string };
 
+/** What a tutorial plays over: a card, the Biome choice screen, or a staged game board. */
+export type TutorialScene = "card-anatomy" | "biome-choice" | "board";
+
 export type TutorialStep = {
+  /** The lit part: a `data-tutorial-target` name, or names separated by spaces for a part inside another part. */
   target: string;
+  /** The scene for this step, when it differs from the tutorial's. */
+  scene?: TutorialScene;
   title: string;
   body: TutorialCopy[];
 };
@@ -20,7 +26,7 @@ export type TutorialDefinition = {
   title: string;
   summary: string;
   /** Which scene the tutorial plays over. */
-  scene: "card-anatomy";
+  scene: TutorialScene;
   steps: TutorialStep[];
 };
 
@@ -158,6 +164,178 @@ export const TUTORIALS: TutorialDefinition[] = [
           "Name, place on the tree of life, diet, traits, time and a real fact: every creature card carries the same parts.",
           "To read more about the animals, open Learn Something from the main screen at any time.",
         ],
+      },
+    ],
+  },
+  {
+    id: "the-table",
+    group: "play",
+    title: "The table",
+    summary: "Biomes, the board, your hand and when you draw: everything before your first play.",
+    scene: "board",
+    steps: [
+      {
+        scene: "biome-choice",
+        target: "biome-grid",
+        title: "Choose your Biome",
+        body: [
+          "Before any cards are dealt, each player secretly chooses one of five Biomes. Yours changes the rules on your side of the table for the whole game.",
+        ],
+      },
+      {
+        scene: "biome-choice",
+        target: "biome-temperate",
+        title: "Reading a Biome",
+        body: [
+          "Each Biome lists the real environments it stands for, its ability, and the science behind that ability.",
+          "Temperate’s Seasonal Cycle, for example, gives you four Season counters. Once per turn, after you flip a coin, you may spend one to flip that coin again.",
+        ],
+      },
+      {
+        scene: "biome-choice",
+        target: "biome-confirm",
+        title: "Lock it in",
+        body: [
+          "Confirm your choice. With two players on one device, you then pass it over so the other player can choose in private. Against the computer, it chooses without seeing yours.",
+          "Both Biomes are revealed together, and then the opening hands are dealt.",
+        ],
+      },
+      {
+        target: "table",
+        title: "The table",
+        body: [
+          "This is the table during your turn. Your side is the bottom half; your opponent’s is the top half.",
+          "Here you are Player One. Player Two went first, and it is now your turn.",
+        ],
+      },
+      {
+        target: "player-half",
+        title: "Your Biome, on the board",
+        body: [
+          "Each half of the table shows its owner’s Biome as a landscape behind the Niches. Yours is Temperate woodland; your opponent’s is Aquatic.",
+          "The badge beside each player’s name says which Biome they chose.",
+        ],
+      },
+      {
+        target: "biome-control",
+        title: "Your Biome’s status",
+        body: [
+          "Your Biome’s ability and how much of it is left are shown here: for Temperate, how many Season counters remain.",
+          "Biomes with an ability you use by choice, such as Aquatic, put its buttons here too.",
+        ],
+      },
+      {
+        target: "player-niches",
+        title: "Your five Niches",
+        body: [
+          "Your side has five Niches, the places in your ecosystem where your Creatures live. Each Niche holds one Creature at a time.",
+          "Creature cards are played into your Niches.",
+        ],
+      },
+      {
+        target: "player-niches adaptation-slot",
+        title: "Adaptation slots",
+        body: [
+          "Under each Niche is an Adaptation slot. An Adaptation card is played here, attached to the Creature in that Niche, and stays with it.",
+        ],
+      },
+      {
+        target: "player-ribbon event-zone",
+        title: "Event Zone",
+        body: [
+          "A Continuous Event is played here and keeps working while it stays in play.",
+          "Instantaneous Events take effect at once instead. A few, such as Wildfire and Drought, lock a Niche for a while.",
+          "Concepts also take effect at once, then go to your History.",
+        ],
+      },
+      {
+        target: "opponent-niches creature",
+        title: "A Creature in play",
+        body: [
+          "Your opponent has played a Creature. On the board, a Creature shows its Primary Taxon and Level at the top, then its name, Diet and Period, and its Tags.",
+          "At the bottom is how many Victory Levels it is worth right now. Point at it to read the whole card.",
+        ],
+      },
+      {
+        target: "centerline",
+        title: "Facing Niches",
+        body: [
+          "Each of your Niches faces your opponent’s Niche directly across the centre line. That matters when Creatures Hunt, which a later tutorial covers.",
+        ],
+      },
+      {
+        target: "player-ribbon victory",
+        title: "Victory",
+        body: [
+          "Your Victory total: the Victory Levels of all your Creatures in play, added together.",
+          "The first player to reach 12 wins.",
+        ],
+      },
+      {
+        target: "player-ribbon piles",
+        title: "Deck, Hand and History",
+        body: [
+          { term: "Deck", text: "How many cards you have left to draw." },
+          { term: "Hand", text: "How many cards you are holding." },
+          {
+            term: "History",
+            text: "Your discard pile. Creatures that leave the board, and Concepts and Events once they are done, go here. Click it to look through it.",
+          },
+        ],
+      },
+      {
+        target: "turn-summary",
+        title: "Turn and phase",
+        body: [
+          "The top of the screen shows the turn number and whose phase it is.",
+          "Every turn has three phases: the Start Phase, when you draw; the Development Phase, when you play cards; and the Battle Phase, when your Creatures can Hunt.",
+        ],
+      },
+      {
+        target: "hand",
+        title: "Your hand",
+        body: [
+          "Your cards are here, at the bottom of the screen. Point at one to read it, or click it to choose it.",
+          "Each player starts with five cards, always including at least one Level 0 or Level 1 Creature, so every player can fill a Niche on their first turn.",
+          "With two players on one device, your hand is covered whenever the device is passed, until the next player confirms it is them.",
+        ],
+      },
+      {
+        target: "player-ribbon piles",
+        title: "When you draw",
+        body: [
+          "At the start of each of your turns, in the Start Phase, you draw one card. You started with five and drew one, so you now hold six.",
+          "You can hold at most 10 cards. A full hand blocks your draws, and ending two of your turns in a row with a full hand, while your deck still has cards, forfeits the game.",
+        ],
+      },
+      {
+        target: "allowances",
+        title: "What you can play",
+        body: [
+          "In your Development Phase you may play one Creature, one Adaptation, one Event and one Concept, in any order. These markers show what you have used this turn.",
+          "Playing a card is the next tutorial.",
+        ],
+      },
+      {
+        target: "inspector",
+        title: "The Inspector",
+        body: [
+          "Point at any card, on the board or in your hand, and the Inspector shows it in full.",
+          "It also keeps the game log: a record of everything that has happened so far.",
+          "On smaller screens, open it with the Inspector button at the top.",
+        ],
+      },
+      {
+        target: "header-controls",
+        title: "Rules and menu",
+        body: [
+          "Rules opens a quick reference at any time. Main menu leaves the game; it is saved, so you can resume it later.",
+        ],
+      },
+      {
+        target: "table",
+        title: "Ready to play",
+        body: ["That is everything on the table before your first play. Next: playing a card."],
       },
     ],
   },

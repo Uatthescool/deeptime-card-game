@@ -20,7 +20,10 @@ type BiomePanelProps = { biomeKey: BiomeKey; selected: boolean; onSelect?: () =>
 export function BiomePanel({ biomeKey, selected, onSelect }: BiomePanelProps) {
   const biome = biomeByKey(biomeKey);
   return (
-    <article className={`biome-panel biome-${biome.key} ${selected ? "selected" : ""}`}>
+    <article
+      className={`biome-panel biome-${biome.key} ${selected ? "selected" : ""}`}
+      data-tutorial-target={`biome-${biome.key}`}
+    >
       <header>
         <small>Biome</small>
         <h2>{biome.name}</h2>
@@ -119,7 +122,7 @@ export function BiomePregame({ state, onSelect, onConfirm, onContinue, onDeal, o
             : "The computer chooses its own without seeing yours; both are revealed before the opening hands are drawn."}
         </p>
       </header>
-      <section className="biome-panel-grid">
+      <section className="biome-panel-grid" data-tutorial-target="biome-grid">
         {BIOMES.map((biome) => (
           <BiomePanel
             key={biome.key}
@@ -129,7 +132,7 @@ export function BiomePregame({ state, onSelect, onConfirm, onContinue, onDeal, o
           />
         ))}
       </section>
-      <footer className="biome-selection-footer">
+      <footer className="biome-selection-footer" data-tutorial-target="biome-confirm">
         <span>
           {state.selected
             ? `${biomeByKey(state.selected).name} · ${biomeByKey(state.selected).abilityName}`

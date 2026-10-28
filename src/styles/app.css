@@ -4616,6 +4616,22 @@ button.event-slot small {
   place-items: center;
   padding: 3vh calc(2vw + var(--caption-room)) 3vh 2vw;
 }
+/* The scene sits beneath the dimming, the lit outline and the caption, whatever z-index its own parts use. */
+.tutorial-scene {
+  z-index: 0;
+}
+.tutorial-blocker,
+.tutorial-hole,
+.tutorial-caption {
+  z-index: 1;
+}
+/* A staged game fills the screen as it would in play. */
+.tutorial-scene.scene-board,
+.tutorial-scene.scene-biome-choice {
+  display: block;
+  overflow: hidden;
+  padding: 0;
+}
 .tutorial-card {
   position: relative;
   height: min(90dvh, calc((96vw - var(--caption-room)) * 1434 / 1024));

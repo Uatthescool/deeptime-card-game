@@ -11,7 +11,10 @@ import {
 } from "../../data/tutorials.ts";
 import { assetUrl } from "../assets.ts";
 import { readJson, writeJson } from "../storage.ts";
+import { boardTutorialGame } from "../tutorialGames.ts";
 import { Dialog } from "./Dialog.tsx";
+import { GameScreen } from "./GameScreen.tsx";
+import { BiomePregame } from "./Pregame.tsx";
 
 const DONE_KEY = "pcg.tutorials.done";
 
@@ -103,6 +106,7 @@ export function TutorialPlayer({
   const [index, setIndex] = useState(0);
   const sceneRef = useRef<HTMLDivElement>(null);
   const step = tutorial.steps[index]!;
+  const scene = step.scene ?? tutorial.scene;
   const last = index === tutorial.steps.length - 1;
   const next = useCallback(() => (last ? onExit(true) : setIndex((i) => i + 1)), [last, onExit]);
   const back = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
@@ -119,8 +123,10 @@ export function TutorialPlayer({
 
   return (
     <Dialog label={`Tutorial: ${tutorial.title}`} className="tutorial-player">
-      <div className="tutorial-scene" ref={sceneRef}>
-        {tutorial.scene === "card-anatomy" && <CardAnatomyScene />}
+      <div className={`tutorial-scene scene-${scene}`} ref={sceneRef}>
+        {scene === "card-anatomy" && <CardAnatomyScene />}
+        {scene === "biome-choice" && <BiomeChoiceScene />}
+        {scene === "board" && <BoardScene />}
       </div>
       <Spotlight
         sceneRef={sceneRef}
@@ -200,29 +206,51 @@ function Spotlight({
     const measure = () => {
       const main = scene.querySelector<HTMLElement>("[data-tutorial-subject]")?.getBoundingClientRect();
       setSubject(main ? { left: main.left, top: main.top, width: main.width, height: main.height } : null);
-      const target = scene.querySelector<HTMLElement>(`[data-tutorial-target="${step.target}"]`);
-      if (!target) return setHole(null);
-      const r = target.getBoundingClientRect();
+      const target = scene.querySelector<HTMLElement>(targetSelector(step.target));
+      const r = target?.getBoundingClientRect();
+      // Light only what is on screen. A part mostly off it at this size (a closed drawer, say) is explained without
+      // a hole.
+      const left = Math.max(0, r?.left ?? 0);
+      const top = Math.max(0, r?.top ?? 0);
+      const right = Math.min(window.innerWidth, r?.right ?? 0);
+      const bottom = Math.min(window.innerHeight, r?.bottom ?? 0);
+      if (!r || right <= left || bottom <= top || (right - left) * (bottom - top) < 0.4 * r.width * r.height) {
+        return setHole(null);
+      }
       setHole({
-        left: r.left - HOLE_PADDING,
-        top: r.top - HOLE_PADDING,
-        width: r.width + HOLE_PADDING * 2,
-        height: r.height + HOLE_PADDING * 2,
+        left: left - HOLE_PADDING,
+        top: top - HOLE_PADDING,
+        width: right - left + HOLE_PADDING * 2,
+        height: bottom - top + HOLE_PADDING * 2,
       });
     };
+    // Bring the part into view first, in case the scene scrolls (a small screen, say).
+    scene
+      .querySelector<HTMLElement>(targetSelector(step.target))
+      ?.scrollIntoView?.({ block: "center", inline: "center" });
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(scene);
     window.addEventListener("resize", measure);
+    // A scene that has just appeared may still be settling (images, fonts): measure again shortly after.
+    const settle = window.setTimeout(measure, 250);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", measure);
+      window.clearTimeout(settle);
     };
   }, [sceneRef, step.target]);
 
   useLayoutEffect(() => {
     const caption = captionRef.current;
-    if (!caption || !hole) return;
+    if (!caption) return;
+    if (!hole) {
+      setPlacement({
+        left: (window.innerWidth - caption.offsetWidth) / 2,
+        top: (window.innerHeight - caption.offsetHeight) / 2,
+      });
+      return;
+    }
     setPlacement(captionPlacement(hole, { width: caption.offsetWidth, height: caption.offsetHeight }, subject));
   }, [hole, subject, step]);
 
@@ -256,6 +284,13 @@ function Spotlight({
     </>
   );
 }
+
+/** A step's target, e.g. "victory" or a part inside another part, "player-ribbon victory". */
+const targetSelector = (target: string) =>
+  target
+    .split(" ")
+    .map((part) => `[data-tutorial-target="${part}"]`)
+    .join(" ");
 
 /** Paragraphs as paragraphs; each run of terms as one list. */
 function TutorialBody({ copy }: { copy: TutorialCopy[] }) {
@@ -316,4 +351,33 @@ function CardAnatomyScene() {
       ))}
     </div>
   );
+}
+
+/** The Biome choice screen as a player first sees it, with Temperate picked. */
+function BiomeChoiceScene() {
+  const noop = () => {};
+  return (
+    <BiomePregame
+      state={{
+        players: ["Player One", "Player Two"],
+        decks: ["deck-1", "deck-1"],
+        seed: null,
+        opponent: "person",
+        chooser: 0,
+        choices: [null, null],
+        selected: "temperate",
+        stage: "select",
+      }}
+      onSelect={noop}
+      onConfirm={noop}
+      onContinue={noop}
+      onDeal={noop}
+      onBack={noop}
+    />
+  );
+}
+
+function BoardScene() {
+  const [game] = useState(boardTutorialGame);
+  return <GameScreen initialGame={game} resumed={false} onExit={() => {}} tutorial />;
 }

@@ -92,10 +92,12 @@ type GameScreenProps = {
   /** True when the game was restored from a save: cover the hand until the right player confirms. */
   resumed: boolean;
   onExit: () => void;
+  /** A tutorial's staged game: never saved, so it cannot replace a game in progress. */
+  tutorial?: boolean;
 };
 
-export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
-  const { game, dispatch: dispatchAny, currentDraw } = useGameSession(initialGame);
+export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: GameScreenProps) {
+  const { game, dispatch: dispatchAny, currentDraw } = useGameSession(initialGame, { persist: !tutorial });
   const computerTurn = useComputerOpponent(game, dispatchAny);
   // The person's own moves; ignored while the computer is the one to move.
   const dispatch = (action: GameAction) => {
@@ -425,22 +427,29 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
   const ribbon = (playerId: PlayerId, label: string) => {
     const player = game.players[playerId];
     return (
-      <div className={`player-ribbon ${playerId === viewPlayer ? "active-ribbon" : "opponent-ribbon"}`}>
+      <div
+        className={`player-ribbon ${playerId === viewPlayer ? "active-ribbon" : "opponent-ribbon"}`}
+        data-tutorial-target={playerId === viewPlayer ? "player-ribbon" : "opponent-ribbon"}
+      >
         <div className="player-identity">
           <small>{label}</small>
           <strong>{player.name}</strong>
-          {player.biome.key && <span className="biome-ribbon-badge">{biomeByKey(player.biome.key).name}</span>}
+          {player.biome.key && (
+            <span className="biome-ribbon-badge" data-tutorial-target="biome-badge">
+              {biomeByKey(player.biome.key).name}
+            </span>
+          )}
         </div>
-        <div className="ribbon-event">
+        <div className="ribbon-event" data-tutorial-target="event-zone">
           <EventZone game={game} playerId={playerId} onPin={pin} onPreview={preview} />
         </div>
-        <div className="score-pill">
+        <div className="score-pill" data-tutorial-target="victory">
           <span>Victory</span>
           <b>
             {totals[playerId]} / {VICTORY_THRESHOLD}
           </b>
         </div>
-        <div className="pile-counts">
+        <div className="pile-counts" data-tutorial-target="piles">
           <span>Deck {player.deck.length}</span>
           <span className="hand-counter">Hand {player.hand.length}</span>
           <button onClick={() => openHistory(playerId)}>History {player.history.length}</button>
@@ -450,7 +459,10 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
   };
 
   const lanes = (playerId: PlayerId) => (
-    <div className={`lanes ${playerId === viewPlayer ? "player-lanes" : "opponent-lanes"}`}>
+    <div
+      className={`lanes ${playerId === viewPlayer ? "player-lanes" : "opponent-lanes"}`}
+      data-tutorial-target={playerId === viewPlayer ? "player-niches" : "opponent-niches"}
+    >
       {LANES.map((laneIndex) => (
         <NicheLane
           key={laneIndex}
@@ -488,7 +500,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
             {game.players[0].name} vs. {game.players[1].name}
           </h1>
         </div>
-        <div className="turn-summary">
+        <div className="turn-summary" data-tutorial-target="turn-summary">
           <span>
             Turn {game.turnNumber}
             {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
@@ -508,7 +520,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
             {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
           </strong>
         </div>
-        <div className="header-controls">
+        <div className="header-controls" data-tutorial-target="header-controls">
           <button className="quiet-button inspector-drawer-toggle" onClick={() => setInspectorOpen(!inspectorOpen)}>
             {inspectorOpen ? "Close inspector" : "Inspector"}
           </button>
@@ -536,9 +548,10 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
 
       <div className="game-layout">
         <section className="board" aria-label="Game board">
-          <section className="table-board-region">
+          <section className="table-board-region" data-tutorial-target="table">
             <div
               className={`biome-board-half opponent-biome-half biome-${opponentState.biome.key ?? "none"}`}
+              data-tutorial-target="opponent-half"
               style={biomeBoardStyle(opponentState.biome.key)}
               aria-label={`${opponentState.name}'s ${opponentState.biome.key ? biomeByKey(opponentState.biome.key).name : "standard"} ecosystem`}
             >
@@ -546,7 +559,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
               {lanes(opponent)}
             </div>
 
-            <div className="centerline">
+            <div className="centerline" data-tutorial-target="centerline">
               <span>
                 {game.periodAuras.length
                   ? game.periodAuras.map((aura) => `Geological Boundary · ${aura.period} +1 Battle Level`).join(" · ")
@@ -556,6 +569,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
 
             <div
               className={`biome-board-half player-biome-half biome-${viewer.biome.key ?? "none"}`}
+              data-tutorial-target="player-half"
               style={biomeBoardStyle(viewer.biome.key)}
               aria-label={`${viewer.name}'s ${viewer.biome.key ? biomeByKey(viewer.biome.key).name : "standard"} ecosystem`}
             >
@@ -721,7 +735,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
               </section>
             )}
 
-            <section className="hand-zone">
+            <section className="hand-zone" data-tutorial-target="hand">
               <div className="section-heading">
                 <div>
                   <small>{handHidden ? "Hand covered" : "Private hand"}</small>
@@ -737,7 +751,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
                   <span className="turn-phase-label">
                     Turn {game.turnNumber} · {PHASE_NAMES[game.phase].replace(" Phase", "")}
                   </span>
-                  <div className="allowances">
+                  <div className="allowances" data-tutorial-target="allowances">
                     <span className={allowances.creaturePlayed ? "used" : ""}>
                       Creature {allowances.creaturePlayed ? "used" : "1"}
                     </span>
@@ -788,7 +802,7 @@ export function GameScreen({ initialGame, resumed, onExit }: GameScreenProps) {
           </section>
         </section>
 
-        <aside className={`side-rail ${inspectorOpen ? "open" : ""}`}>
+        <aside className={`side-rail ${inspectorOpen ? "open" : ""}`} data-tutorial-target="inspector">
           {explanation && <LegalityPanel explanation={explanation} className="in-rail" />}
           <Inspector
             target={pinned ?? hover}
@@ -980,7 +994,7 @@ function BiomeControl({ game, active, onReposition, onOverride, onCancel }: Biom
       : "Disconnected · free override spent";
   }
   return (
-    <section className={`biome-control biome-${player.biome.key}`}>
+    <section className={`biome-control biome-${player.biome.key}`} data-tutorial-target="biome-control">
       <small>
         {biome.name} · {biome.abilityName}
       </small>

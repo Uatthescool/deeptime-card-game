@@ -64,6 +64,7 @@ function BoardCreature({
 
   return (
     <button
+      data-tutorial-target="creature"
       className={`board-creature period-${card.period.toLowerCase()} ${selected ? "selected" : ""} ${highlighted ? "legal-target" : ""}`}
       onClick={() => {
         onPin(target);
@@ -191,6 +192,7 @@ export function NicheLane({
   } else {
     content = (
       <button
+        data-tutorial-target="empty-niche"
         className={`empty-niche ${highlighted ? "legal-target" : ""} ${locked ? "lane-locked" : ""}`}
         onClick={onLaneClick}
         aria-label={`${opponentRow ? "Opponent" : "Your"} Niche ${niche}${locked ? ", locked" : ", empty"}${highlighted ? ", available" : ""}`}
@@ -235,13 +237,16 @@ export function NicheLane({
       {slotTarget ? (
         <button
           className={slotClass}
+          data-tutorial-target="adaptation-slot"
           onClick={() => onPin(slotTarget)}
           {...inspectionHandlers(slotTarget, onPreview, onPin)}
         >
           {slotLabel}
         </button>
       ) : (
-        <div className={slotClass}>{slotLabel}</div>
+        <div className={slotClass} data-tutorial-target="adaptation-slot">
+          {slotLabel}
+        </div>
       )}
     </div>
   );

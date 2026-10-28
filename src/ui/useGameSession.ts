@@ -8,9 +8,9 @@ const DRAW_ANIMATION_MS = 680;
 /**
  * Owns the live GameState for one game. Every change goes through
  * `dispatch(action)`, which runs the engine, queues draw animations, and
- * autosaves so a refresh never loses a game in progress.
+ * autosaves so a refresh never loses a game in progress (unless `persist` is false, as in a tutorial).
  */
-export function useGameSession(initial: GameState) {
+export function useGameSession(initial: GameState, { persist = true }: { persist?: boolean } = {}) {
   const [game, setGame] = useState(initial);
   const gameRef = useRef(initial);
   const [drawQueue, setDrawQueue] = useState<DrawEvent[]>([]);
@@ -53,7 +53,9 @@ export function useGameSession(initial: GameState) {
     return () => window.clearTimeout(timer);
   }, [drawQueue]);
 
-  useEffect(() => saveGame(game), [game]);
+  useEffect(() => {
+    if (persist) saveGame(game);
+  }, [game, persist]);
 
   return { game, dispatch, currentDraw: drawQueue[0] ?? null };
 }

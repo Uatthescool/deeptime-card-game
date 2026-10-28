@@ -110,20 +110,46 @@ describe("App", () => {
     expect(within(player).getByRole("button", { name: "Back" })).toBeDisabled();
     expect(within(player).getByRole("button", { name: "Next" })).toHaveFocus();
 
-    const tutorial = TUTORIALS_BY_ID.get("card-anatomy")!;
-    for (const [index, step] of tutorial.steps.entries()) {
-      expect(within(player).getByRole("heading", { name: step.title })).toBeInTheDocument();
-      expect(within(player).getByText(`Step ${index + 1} of ${tutorial.steps.length}`)).toBeInTheDocument();
-      expect(player.querySelector(`[data-tutorial-target="${step.target}"]`), step.target).not.toBeNull();
-      await user.click(
-        within(player).getByRole("button", { name: index === tutorial.steps.length - 1 ? "Finish" : "Next" }),
-      );
-    }
-
+    await walkTutorial(user, player, "card-anatomy");
     expect(screen.queryByRole("dialog", { name: /^Tutorial:/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Anatomy of a card/ })).toHaveTextContent("✓ Done");
   });
+
+  test("the table tutorial walks the Biome choice and a staged board without touching a saved game", async () => {
+    const saved = applyAction(createGame("A", "B", [null, null], ["deck-1", "deck-2"], { seed: 9 }), {
+      type: "acknowledgeHandoff",
+    });
+    saveGame(saved);
+    const before = window.localStorage.getItem("pcg.savedGame");
+
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Tutorials" }));
+    await user.click(screen.getByRole("button", { name: /The table/ }));
+    const player = screen.getByRole("dialog", { name: "Tutorial: The table" });
+    await walkTutorial(user, player, "the-table");
+
+    expect(window.localStorage.getItem("pcg.savedGame")).toBe(before);
+    expect(screen.getByRole("button", { name: /The table/ })).toHaveTextContent("✓ Done");
+  });
 });
+
+/** Steps through a tutorial to the end, checking each step's caption and that the part it lights is in its scene. */
+async function walkTutorial(user: ReturnType<typeof userEvent.setup>, player: HTMLElement, id: string) {
+  const tutorial = TUTORIALS_BY_ID.get(id)!;
+  for (const [index, step] of tutorial.steps.entries()) {
+    const caption = player.querySelector<HTMLElement>(".tutorial-caption")!;
+    expect(within(caption).getByRole("heading", { name: step.title })).toBeInTheDocument();
+    expect(within(caption).getByText(`Step ${index + 1} of ${tutorial.steps.length}`)).toBeInTheDocument();
+    const selector = step.target
+      .split(" ")
+      .map((part) => `[data-tutorial-target="${part}"]`)
+      .join(" ");
+    expect(player.querySelector(selector), step.target).not.toBeNull();
+    const last = index === tutorial.steps.length - 1;
+    await user.click(within(caption).getByRole("button", { name: last ? "Finish" : "Next" }));
+  }
+}
 
 describe("saved games", () => {
   test("round-trip through storage and re-link card definitions", () => {
