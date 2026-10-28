@@ -570,7 +570,7 @@ test("Blue Whale is the playable Level 4 capstone with locked normal and Rapid S
   assert.equal(blueWhale.period, "Quaternary");
   assert.equal(blueWhale.periodColor, "Ice White");
   assert.equal(blueWhale.diet, "Carnivore");
-  assert.equal(blueWhale.gameplayTaxon, "Mammal");
+  assert.equal(blueWhale.gameplayTaxon, "Synapsid");
   assert.deepEqual(blueWhale.tags, ["Aquatic", "Filter Feeder", "Specialized", "Gigantic"]);
   assert.deepEqual(blueWhale.visualTags, ["Baleen", "Ventral Grooves", "Paired Blowholes", "Flippers", "Tail Flukes"]);
   assert.equal(tagEffectMultiplier(blueWhale, "Gigantic"), 2);
