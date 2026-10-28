@@ -96,10 +96,10 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "gameplay-taxon",
-        title: "The bold Taxon",
+        title: "The Primary Taxon",
         body: [
-          "On every card, one taxon is bold and underlined. Here it is Mollusk.",
-          "It is the card’s main group in play, used when one creature evolves into another. Animals that share it are close enough relatives for the game to connect them.",
+          "On every card, one taxon is bold and underlined: the Primary Taxon. Here it is Mollusk.",
+          "In play, a Creature can override another in a Niche, taking its place, when the two match on enough of Diet, Period, Primary Taxon and Tags. Sharing a Primary Taxon counts as one of those matches.",
         ],
       },
       {
@@ -131,8 +131,8 @@ export const TUTORIALS: TutorialDefinition[] = [
         target: "level",
         title: "Level",
         body: [
-          "The Level is a game number, not a biological one. Level 0 creatures start a line of evolution in play, and each step of evolution climbs a Level.",
-          "It does not mean an animal is more or less evolved. Every species alive today has been evolving for exactly as long as every other.",
+          "The Level is a game number, not a biological one. An empty Niche takes a Level 0 or 1 Creature, and an override can rise at most one Level at a time. A Creature’s Level also counts toward the 12 Victory Levels that win the game.",
+          "It does not rank animals. A Level 3 animal is not more advanced than a Level 0 one: every species alive today has an ancestry exactly as long as every other’s.",
         ],
       },
       {

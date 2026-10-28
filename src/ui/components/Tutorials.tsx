@@ -289,7 +289,7 @@ const CARD_PARTS: Record<string, [x0: number, y0: number, x1: number, y1: number
   diet: [852, 55, 967, 169],
   art: [69, 189, 954, 682],
   taxa: [73, 720, 951, 880],
-  "gameplay-taxon": [356, 816, 524, 862],
+  "gameplay-taxon": [636, 776, 770, 818],
   tags: [73, 911, 951, 1010],
   flavor: [90, 1050, 940, 1308],
   level: [83, 1194, 247, 1357],
