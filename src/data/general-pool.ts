@@ -16,6 +16,7 @@ type Candidate = {
   role: string;
   flavorText: string;
   visualTags?: string[];
+  cardFace?: string;
 };
 
 const candidate = (entry: Candidate): CreatureCard => ({
@@ -121,6 +122,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Flexible Triassic starter connecting early dinosaurs to several later branches.",
     flavorText:
       "Eoraptor was a small early dinosaur with a mixed set of tooth shapes, an anatomy that suits a generalized diet and an early position near major saurischian branches.",
+    cardFace: "/card-faces/eoraptor.webp",
   }),
   candidate({
     key: "lystrosaurus",
@@ -137,6 +139,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Signature Opportunist starter that turns opposing Continuous Events into earned tempo.",
     flavorText:
       "Lystrosaurus crossed the Permian–Triassic boundary and became extraordinarily abundant afterward, making it a natural emblem of survival followed by rapid occupation of open niches.",
+    cardFace: "/card-faces/lystrosaurus.webp",
   }),
   candidate({
     key: "edaphosaurus",
@@ -153,6 +156,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Herbivorous Synapsid bridge that broadens the Spinal Sail package.",
     flavorText:
       "Unlike the predatory Dimetrodon, Edaphosaurus was a bulky plant-eater whose tall sail carried distinctive crossbars along its elongated vertebral spines.",
+    cardFace: "/card-faces/edaphosaurus.webp",
   }),
   candidate({
     key: "brachiosaurus",
@@ -210,6 +214,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Large non-therapsid Synapsid endpoint with a clean Victory contribution.",
     flavorText:
       "Cotylorhynchus paired a remarkably small head with a huge barrel-shaped trunk, reflecting a digestive system suited to processing large amounts of fibrous vegetation.",
+    cardFace: "/card-faces/cotylorhynchus.webp",
   }),
   candidate({
     key: "thrinaxodon",
@@ -226,6 +231,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Low-level Synapsid foundation that values shelter and broad override access.",
     flavorText:
       "Thrinaxodon was a small cynodont known from articulated skeletons preserved in burrows, evidence that sheltering underground was an important part of its ecology.",
+    cardFace: "/card-faces/thrinaxodon.webp",
   }),
   candidate({
     key: "anomalocaris",
@@ -338,6 +344,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Mobile marine Carnivore bridge for dedicated aquatic development lines.",
     flavorText:
       "Ichthyosaurus had a streamlined body, paddlelike limbs, and a fish-shaped profile produced independently from dolphins through adaptation to fast swimming.",
+    cardFace: "/card-faces/ichthyosaurus.webp",
   }),
   candidate({
     key: "shastasaurus",
@@ -354,6 +361,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "High-end marine giant that wins through scale rather than predator keywords.",
     flavorText:
       "Giant shastasaurid ichthyosaurs reached whale-like lengths during the Triassic, demonstrating how quickly reptiles occupied enormous open-ocean body sizes.",
+    cardFace: "/card-faces/shastasaurus.webp",
   }),
   candidate({
     key: "plesiosaurus",
@@ -370,6 +378,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Stable Level 2 marine Carnivore connecting low aquatic reptiles to giant finishers.",
     flavorText:
       "Plesiosaurus propelled itself with four hydrofoil-like limbs while its compact body and long neck created a silhouette unlike that of ichthyosaurs or mosasaurs.",
+    cardFace: "/card-faces/plesiosaurus.webp",
   }),
   candidate({
     key: "mosasaurus",
@@ -386,6 +395,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Marine reptile apex endpoint with both Aquatic and Lepidosaur connections.",
     flavorText:
       "Mosasaurus was a giant marine squamate with powerful jaws and a deep tail adapted for propulsion, occupying the top of Late Cretaceous food webs.",
+    cardFace: "/card-faces/mosasaurus.webp",
   }),
   candidate({
     key: "purussaurus",
@@ -402,6 +412,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Explosive semi-aquatic ambush finisher with a heavily committed tag line.",
     flavorText:
       "Purussaurus was an enormous caiman from Miocene South America, combining a massive skull and robust teeth with the concealed approach of an aquatic ambush predator.",
+    cardFace: "/card-faces/purussaurus.webp",
   }),
   candidate({
     key: "dunkleosteus",
@@ -450,6 +461,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Terrestrial mammal ambusher that brings Raptorial pressure beyond dinosaurs.",
     flavorText:
       "Smilodon combined elongated upper canines with exceptionally powerful forelimbs, a build suited to restraining prey before delivering a carefully positioned bite.",
+    cardFace: "/card-faces/smilodon.webp",
   }),
   candidate({
     key: "woolly-mammoth",
@@ -466,6 +478,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Cold-adapted defensive giant and mammalian herbivore finisher.",
     flavorText:
       "Woolly mammoths combined dense hair, insulating fat, small ears, and long curved tusks to survive and forage across the cold steppe environments of the Pleistocene.",
+    cardFace: "/card-faces/woolly-mammoth.webp",
   }),
   candidate({
     key: "paraceratherium",
@@ -482,6 +495,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Non-dinosaur terrestrial giant that rewards isolated lane placement.",
     flavorText:
       "Paraceratherium was a hornless rhinocerotoid with a long neck and towering limbs, among the largest land mammals yet known from the fossil record.",
+    cardFace: "/card-faces/paraceratherium.webp",
   }),
   candidate({
     key: "megatherium",
@@ -498,6 +512,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Defensive mammal bruiser whose size and claws punish careless Hunts.",
     flavorText:
       "Megatherium was an elephant-sized ground sloth able to rear upright, using a powerful tail as support while its long foreclaws pulled vegetation within reach.",
+    cardFace: "/card-faces/megatherium.webp",
   }),
   candidate({
     key: "arctotherium",
@@ -514,6 +529,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Flexible omnivore boss that is strongest when developed away from adjacent allies.",
     flavorText:
       "Arctotherium included some exceptionally large short-faced bears in Pleistocene South America, with a broad omnivorous anatomy capable of exploiting varied foods.",
+    cardFace: "/card-faces/arctotherium.webp",
   }),
   candidate({
     key: "epicyon",
@@ -530,6 +546,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Bone-cracking canid payoff for a coordinated mammalian predator line.",
     flavorText:
       "Epicyon was a massive borophagine canid with a deep skull and robust teeth adapted for forces far beyond those used by most living dogs.",
+    cardFace: "/card-faces/epicyon.webp",
   }),
   candidate({
     key: "dire-wolf",
@@ -546,5 +563,6 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     role: "Efficient pack bridge that makes repeated Hunts matter without acting as a solo apex.",
     flavorText:
       "Dire wolves were robust New World canids whose remains occur in large numbers at some fossil sites, suggesting predators repeatedly drawn to concentrated prey resources.",
+    cardFace: "/card-faces/dire-wolf.webp",
   }),
 ];
