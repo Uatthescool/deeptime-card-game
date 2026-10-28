@@ -9,6 +9,7 @@ import { App } from "../../src/ui/App.tsx";
 import { BattleModal } from "../../src/ui/components/BattleModal.tsx";
 import { GameScreen } from "../../src/ui/components/GameScreen.tsx";
 import { WinnerOverlay } from "../../src/ui/components/Modals.tsx";
+import { TUTORIALS_BY_ID } from "../../src/data/tutorials.ts";
 import { clearSavedGame, loadSavedGame, saveGame, savedGameSummary } from "../../src/ui/save.ts";
 import { elusiveHunt, inPlay, takeFromLibrary } from "../fixtures.ts";
 
@@ -98,6 +99,29 @@ describe("App", () => {
     // Support cards have no finished face yet, so they only pin in the inspector.
     await user.click(browserCard("Wildfire"));
     expect(screen.queryByRole("dialog", { name: /card$/ })).not.toBeInTheDocument();
+  });
+
+  test("the card anatomy tutorial lights every part it explains, step by step, and is marked done", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Tutorials" }));
+    await user.click(screen.getByRole("button", { name: /Anatomy of a card/ }));
+    const player = screen.getByRole("dialog", { name: "Tutorial: Anatomy of a card" });
+    expect(within(player).getByRole("button", { name: "Back" })).toBeDisabled();
+    expect(within(player).getByRole("button", { name: "Next" })).toHaveFocus();
+
+    const tutorial = TUTORIALS_BY_ID.get("card-anatomy")!;
+    for (const [index, step] of tutorial.steps.entries()) {
+      expect(within(player).getByRole("heading", { name: step.title })).toBeInTheDocument();
+      expect(within(player).getByText(`Step ${index + 1} of ${tutorial.steps.length}`)).toBeInTheDocument();
+      expect(player.querySelector(`[data-tutorial-target="${step.target}"]`), step.target).not.toBeNull();
+      await user.click(
+        within(player).getByRole("button", { name: index === tutorial.steps.length - 1 ? "Finish" : "Next" }),
+      );
+    }
+
+    expect(screen.queryByRole("dialog", { name: /^Tutorial:/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Anatomy of a card/ })).toHaveTextContent("✓ Done");
   });
 });
 

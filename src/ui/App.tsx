@@ -8,6 +8,7 @@ import { GameScreen } from "./components/GameScreen.tsx";
 import { LessonExperience } from "./components/Lesson.tsx";
 import { BiomePregame, OpeningDealOverlay, type PregameState } from "./components/Pregame.tsx";
 import { type SetupChoices, SetupScreen } from "./components/SetupScreen.tsx";
+import { TutorialsMenu } from "./components/Tutorials.tsx";
 import { clearSavedGame, loadSavedGame, savedGameSummary } from "./save.ts";
 
 type Screen =
@@ -15,7 +16,7 @@ type Screen =
   | { kind: "pregame"; pregame: PregameState }
   | { kind: "game"; game: GameState; resumed: boolean; gameId: number };
 
-type Overlay = "cards" | "lesson" | "credits" | null;
+type Overlay = "cards" | "lesson" | "credits" | "tutorials" | null;
 
 type OpeningDeal = {
   players: [string, string];
@@ -119,12 +120,14 @@ export function App() {
           setSavedGame(null);
         }}
         onInspectCards={() => setOverlay("cards")}
+        onTutorials={() => setOverlay("tutorials")}
         onLearn={() => setOverlay("lesson")}
         onCredits={() => setOverlay("credits")}
       />
       {overlay === "cards" && <DeckBrowser onClose={() => setOverlay(null)} />}
       {overlay === "lesson" && <LessonExperience onClose={() => setOverlay(null)} />}
       {overlay === "credits" && <Credits onClose={() => setOverlay(null)} />}
+      {overlay === "tutorials" && <TutorialsMenu onClose={() => setOverlay(null)} />}
     </>
   );
 }

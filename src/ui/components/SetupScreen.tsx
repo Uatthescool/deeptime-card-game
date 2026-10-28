@@ -36,6 +36,7 @@ type SetupScreenProps = {
   onResume: () => void;
   onDiscardSave: () => void;
   onInspectCards: () => void;
+  onTutorials: () => void;
   onLearn: () => void;
   onCredits: () => void;
 };
@@ -49,6 +50,7 @@ export function SetupScreen({
   onResume,
   onDiscardSave,
   onInspectCards,
+  onTutorials,
   onLearn,
   onCredits,
 }: SetupScreenProps) {
@@ -188,6 +190,9 @@ export function SetupScreen({
             </button>
             <button className="quiet-button" type="button" onClick={onInspectCards}>
               Inspect Cards
+            </button>
+            <button className="quiet-button" type="button" onClick={onTutorials}>
+              Tutorials
             </button>
             <button className="learn-something-button" type="button" onClick={onLearn}>
               <span>Learn Something</span>

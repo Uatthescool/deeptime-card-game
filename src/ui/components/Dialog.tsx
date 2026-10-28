@@ -18,7 +18,10 @@ export function Dialog({ label, className = "", role = "dialog", children }: Dia
     const root = ref.current;
     if (!root) return;
     const previous = document.activeElement as HTMLElement | null;
-    const first = root.querySelector<HTMLElement>("button:not([disabled]), [href], input, select, [tabindex='0']");
+    // A control marked data-autofocus takes focus first; otherwise the first focusable control does.
+    const first =
+      root.querySelector<HTMLElement>("[data-autofocus]") ??
+      root.querySelector<HTMLElement>("button:not([disabled]), [href], input, select, [tabindex='0']");
     (first ?? root).focus();
 
     const trap = (event: KeyboardEvent) => {

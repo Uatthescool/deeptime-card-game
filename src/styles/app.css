@@ -4521,6 +4521,222 @@ button.event-slot small {
   font-weight: 800;
 }
 
+.tutorials-overlay {
+  place-items: start center;
+  overflow-y: auto;
+}
+.tutorials-panel {
+  width: min(720px, 100%);
+  margin: 4vh auto;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.1rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  background: linear-gradient(155deg, #22392c, #17271f);
+}
+.tutorials-panel > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.tutorials-panel h2 {
+  margin: 0.25rem 0 0;
+  font:
+    600 2rem Georgia,
+    serif;
+}
+.tutorials-panel .quiet-button {
+  color: #f4ede0;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.tutorials-group {
+  margin-top: 1.6rem;
+}
+.tutorials-group h3 {
+  margin: 0;
+  font:
+    600 1.2rem Georgia,
+    serif;
+}
+.tutorials-group > p {
+  margin: 0.2rem 0 0.7rem;
+  color: #b9c6bb;
+  font-size: 0.9rem;
+}
+.tutorials-group ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tutorial-entry {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.8rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f4ede0;
+  text-align: left;
+  cursor: pointer;
+}
+.tutorial-entry:hover,
+.tutorial-entry:focus-visible {
+  border-color: #c9853c;
+  background: rgba(201, 133, 60, 0.12);
+}
+.tutorial-entry b {
+  font:
+    600 1.05rem Georgia,
+    serif;
+}
+.tutorial-entry span {
+  color: #d4dcd3;
+  font-size: 0.92rem;
+}
+.tutorial-entry small,
+.tutorials-soon {
+  color: #9eafa2;
+  font-size: 0.78rem;
+}
+.tutorial-player {
+  z-index: 140;
+  padding: 0;
+  background: linear-gradient(150deg, #1c2e24, #111c17 70%);
+}
+.tutorial-scene {
+  /* When the window is wide enough for the card (90% of the height tall) and a caption beside it, the scene
+     keeps a column on the right for the captions, so they never cover the card. The calc is a step: all or nothing. */
+  --caption-room: clamp(0px, calc((100vw - 90dvh * 1024 / 1434 - 480px) * 1000), 440px);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 3vh calc(2vw + var(--caption-room)) 3vh 2vw;
+}
+.tutorial-card {
+  position: relative;
+  height: min(90dvh, calc((96vw - var(--caption-room)) * 1434 / 1024));
+  aspect-ratio: 1024 / 1434;
+}
+.tutorial-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.tutorial-card-part {
+  position: absolute;
+  pointer-events: none;
+}
+.tutorial-blocker {
+  position: fixed;
+  inset: 0;
+}
+.tutorial-hole {
+  position: fixed;
+  border-radius: 14px;
+  /* Everything outside the lit part is dimmed by the hole's shadow. */
+  box-shadow:
+    0 0 0 2px rgba(240, 200, 140, 0.85),
+    0 0 0 200vmax rgba(4, 9, 6, 0.8);
+  pointer-events: none;
+  transition:
+    left 280ms ease,
+    top 280ms ease,
+    width 280ms ease,
+    height 280ms ease;
+}
+.tutorial-caption {
+  position: fixed;
+  width: min(380px, calc(100vw - 32px));
+  border: 1px solid rgba(240, 200, 140, 0.35);
+  border-radius: 1rem;
+  padding: 1.1rem 1.2rem 1rem;
+  background: rgba(20, 33, 26, 0.96);
+  box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, 0.5);
+  color: #f4ede0;
+  transition:
+    left 280ms ease,
+    top 280ms ease;
+}
+.tutorial-caption small {
+  color: #d9a65f;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tutorial-caption h2 {
+  margin: 0.3rem 0 0.5rem;
+  font:
+    600 1.35rem Georgia,
+    serif;
+}
+.tutorial-caption p {
+  margin: 0 0 0.6rem;
+  color: #e2e8df;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.tutorial-caption dl {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 0.6rem;
+}
+.tutorial-caption dl div {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.tutorial-caption dt {
+  display: inline;
+  color: #f0c88c;
+  font-weight: 700;
+}
+.tutorial-caption dt::after {
+  content: ": ";
+}
+.tutorial-caption dd {
+  display: inline;
+  margin: 0;
+  color: #e2e8df;
+}
+.tutorial-caption-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+.tutorial-caption-actions span {
+  display: flex;
+  gap: 0.5rem;
+}
+.tutorial-caption .quiet-button {
+  color: #f4ede0;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+@media (max-width: 600px) {
+  /* Phones: a compact caption that scrolls if it must, so it fits above or below the lit part. */
+  .tutorial-caption {
+    max-height: 45dvh;
+    overflow-y: auto;
+    padding: 0.8rem 0.9rem 0.75rem;
+  }
+  .tutorial-caption h2 {
+    font-size: 1.1rem;
+  }
+  .tutorial-caption p,
+  .tutorial-caption dl div {
+    font-size: 0.85rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-hole,
+  .tutorial-caption {
+    transition: none;
+  }
+}
 .card-lightbox {
   z-index: 140;
   padding: 0;
