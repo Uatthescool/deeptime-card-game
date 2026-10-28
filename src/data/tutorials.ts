@@ -122,9 +122,9 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "flavor",
-        title: "The science",
+        title: "Flavor text",
         body: [
-          "The text at the bottom is a real fact about the animal: how it lived, what its fossils show, or why it matters to scientists.",
+          "The flavor text at the bottom is a real fact about the animal: how it lived, or what its fossils show.",
         ],
       },
       {
@@ -140,7 +140,7 @@ export const TUTORIALS: TutorialDefinition[] = [
         title: "When it lived",
         body: [
           "The footer gives the period the animal lived in: here, the Early Paleogene.",
-          "The Paleogene Period ran from about 66 to 23 million years ago, beginning just after the extinction that ended the non-bird dinosaurs. Early, Middle or Late narrows it down. Cards for animals still alive today show the period alone.",
+          "The Paleogene Period ran from about 66 to 23 million years ago, beginning just after the extinction that ended the non-avian dinosaurs. Early, Middle or Late narrows it down. Cards for animals still alive today show the period alone.",
         ],
       },
       {

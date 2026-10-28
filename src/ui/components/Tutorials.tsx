@@ -291,7 +291,7 @@ const CARD_PARTS: Record<string, [x0: number, y0: number, x1: number, y1: number
   taxa: [73, 720, 951, 880],
   "gameplay-taxon": [636, 776, 770, 818],
   tags: [73, 911, 951, 1010],
-  flavor: [90, 1050, 940, 1308],
+  flavor: [90, 1050, 940, 1270],
   level: [83, 1194, 247, 1357],
   period: [700, 1300, 930, 1362],
 };
