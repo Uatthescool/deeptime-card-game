@@ -13,7 +13,7 @@ import { assetUrl } from "../assets.ts";
 import { readJson, writeJson } from "../storage.ts";
 import { boardTutorialGame } from "../tutorialGames.ts";
 import { Dialog } from "./Dialog.tsx";
-import { GameScreen } from "./GameScreen.tsx";
+import { GameScreen, type MobileView } from "./GameScreen.tsx";
 import { BiomePregame } from "./Pregame.tsx";
 
 const DONE_KEY = "pcg.tutorials.done";
@@ -105,7 +105,11 @@ export function TutorialPlayer({
 }) {
   const [index, setIndex] = useState(0);
   const sceneRef = useRef<HTMLDivElement>(null);
-  const step = tutorial.steps[index]!;
+  const phone = usePhoneLayout();
+  const written = tutorial.steps[index]!;
+  const step = phone
+    ? { ...written, target: written.phone?.target ?? written.target, body: written.phone?.body ?? written.body }
+    : written;
   const scene = step.scene ?? tutorial.scene;
   const last = index === tutorial.steps.length - 1;
   const next = useCallback(() => (last ? onExit(true) : setIndex((i) => i + 1)), [last, onExit]);
@@ -126,7 +130,7 @@ export function TutorialPlayer({
       <div className={`tutorial-scene scene-${scene}`} ref={sceneRef}>
         {scene === "card-anatomy" && <CardAnatomyScene />}
         {scene === "biome-choice" && <BiomeChoiceScene />}
-        {scene === "board" && <BoardScene />}
+        {scene === "board" && <BoardScene view={phone ? (written.phone?.view ?? "board") : undefined} />}
       </div>
       <Spotlight
         sceneRef={sceneRef}
@@ -210,11 +214,13 @@ function Spotlight({
       const r = target?.getBoundingClientRect();
       // Light only what is on screen. A part mostly off it at this size (a closed drawer, say) is explained without
       // a hole.
+      // A part larger than the screen counts as on screen when it fills most of it.
       const left = Math.max(0, r?.left ?? 0);
       const top = Math.max(0, r?.top ?? 0);
       const right = Math.min(window.innerWidth, r?.right ?? 0);
       const bottom = Math.min(window.innerHeight, r?.bottom ?? 0);
-      if (!r || right <= left || bottom <= top || (right - left) * (bottom - top) < 0.4 * r.width * r.height) {
+      const fullArea = r ? Math.min(r.width, window.innerWidth) * Math.min(r.height, window.innerHeight) : 0;
+      if (!r || right <= left || bottom <= top || (right - left) * (bottom - top) < 0.4 * fullArea) {
         return setHole(null);
       }
       setHole({
@@ -239,7 +245,7 @@ function Spotlight({
       window.removeEventListener("resize", measure);
       window.clearTimeout(settle);
     };
-  }, [sceneRef, step.target]);
+  }, [sceneRef, step.target, index]);
 
   useLayoutEffect(() => {
     const caption = captionRef.current;
@@ -377,7 +383,22 @@ function BiomeChoiceScene() {
   );
 }
 
-function BoardScene() {
+function BoardScene({ view }: { view: MobileView | undefined }) {
   const [game] = useState(boardTutorialGame);
-  return <GameScreen initialGame={game} resumed={false} onExit={() => {}} tutorial />;
+  return <GameScreen initialGame={game} resumed={false} onExit={() => {}} tutorial mobileView={view} />;
+}
+
+/** True at the width where the game switches to its phone layout (the same breakpoint as the styles). */
+const PHONE_QUERY = "(max-width: 820px)";
+
+function usePhoneLayout() {
+  const [phone, setPhone] = useState(() => window.matchMedia?.(PHONE_QUERY).matches ?? false);
+  useEffect(() => {
+    const query = window.matchMedia?.(PHONE_QUERY);
+    if (!query) return;
+    const update = () => setPhone(query.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return phone;
 }

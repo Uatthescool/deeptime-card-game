@@ -77,7 +77,7 @@ type BoardAction =
   | { kind: "facultative-destination"; sourceLane: number }
   | null;
 
-type MobileView = "board" | "hand" | "inspect";
+export type MobileView = "board" | "hand" | "inspect";
 
 const PHASE_NAMES: Record<GameState["phase"], string> = {
   handoff: "Handoff",
@@ -94,9 +94,17 @@ type GameScreenProps = {
   onExit: () => void;
   /** A tutorial's staged game: never saved, so it cannot replace a game in progress. */
   tutorial?: boolean;
+  /** Which of the phone layout's views to show, when something outside the game chooses (a tutorial). */
+  mobileView?: MobileView;
 };
 
-export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: GameScreenProps) {
+export function GameScreen({
+  initialGame,
+  resumed,
+  onExit,
+  tutorial = false,
+  mobileView: chosenMobileView,
+}: GameScreenProps) {
   const { game, dispatch: dispatchAny, currentDraw } = useGameSession(initialGame, { persist: !tutorial });
   const computerTurn = useComputerOpponent(game, dispatchAny);
   // The person's own moves; ignored while the computer is the one to move.
@@ -115,7 +123,8 @@ export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: G
   const [hover, setHover] = useState<InspectionTarget | null>(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("log");
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const [mobileView, setMobileView] = useState<MobileView>("board");
+  const [ownMobileView, setMobileView] = useState<MobileView>("board");
+  const mobileView = chosenMobileView ?? ownMobileView;
   const [confirmConcede, setConfirmConcede] = useState(false);
 
   // A new viewer takes the device at every handoff: clear everything the previous player had open.

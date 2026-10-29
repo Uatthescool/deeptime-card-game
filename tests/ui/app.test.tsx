@@ -134,10 +134,40 @@ describe("App", () => {
   });
 });
 
+describe("tutorials on a phone", () => {
+  beforeEach(() => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: query === "(max-width: 820px)",
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  test("the table tutorial shows the phone view each step needs and lights a part that is there", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Tutorials" }));
+    await user.click(screen.getByRole("button", { name: /The table/ }));
+    await walkTutorial(user, screen.getByRole("dialog", { name: "Tutorial: The table" }), "the-table", { phone: true });
+  });
+});
+
 /** Steps through a tutorial to the end, checking each step's caption and that the part it lights is in its scene. */
-async function walkTutorial(user: ReturnType<typeof userEvent.setup>, player: HTMLElement, id: string) {
+async function walkTutorial(
+  user: ReturnType<typeof userEvent.setup>,
+  player: HTMLElement,
+  id: string,
+  { phone = false } = {},
+) {
   const tutorial = TUTORIALS_BY_ID.get(id)!;
-  for (const [index, step] of tutorial.steps.entries()) {
+  for (const [index, written] of tutorial.steps.entries()) {
+    const step = phone ? { ...written, target: written.phone?.target ?? written.target } : written;
+    if (phone && (written.scene ?? tutorial.scene) === "board") {
+      const view = written.phone?.view ?? "board";
+      expect(player.querySelector(".game-page"), step.title).toHaveClass(`mobile-${view}`);
+    }
     const caption = player.querySelector<HTMLElement>(".tutorial-caption")!;
     expect(within(caption).getByRole("heading", { name: step.title })).toBeInTheDocument();
     expect(within(caption).getByText(`Step ${index + 1} of ${tutorial.steps.length}`)).toBeInTheDocument();

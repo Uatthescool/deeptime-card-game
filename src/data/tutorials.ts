@@ -16,6 +16,11 @@ export type TutorialStep = {
   target: string;
   /** The scene for this step, when it differs from the tutorial's. */
   scene?: TutorialScene;
+  /**
+   * On a phone, where the game shows its board, hand and Inspector as separate views: the view to show, and a
+   * different part or text when the part is not on phones.
+   */
+  phone?: { view?: "board" | "hand" | "inspect"; target?: string; body?: TutorialCopy[] };
   title: string;
   body: TutorialCopy[];
 };
@@ -218,6 +223,7 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "biome-control",
+        phone: { view: "hand" },
         title: "Your Biome’s status",
         body: [
           "Your Biome’s ability and how much of it is left are shown here: for Temperate, how many Season counters remain.",
@@ -273,6 +279,13 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "player-ribbon piles",
+        phone: {
+          view: "inspect",
+          target: "inspector-history",
+          body: [
+            "On a phone, your History is the History tab of the Inspect view. It is your discard pile: Creatures that leave the board, and Concepts and Events once they are done, go there.",
+          ],
+        },
         title: "Deck, Hand and History",
         body: [
           { term: "Deck", text: "How many cards you have left to draw." },
@@ -293,6 +306,14 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "hand",
+        phone: {
+          view: "hand",
+          body: [
+            "On a phone, your hand has its own view: switch between Board, Hand and Inspect with the tabs at the top. Tap a card to choose it.",
+            "Each player starts with five cards, always including at least one Level 0 or Level 1 Creature, so every player can fill a Niche on their first turn.",
+            "With two players on one device, your hand is covered whenever the device is passed, until the next player confirms it is them.",
+          ],
+        },
         title: "Your hand",
         body: [
           "Your cards are here, at the bottom of the screen. Point at one to read it, or click it to choose it.",
@@ -302,6 +323,7 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "player-ribbon piles",
+        phone: { view: "hand", target: "hand" },
         title: "When you draw",
         body: [
           "At the start of each of your turns, in the Start Phase, you draw one card. You started with five and drew one, so you now hold six.",
@@ -310,6 +332,7 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "allowances",
+        phone: { view: "hand" },
         title: "What you can play",
         body: [
           "In your Development Phase you may play one Creature, one Adaptation, one Event and one Concept, in any order. These markers show what you have used this turn.",
@@ -318,6 +341,13 @@ export const TUTORIALS: TutorialDefinition[] = [
       },
       {
         target: "inspector",
+        phone: {
+          view: "inspect",
+          body: [
+            "Tap any card, on the board or in your hand, and the Inspector shows it in full. On a phone, it is the Inspect view.",
+            "It also keeps the game log: a record of everything that has happened so far.",
+          ],
+        },
         title: "The Inspector",
         body: [
           "Point at any card, on the board or in your hand, and the Inspector shows it in full.",

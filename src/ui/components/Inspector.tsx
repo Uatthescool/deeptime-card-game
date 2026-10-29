@@ -117,6 +117,7 @@ export function Inspector({
           <button
             key={tab.id}
             className={activeTab === tab.id ? "active" : ""}
+            data-tutorial-target={`inspector-${tab.id}`}
             aria-pressed={activeTab === tab.id}
             disabled={!card && (tab.id === "card" || tab.id === "tags" || tab.id === "state")}
             onClick={() => onTabChange(tab.id)}
