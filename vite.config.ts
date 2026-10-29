@@ -27,7 +27,31 @@ export default defineConfig({
     maxWorkers: Math.max(2, Math.floor(availableParallelism() / 2)),
     // Worker threads start in well under a second; forked processes sometimes missed that timeout on Windows.
     pool: "threads",
-    include: ["tests/**/*.test.{ts,tsx}"],
     setupFiles: ["tests/setup.ts"],
+    // A jsdom worker must load jsdom (~700 files) within that same 60-second start timeout, and it
+    // intermittently missed it when it booted while the simulation threads were saturating the CPU or
+    // jsdom's files had dropped out of the disk cache. So the UI tests run as their own group, ahead
+    // of everything else, and jsdom is loaded once in the main process (where no timeout applies)
+    // before any worker starts.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "ui",
+          include: ["tests/ui/**/*.test.tsx"],
+          globalSetup: ["tests/warm-jsdom.ts"],
+          sequence: { groupOrder: 0 },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "logic",
+          include: ["tests/**/*.test.{ts,tsx}"],
+          exclude: ["tests/ui/**"],
+          sequence: { groupOrder: 1 },
+        },
+      },
+    ],
   },
 });
