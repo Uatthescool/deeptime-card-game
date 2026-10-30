@@ -29,7 +29,7 @@ afterEach(() => {
 });
 
 async function dealGame(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole("button", { name: "Continue to Biomes" }));
+  await user.click(screen.getByRole("button", { name: "Play Now" }));
   await user.click(screen.getByRole("button", { name: "Choose Tropical" }));
   await user.click(screen.getByRole("button", { name: "Confirm selection" }));
   await user.click(screen.getByRole("button", { name: /choose my Biome/ }));
@@ -321,7 +321,7 @@ describe("against the computer", () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<App />);
     await user.click(screen.getByRole("radio", { name: /Computer · Easy/ }));
-    await user.click(screen.getByRole("button", { name: "Continue to Biomes" }));
+    await user.click(screen.getByRole("button", { name: "Play Now" }));
     // Cold: no start-of-turn choice for the person, so play runs straight to their Development Phase.
     await user.click(screen.getByRole("button", { name: "Choose Cold" }));
     await user.click(screen.getByRole("button", { name: "Confirm selection" }));

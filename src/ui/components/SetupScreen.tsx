@@ -184,7 +184,7 @@ export function SetupScreen({
           </details>
           <div className="setup-actions">
             <button className="primary-button" type="submit" disabled={seedInvalid}>
-              Continue to Biomes
+              Play Now
             </button>
             <button className="quiet-button" type="button" onClick={onInspectCards}>
               Inspect Cards
