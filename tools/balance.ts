@@ -4,6 +4,7 @@
  *
  *   npm run balance                     # 1080 games, split across CPU cores (about an hour)
  *   npm run balance -- --games 180      # a quicker, rougher pass
+ *   npm run balance -- --locked-biomes  # each deck always in its own Biome, no mirror matches
  *
  * Writes every game to reports/balance-games.jsonl and the summary to
  * reports/balance-summary.json (the reports folder is not committed). The same
@@ -33,6 +34,14 @@ const GAMES_CSV = `${REPORTS}/balance-games.csv`;
 const CARDS_CSV = `${REPORTS}/balance-cards.csv`;
 const BASE_SEED = 50_000;
 const MAX_STEPS = 6000;
+
+/** Each deck's own Biome in `--locked-biomes` runs: the pairing planned to replace the Biome pick. */
+const DECK_BIOMES: Record<DeckKey, BiomeKey> = { "deck-1": "arid", "deck-2": "tropical", "deck-3": "aquatic" };
+const lockedBiomes = process.argv.includes("--locked-biomes");
+/** Ordered deck pairings to cycle through; a locked run skips mirrors, which always split evenly. */
+const PAIRINGS = DECK_KEYS.flatMap((north) =>
+  DECK_KEYS.filter((south) => !lockedBiomes || south !== north).map((south): [DeckKey, DeckKey] => [north, south]),
+);
 
 type Ending = "victory" | "tipping-point" | "exhaustion" | "forfeit" | "hand-lock" | "concede" | "other" | "unfinished";
 
@@ -73,13 +82,16 @@ function ending(reason: string | null, finished: boolean, winner: PlayerId | nul
   return winner === null ? "exhaustion" : "other";
 }
 
-/** Game `index` of the run: every ordered deck pairing equally often, Biomes at random. */
+/** Game `index` of the run: every ordered deck pairing equally often, Biomes at random unless locked. */
 function configure(index: number) {
-  const pairing = index % (DECK_KEYS.length * DECK_KEYS.length);
-  const decks: [DeckKey, DeckKey] = [
-    DECK_KEYS[Math.floor(pairing / DECK_KEYS.length)]!,
-    DECK_KEYS[pairing % DECK_KEYS.length]!,
-  ];
+  const decks = PAIRINGS[index % PAIRINGS.length]!;
+  if (lockedBiomes) {
+    return {
+      seed: BASE_SEED + index,
+      decks,
+      biomes: [DECK_BIOMES[decks[0]], DECK_BIOMES[decks[1]]] as [BiomeKey, BiomeKey],
+    };
+  }
   // Neighbouring seeds start this generator in similar places, so scramble the index and discard a few draws.
   const random = aiRandom(Math.imul(BASE_SEED + index + 1, 0x9e3779b1) ^ 0x85ebca6b);
   for (let warm = 0; warm < 8; warm += 1) random();
@@ -312,17 +324,22 @@ if (args.includes("--summarize")) {
 } else {
   const workers = option("workers", Math.max(1, availableParallelism() - 1));
   mkdirSync(REPORTS, { recursive: true });
-  console.log(`Playing ${games} Normal-vs-Normal games across ${workers} processes…`);
+  console.log(
+    `Playing ${games} Normal-vs-Normal games${lockedBiomes ? " with each deck in its own Biome" : ""} across ${workers} processes…`,
+  );
   const started = Date.now();
   await Promise.all(
     Array.from(
       { length: workers },
       (_, shard) =>
         new Promise<void>((resolve, reject) => {
-          const child = spawn(`npx vite-node tools/balance.ts -- --shard ${shard} --of ${workers} --games ${games}`, {
-            shell: true,
-            stdio: "inherit",
-          });
+          const child = spawn(
+            `npx vite-node tools/balance.ts -- --shard ${shard} --of ${workers} --games ${games}${lockedBiomes ? " --locked-biomes" : ""}`,
+            {
+              shell: true,
+              stdio: "inherit",
+            },
+          );
           child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`shard ${shard} exited ${code}`))));
         }),
     ),
