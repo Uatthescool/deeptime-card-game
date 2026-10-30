@@ -4,7 +4,9 @@ import { existsSync, readFileSync } from "node:fs";
 
 import {
   AI_PLACEHOLDER_ARTWORK_KEYS,
+  artCreditLine,
   artSource,
+  type ArtworkCredit,
   artworkPath,
   countsAsAquatic,
   CREATURES,
@@ -432,6 +434,27 @@ test("every card's artwork source is recorded and matches the files on disk", ()
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "inostrancevia")!), undefined);
   assert.equal(artworkPath(DECK_2.find((card) => card.key === "stegosaurus")!), "/artwork/stegosaurus.webp");
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "eoraptor")!), "/artwork/eoraptor.webp");
+});
+
+test("every piece of artwork shown on screen carries a short credit", () => {
+  const credits = (
+    JSON.parse(readFileSync(new URL("../../public/artwork/attribution-manifest.json", import.meta.url), "utf8")) as {
+      assets: ArtworkCredit[];
+    }
+  ).assets;
+  assert.equal(artCreditLine("wildfire", credits, "artwork"), "Art: Grand Canyon NPS · Public domain");
+  assert.equal(artCreditLine("nautilus", credits, "face"), "Placeholder art · AI-generated");
+  assert.equal(artCreditLine("allosaurus", credits, "face"), null);
+  // A CC BY-SA image is shown as artwork, but its card face ships as a placeholder until that license is settled.
+  assert.match(artCreditLine("edestus", credits, "artwork") ?? "", /CC BY-SA/);
+  assert.equal(artCreditLine("edestus", credits, "face"), null);
+  // Before the manifest loads, a licensed credit waits rather than showing a wrong one.
+  assert.equal(artCreditLine("wildfire", null, "artwork"), null);
+  for (const credit of credits) {
+    const line = artCreditLine(credit.cardKey, credits, "artwork");
+    assert.ok(line?.startsWith("Art: "), `${credit.cardName} has no credit line`);
+    assert.doesNotMatch(line ?? "", /https?:|\(UTC\)|^Art: --|\s,/, `${credit.cardName}'s credit reads "${line}"`);
+  }
 });
 
 test("all 22 playable Creatures carry final flavor text and corrected records", () => {

@@ -2198,6 +2198,43 @@ button:disabled {
   min-height: 0;
   padding: 0;
 }
+/* Who made a card's art, over the art's lower right corner. */
+.art-credit {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  max-width: calc(100% - 0.7rem);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.3rem;
+  background: rgba(8, 14, 10, 0.7);
+  color: #f4ede0;
+  font-size: 0.62rem;
+  font-style: normal;
+  line-height: 1.3;
+  text-align: right;
+  pointer-events: none;
+}
+/* Covers a finished face, so the credit can sit on its art window (69–954 × 189–682 of 1024 × 1434). */
+.face-art-credit-layer {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+  pointer-events: none;
+}
+.face-art-credit-layer .art-credit {
+  right: 7.8%;
+  bottom: 53.2%;
+  max-width: 78%;
+  padding: 0.3cqw 1cqw;
+  border-radius: 0.7cqw;
+  font-size: max(9px, 1.9cqw);
+}
+/* Too small to read on a hand or thumbnail; the Inspector shows the credit there. */
+@container (max-width: 239px) {
+  .face-art-credit-layer .art-credit {
+    display: none;
+  }
+}
 .card-accessible-copy {
   position: absolute;
   width: 1px;
@@ -2260,6 +2297,7 @@ button:disabled {
   text-overflow: ellipsis;
 }
 .card-art-window {
+  position: relative;
   aspect-ratio: 23 / 13;
   margin: 0.5rem 0 0.7rem;
   overflow: hidden;
@@ -4782,6 +4820,9 @@ button.event-slot small {
     0 0 0 1px rgba(255, 255, 255, 0.06);
   cursor: zoom-out;
   animation: card-lightbox-rise 220ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.card-lightbox-frame {
+  position: relative;
 }
 .card-lightbox-close {
   position: absolute;

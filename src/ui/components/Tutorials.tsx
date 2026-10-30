@@ -12,6 +12,7 @@ import {
 import { assetUrl } from "../assets.ts";
 import { readJson, writeJson } from "../storage.ts";
 import { boardTutorialGame } from "../tutorialGames.ts";
+import { FaceArtCredit } from "./CardFace.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { GameScreen, type MobileView } from "./GameScreen.tsx";
 import { BiomePregame } from "./Pregame.tsx";
@@ -342,6 +343,7 @@ function CardAnatomyScene() {
   return (
     <div className="tutorial-card" data-tutorial-subject>
       <img src={assetUrl(cardFacePath(nautilus)!)} alt="The Nautilus card" draggable={false} />
+      <FaceArtCredit card={nautilus} />
       {Object.entries(CARD_PARTS).map(([part, [x0, y0, x1, y1]]) => (
         <span
           key={part}

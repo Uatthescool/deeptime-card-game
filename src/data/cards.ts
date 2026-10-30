@@ -16,7 +16,14 @@ import { GENERAL_POOL_CANDIDATES } from "./general-pool.ts";
 import type { CardDefinition, CreatureCard, DeckKey, ImplementationRegister, SupportCard } from "./types.ts";
 
 export * from "./types.ts";
-export { AI_PLACEHOLDER_ARTWORK_KEYS, artSource, type ArtSource, PENDING_ARTWORK_KEYS } from "./art.ts";
+export {
+  AI_PLACEHOLDER_ARTWORK_KEYS,
+  artCreditLine,
+  artSource,
+  type ArtSource,
+  type ArtworkCredit,
+  PENDING_ARTWORK_KEYS,
+} from "./art.ts";
 
 /**
  * Deck 1 is the canonical register: it also carries the shared Tag rules and

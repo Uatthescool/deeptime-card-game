@@ -78,9 +78,7 @@ export function SetupScreen({
   return (
     <main className="setup-page">
       <section className="setup-shell">
-        <div className="eyebrow">
-          A two-player card game of evolution · Rules revision {IMPLEMENTATION_REGISTER.version}
-        </div>
+        <div className="eyebrow">A card game of ecology · Rules revision {IMPLEMENTATION_REGISTER.version}</div>
         <h1>
           Deep
           <br />

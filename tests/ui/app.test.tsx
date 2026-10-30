@@ -93,6 +93,7 @@ describe("App", () => {
       "src",
       expect.stringContaining("/card-faces/spinosaurus.webp"),
     );
+    expect(within(enlarged).getByText("Placeholder art · AI-generated")).toBeInTheDocument();
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "Spinosaurus card" })).not.toBeInTheDocument();
 

@@ -4,7 +4,7 @@
 
 Created by **Merrick McMorris**.
 
-A two-player strategy card game of evolution, with life from the Cambrian to the present. Each player fills five Niches with Creatures, evolves them by overriding one Creature with another that shares enough traits, hunts the opposing ecosystem, and races to 12 Victory Levels.
+A strategy card game about ecology, with life from the Cambrian to the present, for two players or one against the computer. Each player fills five Niches with Creatures, overrides one Creature with another that shares enough traits, hunts the opposing ecosystem, and races to 12 Victory Levels.
 
 The game currently ships three complete 40-card decks, five Biomes that change each player's rules, a card browser, and **Learn Something**, a set of illustrated lessons on the science behind the cards.
 

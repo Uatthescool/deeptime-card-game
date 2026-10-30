@@ -72,3 +72,49 @@ export function artSource(cardKey: string): ArtSource {
   if (AI_PLACEHOLDER_ARTWORK_KEYS.has(cardKey)) return "ai-placeholder";
   return "licensed";
 }
+
+/** One entry of public/artwork/attribution-manifest.json. */
+export type ArtworkCredit = {
+  cardKey: string;
+  cardName: string;
+  creator: string | null;
+  credit: string | null;
+  license: string;
+  licenseUrl: string | null;
+  sourcePage: string;
+  modifications: string | null;
+};
+
+/** A manifest creator as it reads on a card: no web addresses or wiki signature timestamps. */
+function shortCreatorName(creator: string) {
+  return creator
+    .replace(/\s*\(\s*https?:\/\/[^)]*\)/g, "")
+    .replace(/\s*https?:\/\/\S+/g, "")
+    .replace(/^--\s*/, "")
+    .replace(/\s+\d{1,2}:\d{2},.*\(UTC\)$/, "")
+    .replace(/\s+,/g, ",")
+    .trim();
+}
+
+/**
+ * The short credit shown on screen wherever a card's artwork is, or null where no artwork shows. `on` says
+ * which: the artwork itself, or a finished card face. Faces leave out CC BY-SA art (a placeholder face ships
+ * until that license is settled), so those faces carry no credit. Licensed credits wait on the manifest.
+ */
+export function artCreditLine(
+  cardKey: string,
+  credits: readonly ArtworkCredit[] | null,
+  on: "artwork" | "face",
+): string | null {
+  switch (artSource(cardKey)) {
+    case "pending":
+      return null;
+    case "ai-placeholder":
+      return "Placeholder art · AI-generated";
+    case "licensed": {
+      const credit = credits?.find((asset) => asset.cardKey === cardKey);
+      if (!credit || (on === "face" && /BY-SA/i.test(credit.license))) return null;
+      return `Art: ${credit.creator ? shortCreatorName(credit.creator) : "Unknown artist"} · ${credit.license}`;
+    }
+  }
+}

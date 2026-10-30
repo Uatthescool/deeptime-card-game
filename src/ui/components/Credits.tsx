@@ -1,23 +1,10 @@
 import { useEffect, useState } from "react";
 
 import { AI_PLACEHOLDER_ARTWORK_KEYS, CARD_LIBRARY, PENDING_ARTWORK_KEYS } from "../../data/cards.ts";
-import { assetUrl } from "../assets.ts";
+import { type ArtworkManifest, loadArtworkManifest } from "../artCredits.ts";
 import { Dialog } from "./Dialog.tsx";
 
-type AttributionAsset = {
-  cardKey: string;
-  cardName: string;
-  creator: string | null;
-  credit: string | null;
-  license: string;
-  licenseUrl: string | null;
-  sourcePage: string;
-  modifications: string | null;
-};
-
-type Manifest = { notice: string; assets: AttributionAsset[] };
-
-type LoadState = { status: "loading" } | { status: "error" } | { status: "ready"; manifest: Manifest };
+type LoadState = { status: "loading" } | { status: "error" } | { status: "ready"; manifest: ArtworkManifest };
 
 const cardNames = (keys: ReadonlySet<string>) =>
   [...keys].map((key) => CARD_LIBRARY.get(key)?.name ?? key).sort((a, b) => a.localeCompare(b));
@@ -28,11 +15,7 @@ export function Credits({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(assetUrl("/artwork/attribution-manifest.json"))
-      .then((response) => {
-        if (!response.ok) throw new Error(String(response.status));
-        return response.json() as Promise<Manifest>;
-      })
+    loadArtworkManifest()
       .then((manifest) => !cancelled && setState({ status: "ready", manifest }))
       .catch(() => !cancelled && setState({ status: "error" }));
     return () => {
