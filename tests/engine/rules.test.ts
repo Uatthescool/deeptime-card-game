@@ -8,6 +8,7 @@ import {
   artSource,
   type ArtworkCredit,
   artworkPath,
+  CARD_LIBRARY,
   countsAsAquatic,
   CREATURES,
   DECK_2,
@@ -21,6 +22,7 @@ import {
   hasPrintedAquatic,
   IMPLEMENTATION_REGISTER,
   PENDING_ARTWORK_KEYS,
+  printedScientificName,
   SUPPORTS,
   tagEffectMultiplier,
   TAG_RULES,
@@ -455,6 +457,17 @@ test("every piece of artwork shown on screen carries a short credit", () => {
     assert.ok(line?.startsWith("Art: "), `${credit.cardName} has no credit line`);
     assert.doesNotMatch(line ?? "", /https?:|\(UTC\)|^Art: --|\s,/, `${credit.cardName}'s credit reads "${line}"`);
   }
+});
+
+test("a card named for its genus prints the genus as an initial", () => {
+  const printed = (key: string) => printedScientificName(CARD_LIBRARY.get(key) as CreatureCard);
+  assert.equal(printed("allosaurus"), "A. fragilis");
+  assert.equal(CARD_LIBRARY.get("tyrannosaurus-rex")?.name, "Tyrannosaurus");
+  assert.equal(printed("tyrannosaurus-rex"), "T. rex");
+  // Common names keep the full scientific name, even when they echo part of it.
+  assert.equal(printed("orca"), "Orcinus orca");
+  assert.equal(printed("megalodon"), "Otodus megalodon");
+  assert.equal(printed("horseshoe-crab"), null);
 });
 
 test("all 22 playable Creatures carry final flavor text and corrected records", () => {
@@ -2020,7 +2033,7 @@ test("Dermal Armor bridges hard defenses and Durophagy rewards qualifying kills,
   game = previewBattle(game, tyrannosaurus.card.uid, shellPrey.card.uid);
   game = commitBattle(game);
   assert.equal(game.players[0].deck.length, rexDeckBefore - 1);
-  assert.ok(game.log.some((line) => line.includes("Tyrannosaurus rex's Durophagy drew 1 card")));
+  assert.ok(game.log.some((line) => line.includes("Tyrannosaurus's Durophagy drew 1 card")));
 
   game = readyGame(["deck-3", "deck-1"]);
   game.phase = "battle";

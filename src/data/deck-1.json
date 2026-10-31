@@ -538,7 +538,7 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Tyrannosauroid"],
       "tags": ["Cranial Display", "Pack Hunter"],
       "visualTags": [],
-      "role": "Coordinated follow-up attacker and natural route into Tyrannosaurus rex.",
+      "role": "Coordinated follow-up attacker and natural route into Tyrannosaurus.",
       "flavorText": "Meaning “beautiful feathered tyrant,” Yutyrannus was a nine-metre predator whose long plumage likely insulated it in the cool forests of Early Cretaceous China and whose prominent crest crowned its deep skull. Three individuals of different ages were reportedly found together, suggesting some level of social behavior.",
       "cardFace": "/card-faces/yutyrannus.webp",
       "status": "Locked"
@@ -636,7 +636,7 @@
     {
       "key": "tyrannosaurus-rex",
       "kind": "creature",
-      "name": "Tyrannosaurus rex",
+      "name": "Tyrannosaurus",
       "scientificName": "Tyrannosaurus rex",
       "printedLevel": 3,
       "diet": "Carnivore",

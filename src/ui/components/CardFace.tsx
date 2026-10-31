@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { artworkPath, cardFacePath, type CardDefinition } from "../../data/cards.ts";
+import { artworkPath, cardFacePath, type CardDefinition, printedScientificName } from "../../data/cards.ts";
 import { useArtCredit } from "../artCredits.ts";
 import { assetUrl } from "../assets.ts";
 import { typeLabel } from "../inspection.ts";
@@ -109,7 +109,8 @@ export function CardFace({ card, compact = false, selected = false }: CardFacePr
       <h3 className={hasLongTitleWord ? "long-word-title" : undefined}>{card.name}</h3>
       {creature?.scientificName && (
         <p className="scientific-name">
-          <i>{creature.scientificName}</i>
+          <i aria-hidden="true">{printedScientificName(creature)}</i>
+          <span className="sr-only">{creature.scientificName}</span>
         </p>
       )}
       {creature ? (

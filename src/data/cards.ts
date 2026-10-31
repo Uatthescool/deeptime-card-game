@@ -135,6 +135,17 @@ export function cardFacePath(card: CardDefinition): string | undefined {
   return card.kind === "creature" ? card.cardFace : undefined;
 }
 
+/**
+ * The scientific name as printed beside a card's name. A card named for its genus
+ * shortens the genus to its initial, as scientific writing does once a genus has
+ * been spelled out: Allosaurus, A. fragilis. Screen-reader text keeps the full name.
+ */
+export function printedScientificName(card: CreatureCard): string | null {
+  if (!card.scientificName) return null;
+  const [genus, ...species] = card.scientificName.split(" ");
+  return genus === card.name && species.length ? `${genus[0]}. ${species.join(" ")}` : card.scientificName;
+}
+
 export function expandedTagNames(card: CreatureCard): string[] {
   const names = [...card.tags];
   if (card.tags.includes("Sovereign")) {
