@@ -33,7 +33,6 @@ export type CreatureCard = {
   taxa: string[];
   tags: string[];
   visualTags: string[];
-  role: string;
   flavorText: string;
   status: CardStatus;
   artwork?: string;

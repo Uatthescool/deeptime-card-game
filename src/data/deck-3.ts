@@ -14,7 +14,6 @@ type DeckThreeCreature = {
   taxa: string[];
   tags: string[];
   visualTags: string[];
-  role: string;
   flavorText: string;
   cardFace?: string;
 };
@@ -46,7 +45,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Aquatic", "Raptorial", "Small Game Hunter"],
     visualTags: ["Compound Eyes", "Frontal Appendages", "Swimming Flaps"],
-    role: "Reliable Level 0 predator that can pressure other starters and develop through the Cambrian or Raptorial branches.",
     flavorText:
       "Anomalocaris swam with rows of lateral flaps and seized prey using flexible, spined frontal appendages. Its large compound eyes supported visually guided predation in Cambrian seas.",
     cardFace: "/card-faces/anomalocaris.webp",
@@ -63,7 +61,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Stem Chondrichthyan", "Symmoriiform", "Cladoselachid"],
     tags: ["Aquatic", "Generalist", "Small Game Hunter"],
     visualTags: ["Fusiform", "Forked Tail", "Paired Pectoral Fins"],
-    role: "Flexible Devonian foundation that can develop through Period or Small Game Hunter connections.",
     flavorText:
       "Cladoselache was an early shark-like chondrichthyan with a streamlined body and grasping teeth suited to seizing prey whole rather than cutting it apart. Its anatomy preserves an early experiment in the body plan that would later diversify dramatically among cartilaginous fishes.",
     cardFace: "/card-faces/cladoselache.webp",
@@ -88,7 +85,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Aquatic", "Ambush", "Raptorial", "Visual"],
     visualTags: ["Compound Eyes", "Carapace", "Raptorial Appendages"],
-    role: "A first-encounter ambusher that connects the low curve to both Ambush and Raptorial development lines.",
     flavorText:
       "Dollocaris was a small Jurassic predator with enormous compound eyes and three pairs of grasping appendages. Richly preserved specimens reveal details of its eyes, nervous system, and internal organs, providing an unusually complete view of this extinct arthropod.",
     cardFace: "/card-faces/dollocaris.webp",
@@ -105,7 +101,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Actinopterygian", "Teleost", "Scombriform", "Chiasmodontid"],
     tags: ["Aquatic", "Diver", "Specialized", "Engulf"],
     visualTags: ["Expandable Stomach", "Large Jaws"],
-    role: "Specialized doubles Engulf's Victory Level bonus to +2 without changing its prey restriction, capacity, or attack restriction.",
     flavorText:
       "Despite reaching only about 25 centimeters, the Black Swallower can consume prey far larger than itself. Its expandable stomach can accommodate prey several times its own mass, although such extreme meals may also prove fatal.",
     cardFace: "/card-faces/black-swallower.webp",
@@ -122,7 +117,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Sarcopterygian", "Tetrapodomorph", "Elpistostegalian"],
     tags: ["Aquatic", "Transitional"],
     visualTags: ["Lobed Fins", "Dorsal Eyes", "Mobile Neck"],
-    role: "Foundational Devonian sarcopterygian that connects Aquatic development to the fish-to-tetrapod transition without implying habitual movement on land.",
     flavorText:
       "Tiktaalik retained scales and fin rays but also had a mobile neck, robust ribs, and jointed fins capable of supporting its body against the substrate. It lived in shallow Devonian waterways near the evolutionary transition that eventually produced limbed vertebrates.",
     cardFace: "/card-faces/tiktaalik.webp",
@@ -139,7 +133,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euchondrocephalian", "Eugeneodont", "Helicoprionid"],
     tags: ["Aquatic", "Shearing Bite", "Retention"],
     visualTags: ["Tooth Whorl", "Serrated Teeth"],
-    role: "Signature bearer for two mechanically empty placeholder Tags while their reusable effects remain under development.",
     flavorText:
       "Helicoprion carried a continuously growing spiral of serrated teeth within its lower jaw. Rather than crushing hard prey, the whorl likely hooked, sliced, and drew soft-bodied animals deeper into the mouth with repeated jaw movements.",
     cardFace: "/card-faces/helicoprion.webp",
@@ -156,7 +149,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Invertebrate", "Protostome", "Ecdysozoan", "Panarthropod", "Stem Euarthropod"],
     tags: ["Aquatic", "Apex Predator", "Transitional"],
     visualTags: [],
-    role: "An unusually low-Level Apex Predator whose early phylogenetic position supports several Cambrian development routes.",
     flavorText:
       "Known chiefly from enormous raptorial mouthparts, Omnidens probably belonged to a panarthropod lineage near anomalocaridids. Its size suggests an animal capable of occupying a major predatory role in Cambrian ecosystems.",
     cardFace: "/card-faces/omnidens.webp",
@@ -173,7 +165,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Invertebrate", "Protostome", "Mollusk", "Cephalopod", "Endoceratoid", "Endocerid"],
     tags: ["Aquatic", "Shell", "Propulsion", "Apex Predator"],
     visualTags: ["Straight Shell", "Tentacles"],
-    role: "Defensive shell-and-mobility bridge that remains Level 1 despite its exceptional size.",
     flavorText:
       "Among the largest Paleozoic cephalopods, endocerids carried enormous straight chambered shells. Endoceras or related giant forms were major Ordovician predators, although their exact feeding ecology remains uncertain.",
     cardFace: "/card-faces/endoceras.webp",
@@ -190,7 +181,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Invertebrate", "Protostome", "Mollusk", "Cephalopod", "Ammonoid", "Ammonite", "Desmoceratid"],
     tags: ["Aquatic", "Shell", "Propulsion", "Gigantic"],
     visualTags: ["Coiled Shell", "Tentacles"],
-    role: "A protected development piece whose exceptional shell size gives it Gigantic at Level 1.",
     flavorText:
       "The largest ammonite known, Parapuzosia seppenradensis carried a coiled shell that could approach two meters across. Its incomplete remains suggest an animal whose shell dwarfed those of most other ammonites.",
     cardFace: "/card-faces/parapuzosia.webp",
@@ -207,7 +197,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euchondrocephalian", "Eugeneodont", "Edestid"],
     tags: ["Aquatic", "Specialized", "Shearing Bite"],
     visualTags: ["Serrated Teeth", "Opposing Tooth Blades"],
-    role: "Specialized will double the eventual numerical effect of Shearing Bite; until that effect is finalized, both Tags remain mechanically inert here.",
     flavorText:
       "Edestus carried opposing rows of constantly renewed teeth that projected from its jaws like curved blades. Wear on the teeth suggests that prey was sheared through with repeated slicing strokes, creating one of the strangest feeding apparatuses ever evolved among vertebrates.",
     cardFace: "/card-faces/edestus.webp",
@@ -224,7 +213,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Sarcopterygian", "Tetrapodomorph", "Tristichopterid"],
     tags: ["Aquatic", "Ambush", "Apex Predator"],
     visualTags: ["Lobed Fins", "Large Fangs"],
-    role: "Focused Level 1 bridge connecting Devonian and Ambush foundations to the deck's Apex Predator progression.",
     flavorText:
       "Hyneria was a large predatory tristichopterid from Late Devonian waterways. Its deep skull, robust body, and formidable teeth identify it as one of the leading vertebrate predators in its freshwater ecosystem, with an ambush-oriented hunting role inferred from its build and habitat.",
     cardFace: "/card-faces/hyneria.webp",
@@ -241,7 +229,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Placoderm", "Arthrodire", "Dunkleosteid"],
     tags: ["Aquatic", "Apex Predator", "Shearing Bite", "Dermal Armor"],
     visualTags: ["Dermal Armor", "Bladed Gnathal Plates"],
-    role: "Armored Devonian Apex Predator that combines a placeholder cutting Tag with the hard-defense registry.",
     flavorText:
       "Dunkleosteus was an armored apex predator of the Late Devonian. Instead of teeth, its jaws carried sharpened bony plates that formed a powerful cutting edge, allowing it to slice and fragment large prey.",
     cardFace: "/card-faces/dunkleosteus.webp",
@@ -266,7 +253,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Aquatic", "Gigantic", "Engulf"],
     visualTags: ["Large Teeth", "Fusiform"],
-    role: "Large Engulf bearer whose size allows it to store lower-Level prey without requiring Specialized.",
     flavorText:
       "Xiphactinus was one of the largest predatory bony fishes of the Late Cretaceous. Fossils preserve entire fish inside its body, dramatic evidence that it swallowed very large prey whole and sometimes attempted meals it could not safely digest.",
     cardFace: "/card-faces/xiphactinus.webp",
@@ -283,7 +269,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Invertebrate", "Protostome", "Ecdysozoan", "Euarthropod", "Chelicerate", "Eurypterid", "Pterygotid"],
     tags: ["Aquatic", "Gigantic", "Raptorial", "Durophagy"],
     visualTags: ["Compound Eyes", "Enlarged Chelicerae", "Swimming Paddle"],
-    role: "Large arthropod predator whose grasping appendages and robust feeding structures connect Raptorial and Durophagy routes.",
     flavorText:
       "Jaekelopterus was a giant predatory eurypterid whose largest known claw implies a body around 2.5 meters long. Its powerful grasping appendages, acute vision, and crushing mouthparts equipped it to tackle large, armored prey.",
     cardFace: "/card-faces/jaekelopterus.webp",
@@ -300,7 +285,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euselachian", "Shark", "Lamniform", "Ptychodontid"],
     tags: ["Aquatic", "Specialized", "Durophagy"],
     visualTags: ["Pavement Teeth"],
-    role: "Specialized doubles Durophagy's card draw from one card to two without changing which defensive prey qualify.",
     flavorText:
       "Ptychodus was a giant Cretaceous shark with broad crushing teeth arranged into massive dental plates. Unlike modern shell-crushing sharks, it was a far larger marine predator capable of tackling heavily armored prey such as ammonites and marine turtles.",
     cardFace: "/card-faces/ptychodus.webp",
@@ -317,7 +301,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Cetacean", "Odontocete", "Delphinid"],
     tags: ["Aquatic", "Pack Hunter", "Apex Predator", "Resourceful"],
     visualTags: ["Countershaded", "Dorsal Fin", "Flippers"],
-    role: "Coordinated Apex Predator whose Pack Hunter and Resourceful Tags represent learned, flexible group hunting.",
     flavorText:
       "Orcas are highly adaptable apex predators whose populations develop distinct hunting cultures. Through cooperation and social learning, they pass specialized techniques between generations for pursuing prey ranging from fish and seals to sharks and whales.",
     cardFace: "/card-faces/orca.webp",
@@ -334,7 +317,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euselachian", "Shark", "Lamniform", "Otodontid"],
     tags: ["Aquatic", "Apex Predator", "Specialized", "Crushing Bite"],
     visualTags: ["Serrated Teeth"],
-    role: "Specialized marine boss whose doubled Crushing Bite is built to break exceptional attacked-only defenses.",
     flavorText:
       "Otodus megalodon combined enormous jaw force with broad, thick, serrated teeth adapted to penetrate the flesh and bone of large marine mammals, creating a feeding apparatus specialized for catastrophic bites against massive prey.",
     cardFace: "/card-faces/megalodon.webp",
@@ -351,7 +333,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Actinopterygian", "Pachycormiform", "Pachycormid"],
     tags: ["Aquatic", "Gigantic", "Filter Feeder"],
     visualTags: ["Gill Rakers", "Forked Tail"],
-    role: "Non-macropredatory Level 3 utility Creature that trades direct combat pressure for controlled top-deck ordering.",
     flavorText:
       "Leedsichthys was the largest known ray-finned fish, reaching enormous size while feeding on tiny prey. Dense gill rakers strained plankton from Jurassic seawater, allowing suspension feeding to support proportions rivaling the largest marine vertebrates.",
     cardFace: "/card-faces/leedsichthys.webp",
@@ -368,7 +349,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Cetacean", "Odontocete", "Physeteroid"],
     tags: ["Aquatic", "Apex Predator", "Specialized", "Diver"],
     visualTags: ["Massive Teeth", "Flippers"],
-    role: "Specialized doubles Diver from +1 to +2 Battle Level while attacking printed Aquatic prey.",
     flavorText:
       "Livyatan was a giant raptorial sperm whale armed with massive functional teeth in both jaws, some exceeding 35 centimeters. Its powerful skull was built to seize and tear open enormous marine prey, probably including other whales.",
     cardFace: "/card-faces/livyatan.webp",
@@ -385,7 +365,6 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Cetacean", "Mysticete", "Balaenopterid"],
     tags: ["Aquatic", "Filter Feeder", "Specialized", "Gigantic"],
     visualTags: ["Baleen", "Ventral Grooves", "Paired Blowholes", "Flippers", "Tail Flukes"],
-    role: "Exceptional non-predatory Deck 3 capstone. Filter Feeder supplies utility, while Specialized doubles Gigantic's numerical effects without changing its protection.",
     flavorText:
       "The largest animal known to have ever lived, the blue whale can exceed 30 meters in length and weigh more than 150 tonnes. Its immense body is sustained almost entirely by krill, engulfed with huge volumes of seawater and trapped behind baleen plates as the water is expelled.",
     cardFace: "/card-faces/blue-whale.webp",

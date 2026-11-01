@@ -82,7 +82,7 @@
     },
     {
       "title": "Inspection",
-      "rule": "Hovering or focusing a visible card previews it in the permanent sidewall while no card is pinned. Clicking or tapping a card pins it until another card is clicked or tapped; hover and focus previews never override that pin. The primary Card view omits Card Role and Period Color, presents every Tag and its full effect in printed order before flavor and taxonomy, and allows the Tag area to scroll when necessary. Sovereign expands into Gigantic and Territorial and identifies both as granted Tags."
+      "rule": "Hovering or focusing a visible card previews it in the permanent sidewall while no card is pinned. Clicking or tapping a card pins it until another card is clicked or tapped; hover and focus previews never override that pin. The primary Card view omits Period Color, presents every Tag and its full effect in printed order before flavor and taxonomy, and allows the Tag area to scroll when necessary. Sovereign expands into Gigantic and Territorial and identifies both as granted Tags."
     },
     {
       "title": "Artwork readiness",
@@ -286,7 +286,6 @@
       "taxa": ["Invertebrate", "Protostome", "Mollusk", "Cephalopod", "Nautilid"],
       "tags": ["Living Fossil", "Shell", "Aquatic", "Propulsion"],
       "visualTags": [],
-      "role": "Flexible aquatic starter; Living Fossil and Propulsion support repeated low-level development.",
       "flavorText": "Its chambered shell regulated buoyancy while a jet of water propelled it through Paleogene seas. The genus Nautilus entered the fossil record about 60 million years ago, although nautiloids have a fossil history extending nearly 500 million years.",
       "cardFace": "/card-faces/nautilus.webp",
       "status": "Locked"
@@ -304,7 +303,6 @@
       "taxa": ["Invertebrate","Protostome","Ecdysozoan","Euarthropod","Chelicerate","Xiphosuran"],
       "tags": ["Living Fossil", "Shell", "Aquatic", "Burrower"],
       "visualTags": [],
-      "role": "Defensive aquatic starter that trades Propulsion for temporary protection.",
       "flavorText": "Although their body plan has endured for roughly 445 million years, horseshoe crabs are not evolutionarily frozen: their lineage underwent at least three whole-genome duplications.",
       "cardFace": "/card-faces/horseshoe-crab.webp",
       "status": "Locked"
@@ -322,7 +320,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Dromaeosaurid"],
       "tags": ["Generalist", "Glider", "Elusive"],
       "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
-      "role": "Flexible Archosaur foundation and bridge Creature.",
       "flavorText": "Microraptor bore long flight feathers on its arms, legs, and tail, forming multiple aerodynamic surfaces for gliding. Fossil gut contents from different specimens include birds, fish, lizards, and mammals, revealing a remarkably adaptable predator.",
       "cardFace": "/card-faces/microraptor.webp",
       "status": "Locked"
@@ -340,7 +337,6 @@
       "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Tetanuran", "Coelurosaur"],
       "tags": ["Small Game Hunter", "Mob Feeder"],
       "visualTags": [],
-      "role": "Aggressive starter that pressures Level 0 utility Creatures and rewards successful kills.",
       "flavorText": "The Compsognathus holotype preserves the lizard Schoenesmahl dyspepsia in its abdomen—a holotype within another holotype. The find directly confirms small-vertebrate prey, although there is no direct evidence that Compsognathus hunted or fed in groups.",
       "cardFace": "/card-faces/compsognathus.webp",
       "status": "Locked"
@@ -358,7 +354,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Avialan","Bird","Opisthocomiform"],
       "tags": ["Resourceful", "Living Fossil", "Aerial"],
       "visualTags": [],
-      "role": "Resourceful non-carnivore starter that broadens the deck’s development package while remaining a vulnerable Level 0 foundation.",
       "flavorText": "The last surviving member of an ancient bird lineage, the hoatzin ferments leaves in an enlarged crop using foregut microbes, much like a ruminant. Its chicks escape predators by dropping into water, swimming, and climbing back through vegetation with clawed wings before they can fly.",
       "cardFace": "/card-faces/hoatzin.webp",
       "status": "Locked"
@@ -376,7 +371,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Avialan"],
       "tags": ["Small Game Hunter", "Transitional", "Aerial"],
       "visualTags": ["Feathered", "Wings"],
-      "role": "Transitional aerial bridge; Transitional can supply the Time Period match when Primary Taxon also matches.",
       "flavorText": "The Chicago Archaeopteryx preserves long tertial feathers that would have filled the aerodynamic gap between wing and body, strengthening evidence that this early bird was capable of powered flight.",
       "cardFace": "/card-faces/archaeopteryx.webp",
       "status": "Locked"
@@ -394,7 +388,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Dromaeosaurid"],
       "tags": ["Ambush", "Saboteur", "Small Game Hunter"],
       "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
-      "role": "Immediate small-prey pressure and early disruption.",
       "flavorText": "Quill knobs along a Velociraptor forearm show that long wing feathers anchored to the ulna, although the animal could not fly. The famous Fighting Dinosaurs fossil preserves one locked in combat with Protoceratops—a small, feathered predator far removed from its oversized screen portrayals.",
       "cardFace": "/card-faces/velociraptor.webp",
       "status": "Locked"
@@ -412,7 +405,6 @@
       "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Herrerasaurian", "Herrerasaurid"],
       "tags": ["Transitional", "Raptorial"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Early-dinosaur bridge; Theropod is intentionally omitted because herrerasaurid placement remains disputed.",
       "flavorText": "Although often described as an early theropod, Herrerasaurus occupies a disputed branch: competing analyses place herrerasaurs either within Theropoda or separately near the base of Saurischia.",
       "cardFace": "/card-faces/herrerasaurus.webp",
       "status": "Locked"
@@ -430,7 +422,6 @@
       "taxa": ["Vertebrate","Tetrapod","Amphibian","Lepospondyl","Nectridean","Diplocaulid"],
       "tags": ["Aquatic", "Small Game Hunter"],
       "visualTags": [],
-      "role": "Aquatic side-line foundation; it ordinarily overrides into Dimetrodon through Permian, Carnivore, and Small Game Hunter.",
       "flavorText": "Juvenile Diplocaulus had short projections at the rear of the skull that lengthened dramatically with maturity. Hydrodynamic models suggest the adult’s boomerang-shaped head generated lift and high underwater maneuverability, although its actual biological function remains uncertain.",
       "cardFace": "/card-faces/diplocaulus.webp",
       "status": "Locked"
@@ -448,7 +439,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Dromaeosaurid"],
       "tags": ["Semi-Aquatic", "Diver"],
       "visualTags": [],
-      "role": "Aquatic specialist and principal lower-level route toward the spinosaur line.",
       "flavorText": "Natovenator’s backward-swept ribs formed a low, streamlined body like those of diving birds, while its long neck and many small teeth likely helped it pursue fish beneath the water.",
       "cardFace": "/card-faces/natovenator.webp",
       "status": "Locked"
@@ -466,7 +456,6 @@
       "taxa": ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Cynodont", "Cynognathid"],
       "tags": ["Transitional", "Generalist"],
       "visualTags": [],
-      "role": "Flexible Triassic Carnivore bridge; Generalist supplies the third match for Level 2 Triassic Carnivores, while broader routes require Support help.",
       "flavorText": "One of the largest predatory cynodonts, Cynognathus grew rapidly and could exceed 100 kilograms, combining a powerful skull and serrated, blade-like teeth with increasingly mammal-like anatomy.",
       "cardFace": "/card-faces/cynognathus.webp",
       "status": "Locked"
@@ -484,7 +473,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Carnosaur","Allosaurid"],
       "tags": ["Mob Feeder", "Bruiser"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Large opportunistic predator and a clean route into Torvosaurus through Bruiser.",
       "flavorText": "Allosaurus carried recurved, serrated teeth replaced roughly every 100 days. At one Morrison Formation quarry, abundant theropod bite marks likely record repeated scavenging and possible cannibalism by Allosaurus; they do not prove cooperative feeding, but show that competition around carcasses could be intense.",
       "cardFace": "/card-faces/allosaurus.webp",
       "status": "Locked"
@@ -502,7 +490,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Spinosaurid"],
       "tags": ["Semi-Aquatic", "Raptorial"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Semi-aquatic mid-route predator connecting the lower aquatic package to Spinosaurus. Its Diet is Carnivore, not Piscivore.",
       "flavorText": "Fish scales preserved in its stomach prove that Baryonyx ate fish, while young Iguanodon bones reveal a broader carnivorous diet. Its long, crocodile-like jaws seized slippery prey, while powerful forelimbs bore thumb claws more than 30 centimetres long.",
       "cardFace": "/card-faces/baryonyx.webp",
       "status": "Locked"
@@ -520,7 +507,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Dromaeosaurid"],
       "tags": ["Bruiser", "Raptorial", "Saboteur"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Large-prey disruption specialist and flexible Level 2 bridge.",
       "flavorText": "One of the largest known dromaeosaurids, Utahraptor reached roughly six metres long and around half a tonne. It was built more for power than speed and armed with enormous sickle claws likely used to grip and subdue large prey.",
       "cardFace": "/card-faces/utahraptor.webp",
       "status": "Locked"
@@ -538,7 +524,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Tyrannosauroid"],
       "tags": ["Cranial Display", "Pack Hunter"],
       "visualTags": [],
-      "role": "Coordinated follow-up attacker and natural route into Tyrannosaurus.",
       "flavorText": "Meaning “beautiful feathered tyrant,” Yutyrannus was a nine-metre predator whose long plumage likely insulated it in the cool forests of Early Cretaceous China and whose prominent crest crowned its deep skull. Three individuals of different ages were reportedly found together, suggesting some level of social behavior.",
       "cardFace": "/card-faces/yutyrannus.webp",
       "status": "Locked"
@@ -556,7 +541,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Dilophosaurid"],
       "tags": ["Raptorial", "Cranial Display"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Raptorial control predator with a direct Jurassic route into Torvosaurus.",
       "flavorText": "Dilophosaurus carried two tall crests formed from enlarged nasal and lacrimal bones. Their function remains unknown, but display or recognition is plausible; its grasping forelimbs could seize and hold prey beneath its chest after the mouth made first contact.",
       "cardFace": "/card-faces/dilophosaurus.webp",
       "status": "Locked"
@@ -574,7 +558,6 @@
       "taxa": ["Vertebrate", "Amniote", "Synapsid", "Sphenacodontian", "Sphenacodontid"],
       "tags": ["Spinal Sail", "Small Game Hunter", "Apex Predator"],
       "visualTags": [],
-      "role": "Permian Synapsid endpoint; naturally accessible from Diplocaulus and a Convergent Evolution route into Spinosaurus through Spinal Sail.",
       "flavorText": "Dimetrodon was a non-mammalian synapsid, making it more closely related to mammals than to dinosaurs; it lived tens of millions of years before the first dinosaurs appeared.",
       "cardFace": "/card-faces/dimetrodon.webp",
       "status": "Locked"
@@ -592,7 +575,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Coelophysoid"],
       "tags": ["Transitional", "Bruiser"],
       "visualTags": [],
-      "role": "Triassic Level 2 bridge combining Transitional compatibility with Bruiser access to larger predators.",
       "flavorText": "Named for Gojira—the monster known as Godzilla—Gojirasaurus was one of the largest known Triassic neotheropods, showing that large body size had already evolved among early theropods before the Jurassic. Its holotype was skeletally immature and had not yet reached full size.",
       "cardFace": "/card-faces/gojirasaurus.webp",
       "status": "Locked"
@@ -610,7 +592,6 @@
       "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Ceratosaur", "Abelisaurid"],
       "tags": ["Charge", "Rivalry"],
       "visualTags": [],
-      "role": "Aggressive lane-locked predator that may immediately challenge the opposing Creature when it fills a Niche.",
       "flavorText": "Carnotaurus means “meat-eating bull,” named for the thick horns above its eyes. Its tiny arms could contribute little to a hunt, while powerful legs and massive tail muscles could drive explosive, straight-line charges.",
       "cardFace": "/card-faces/carnotaurus.webp",
       "status": "Locked"
@@ -628,7 +609,6 @@
       "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Tetanuran", "Megalosaurid"],
       "tags": ["Apex Predator", "Solitary", "Bruiser"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Heavy Jurassic finisher and primary top-end route from Allosaurus.",
       "flavorText": "Reaching roughly ten meters in length, Torvosaurus was among the Jurassic’s largest land predators. Its deep jaws carried large, recurved, blade-shaped teeth edged with coarse serrations.",
       "cardFace": "/card-faces/torvosaurus.webp",
       "status": "Locked"
@@ -646,7 +626,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Tyrannosauroid","Tyrannosaurid"],
       "tags": ["Apex Predator", "Sovereign", "Crushing Bite", "Durophagy"],
       "visualTags": [],
-      "role": "Flagship boss Creature whose Durophagy converts victories over hard-defended prey into card flow.",
       "flavorText": "Biomechanical models estimate that an adult T. rex could bite with nearly 7,800 pounds of force, while its thick teeth concentrated enough pressure to fracture and pulverize bone. Bone fragments preserved in coprolites provide direct evidence of osteophagy: it swallowed and digested the crushed remains.",
       "cardFace": "/card-faces/tyrannosaurus-rex.webp",
       "status": "Locked"
@@ -664,7 +643,6 @@
       "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Theropod", "Tetanuran", "Spinosaurid"],
       "tags": ["Semi-Aquatic", "Diver", "Spinal Sail", "Apex Predator"],
       "visualTags": ["Raptorial Claws"],
-      "role": "Aquatic-oriented finisher with direct Baryonyx access and a convergent route from Dimetrodon.",
       "flavorText": "Spinosaurus had a deep, flexible tail that could generate thrust in water, yet whether it chased fish underwater or hunted while wading along river margins remains debated.",
       "cardFace": "/card-faces/spinosaurus.webp",
       "status": "Locked"
@@ -833,7 +811,6 @@
       "taxa": ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Gorgonopsian"],
       "tags": ["Ambush", "Raptorial", "Apex Predator"],
       "visualTags": [],
-      "role": "Aggressive Permian apex endpoint for the Synapsid branch.",
       "flavorText": "One of the largest gorgonopsians, Inostrancevia was an apex predator near the end of the Permian, likely ambushing prey, restraining it with powerful forelimbs, and delivering a killing bite with long, saber-like canines.",
       "artwork": "/artwork/inostrancevia.webp",
       "cardFace": "/card-faces/inostrancevia.webp",
@@ -852,7 +829,6 @@
       "taxa": ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Thyreophoran", "Stegosaur", "Stegosaurid"],
       "tags": ["Armament", "Retaliation"],
       "visualTags": ["Plated", "Tail Spikes", "Beaked", "Quadrupedal"],
-      "role": "Reactive defensive lane anchor that punishes predators for attacking it.",
       "flavorText": "Stegosaurus carried two staggered rows of tall plates and four long spikes at the end of its tail. Fossil injuries support the tail’s use as a defensive weapon capable of inflicting serious wounds on attacking predators.",
       "cardFace": "/card-faces/stegosaurus.webp",
       "status": "Not playable · Work in progress"
@@ -870,7 +846,6 @@
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Ornithischian","Ornithopod","Iguanodontian","Hadrosaurid","Saurolophine"],
       "tags": ["Gigantic"],
       "visualTags": [],
-      "role": "Clean Level 3 herbivore endpoint that contributes scale without a dense rules package.",
       "flavorText": "Shantungosaurus was among the largest known hadrosaurids, combining a deep duck-billed skull with a body that rivaled the length of many giant theropods.",
       "cardFace": "/card-faces/shantungosaurus.webp",
       "status": "Not playable · Work in progress"

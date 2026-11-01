@@ -14,7 +14,6 @@ type DeckTwoCreature = {
   taxa: string[];
   tags: string[];
   visualTags: string[];
-  role: string;
   flavorText: string;
   cardFace?: string;
 };
@@ -38,7 +37,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ceratopsian"],
     tags: ["Transitional"],
     visualTags: ["Beaked", "Bipedal"],
-    role: "Earliest-ceratopsian bridge and Jurassic Level 0 setup card whose Transitional route crosses Deck 2's concentrated Cretaceous curve.",
     flavorText:
       "Small and lightly built, Yinlong preserves an early stage of ceratopsian evolution before the elaborate frills and horns of its much later relatives appeared.",
     cardFace: "/card-faces/yinlong.webp",
@@ -55,7 +53,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ceratopsian", "Protoceratopsid"],
     tags: ["Herd", "Retaliation"],
     visualTags: ["Frill", "Beaked", "Quadrupedal"],
-    role: "Active Herd starter whose Retaliation creates an intentionally unusual Rapid Speciation route into Stegosaurus.",
     flavorText:
       "Protoceratops lacked the enormous horns of later ceratopsids, but its deep beak and expanding neck frill made it a distinctive and well-protected desert herbivore.",
     cardFace: "/card-faces/protoceratops.webp",
@@ -81,7 +78,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Osteoderm", "Armament"],
     visualTags: ["Armored", "Tail Club", "Beaked", "Quadrupedal"],
-    role: "Durable Level 1 bridge whose broad Cretaceous and Archosaur profile deliberately opens several Level 2 routes.",
     flavorText:
       "Ankylosaurus combined a broad armored body with an enlarged bony tail club, giving a large predator a serious reason to approach its hindquarters cautiously.",
     cardFace: "/card-faces/ankylosaurus.webp",
@@ -107,7 +103,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Territorial", "Saboteur", "Armament"],
     visualTags: ["Plated", "Tail Spikes", "Beaked", "Quadrupedal"],
-    role: "Disruptive stegosaur bridge that converts weaponized rear anatomy into lane pressure without duplicating Stegosaurus's Retaliation identity.",
     flavorText:
       "Kentrosaurus carried plates over the front of its back and long paired spikes toward the hips and tail, concentrating its protection into a dangerous rear defense.",
     cardFace: "/card-faces/kentrosaurus.webp",
@@ -124,7 +119,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Pachycephalosaurid"],
     tags: ["Cranial Display", "Specialized", "Rivalry"],
     visualTags: ["Cranial Dome", "Bipedal"],
-    role: "Facing-Niche duel specialist whose Specialized Rivalry provides +2 Battle Level without changing Rivalry's lane condition.",
     flavorText:
       "Its greatly thickened skull roof was surrounded by knobs and spikes; whether used in direct impact, flank-butting, display, or several behaviors remains debated.",
     cardFace: "/card-faces/pachycephalosaurus.webp",
@@ -141,7 +135,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Plateosaurid"],
     tags: ["Transitional", "Armament"],
     visualTags: ["Long Neck", "Grasping Hands", "Bipedal"],
-    role: "Deck 2's only Triassic Creature and a major Period bridge, with Armament representing its enlarged thumb claw and robust defensive anatomy.",
     flavorText:
       "Plateosaurus combined a long neck and deep torso with grasping hands and a large thumb claw, preserving an early sauropodomorph body plan before the rise of fully graviportal giants.",
     cardFace: "/card-faces/plateosaurus.webp",
@@ -158,7 +151,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph"],
     tags: ["Herd", "Nesting"],
     visualTags: ["Long Neck", "Quadrupedal", "Bipedal"],
-    role: "Nursery development engine: Herd resolves first, then Nesting may place an adjacent Level 0 and end the turn after its entry effects.",
     flavorText:
       "Eggs, juveniles, and adults preserved together indicate that Mussaurus nested colonially and remained in age-structured groups, unusually strong evidence of social behavior in an early sauropodomorph.",
     cardFace: "/card-faces/mussaurus.webp",
@@ -189,7 +181,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Gigantic", "Generalist"],
     visualTags: ["Flightless", "Long Legs", "Feathered"],
-    role: "Large, flexible Quaternary bridge that counts as Saurischian for Air Sacs but deliberately does not receive Graviportal.",
     flavorText:
       "Giant moa were towering, flightless browsing birds of New Zealand. Their extraordinary height made them immense among birds without producing the heavy, graviportal limb construction of giant terrestrial quadrupeds.",
     cardFace: "/card-faces/giant-moa.webp",
@@ -215,7 +206,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Herd", "Cranial Display"],
     visualTags: ["Horns", "Frill", "Beaked", "Quadrupedal"],
-    role: "Low-level ceratopsian Herd bridge that develops the group and display branches without duplicating their defensive endpoints.",
     flavorText:
       "Bonebeds indicate that Styracosaurus sometimes gathered in groups, while long spikes projected from its neck frill to create one of the most conspicuous cranial displays among ceratopsians.",
     cardFace: "/card-faces/styracosaurus.webp",
@@ -241,7 +231,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Spinal Sail", "Graviportal"],
     visualTags: ["Elongated Neural Spines", "Long Neck", "Quadrupedal"],
-    role: "Distinct saurischian Level 1 bridge whose Spinal Sail adds cross-deck texture while Graviportal supports sauropod progression.",
     flavorText:
       "Amargasaurus carried paired rows of greatly elongated neural spines along its neck and back. Their exact soft-tissue covering remains debated, but the structure gave this compact sauropod an unmistakable profile.",
     cardFace: "/card-faces/amargasaurus.webp",
@@ -268,7 +257,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Herd", "Cranial Display", "Resonance"],
     visualTags: ["Cranial Crest", "Beaked", "Duck-billed"],
-    role: "Mid-curve Herd value card and display-focused hadrosaur; Resonance is retained as a mechanically empty identity Tag.",
     flavorText:
       "Its long, hollow crest connected to the nasal passages and could shape resonant calls, giving Parasaurolophus a striking structure suited to visual and acoustic communication.",
     cardFace: "/card-faces/parasaurolophus.webp",
@@ -294,7 +282,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Armament", "Retaliation"],
     visualTags: ["Plated", "Tail Spikes", "Beaked", "Quadrupedal"],
-    role: "Reactive defensive lane anchor, deliberate Thagomizer endpoint, and unusual Rapid Speciation destination from Protoceratops.",
     flavorText:
       "Stegosaurus carried two staggered rows of tall plates and four long tail spikes. Fossil injuries support the tail's use as a defensive weapon capable of inflicting serious wounds on predators.",
     cardFace: "/card-faces/stegosaurus.webp",
@@ -321,7 +308,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Specialized", "Deimatic"],
     visualTags: ["Feathered", "Large Claws", "Bipedal"],
-    role: "Sticky technical Level 2 whose Specialized Deimatic protection lasts through two opposing turns.",
     flavorText:
       "Therizinosaurus combined an herbivorous theropod body plan with immense manual claws. Their exact use remains uncertain, but their scale alone created a formidable deterrent and display structure.",
     cardFace: "/card-faces/therizinosaurus.webp",
@@ -338,7 +324,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ornithopod", "Iguanodontian"],
     tags: ["Armament", "Resourceful"],
     visualTags: ["Beaked", "Thumb Spike", "Robust Hands"],
-    role: "Flexible technical Level 2 whose thumb spike supplies Armament while its differentiated hands and locomotion support Resourceful.",
     flavorText:
       "Iguanodon had an unusually specialized hand: a stout thumb spike, weight-bearing central fingers, and a flexible outer digit combined defense, locomotion, and manipulation in one structure.",
     cardFace: "/card-faces/iguanodon.webp",
@@ -364,7 +349,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Herd", "Cranial Display", "Rivalry"],
     visualTags: ["Nasal Boss", "Frill", "Beaked", "Quadrupedal"],
-    role: "Ceratopsian progression hub whose nasal boss and bonebed record support Herd, display, and cautious Rivalry interpretations.",
     flavorText:
       "Mass-death assemblages preserve many Pachyrhinosaurus together, while its skull replaced a long nasal horn with a massive roughened boss suited to display and forceful intraspecific contact.",
     cardFace: "/card-faces/pachyrhinosaurus.webp",
@@ -381,7 +365,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Sauropod"],
     tags: ["Armament", "Graviportal"],
     visualTags: ["Tail Club", "Long Neck", "Quadrupedal"],
-    role: "Weaponized sauropod Level 2 whose terminal tail club supplies Armament while its weight-bearing build supplies Graviportal.",
     flavorText:
       "Shunosaurus is known from unusually complete skeletons and carried a compact bony club at the end of its tail, adding a specialized defensive weapon to an early sauropod body plan.",
     cardFace: "/card-faces/shunosaurus.webp",
@@ -408,7 +391,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Osteoderm", "Graviportal"],
     visualTags: ["Osteoderms", "Long Neck", "Quadrupedal"],
-    role: "Armored sauropod Level 2 and one of Deck 2's cleanest Air Sacs launchpads into Dreadnoughtus.",
     flavorText:
       "Saltasaurus combined a graviportal titanosaur frame with bony osteoderms embedded in its skin, demonstrating that substantial dermal armor evolved even among giant sauropods.",
     cardFace: "/card-faces/saltasaurus.webp",
@@ -435,7 +417,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Gigantic", "Herd"],
     visualTags: [],
-    role: "High-end Herd endpoint that combines enormous hadrosaur size with Deck 2's horizontal development engine.",
     flavorText:
       "Shantungosaurus was among the largest known hadrosaurids, combining a deep duck-billed skull with a body that rivaled the length of many giant theropods.",
     cardFace: "/card-faces/shantungosaurus.webp",
@@ -461,7 +442,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Gigantic", "Graviportal", "Overreach"],
     visualTags: ["Long Neck", "Quadrupedal"],
-    role: "High-browsing sauropod finisher whose group-relative feeding reach queues an additional draw next turn.",
     flavorText:
       "Brachiosaurus had forelimbs longer than its hind limbs, lifting the shoulders and long neck into a high browsing profile unlike that of many other sauropods.",
     cardFace: "/card-faces/brachiosaurus.webp",
@@ -487,7 +467,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Gigantic", "Cranial Display", "Bastion"],
     visualTags: ["Horns", "Frill", "Beaked", "Quadrupedal"],
-    role: "Defensive boss and active barrier piece whose Bastion protects adjacent low-Level Creatures.",
     flavorText:
       "A massive skull carried two long brow horns, a shorter nasal horn, and a broad solid frill, forming one of the most imposing defensive displays among dinosaurs.",
     cardFace: "/card-faces/triceratops.webp",
@@ -513,7 +492,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     ],
     tags: ["Graviportal", "Specialized", "Overreach"],
     visualTags: ["Extremely Long Neck", "Quadrupedal"],
-    role: "Alternative Jurassic Level 3 endpoint that trades Gigantic for two delayed draws through Specialized Overreach.",
     flavorText:
       "Mamenchisaurus devoted an exceptional proportion of its body length to the neck, producing an extreme feeding envelope even when compared with other long-necked sauropods.",
     cardFace: "/card-faces/mamenchisaurus.webp",
@@ -530,7 +508,6 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Sauropod", "Titanosaur"],
     tags: ["Sovereign", "Graviportal"],
     visualTags: ["Long Neck", "Massive-bodied", "Quadrupedal"],
-    role: "Exceptional terrestrial Level 4 monument. Sovereign supplies Gigantic and protects the Victory Level of this Herbivore branch.",
     flavorText:
       "Dreadnoughtus is represented by one of the more complete skeletons known for a giant titanosaur. Its holotype was still growing, underscoring the extraordinary scale its lineage could attain.",
     cardFace: "/card-faces/dreadnoughtus.webp",

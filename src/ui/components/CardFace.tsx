@@ -92,8 +92,7 @@ export function CardFace({ card, compact = false, selected = false }: CardFacePr
         <FaceArtCredit card={card} />
         <span className="card-accessible-copy">
           {card.name}. Scientific name: {creature.scientificName}. Level {creature.printedLevel}. {creature.period}.{" "}
-          {creature.diet}. Taxa: {creature.taxa.join(", ")}. Tags: {creature.tags.join(", ")}. {creature.role}{" "}
-          {creature.flavorText}
+          {creature.diet}. Taxa: {creature.taxa.join(", ")}. Tags: {creature.tags.join(", ")}. {creature.flavorText}
         </span>
       </article>
     );
@@ -124,7 +123,6 @@ export function CardFace({ card, compact = false, selected = false }: CardFacePr
               <span key={`${tag}-${index}`}>{tag}</span>
             ))}
           </div>
-          {!compact && <p className="card-rules">{creature.role}</p>}
           {!compact && (
             <p className="card-flavor">
               <i>{creature.flavorText}</i>
