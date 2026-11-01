@@ -1,0 +1,15 @@
+{
+  "status": "Approved by user \u2014 locked Instant Event purple",
+  "dimensions": [
+    1049,
+    1499
+  ],
+  "source": "C:\\Dev\\prehistoric-card-game\\design\\period-textures\\Jurassic.png",
+  "method": "Deterministic color ramp of existing fossil texture; no image generation",
+  "ramp": {
+    "deep_shadow": "#230c31",
+    "shadow": "#4a1c63",
+    "mid_purple": "#7b3797",
+    "highlight": "#b269c3"
+  }
+}

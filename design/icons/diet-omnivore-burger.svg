@@ -1,0 +1,24 @@
+<!-- Omnivore Diet icon: a burger silhouette. White is ink; it is drawn into the 105×105 Diet disc mask. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="105" height="105" viewBox="0 0 105 105">
+  <rect width="105" height="105" fill="#000"/>
+  <g fill="#fff">
+    <!-- top bun -->
+    <path d="M15 45 C15 27 32 18 52.5 18 C73 18 90 27 90 45 Q90 48 87 48 L18 48 Q15 48 15 45 Z"/>
+    <!-- lettuce: a thin band with a gently wavy top edge -->
+    <path d="M14 53.5 Q19 50.5 24 53 Q29 55.5 34 52.5 Q39 50 44 53 Q49 55.5 54 52.5 Q59 50 64 53 Q69 55.5 74 52.5 Q79 50 84 53 Q88 55 91 53 L91 57 L14 57 Z"/>
+    <!-- patty -->
+    <rect x="16" y="60" width="73" height="11" rx="5.5"/>
+    <!-- bottom bun: the same 3px gap below the patty as the lettuce has above it -->
+    <path d="M17 74 L88 74 Q90 74 90 76.5 Q90 84.5 80 84.5 L25 84.5 Q15 84.5 15 76.5 Q15 74 17 74 Z"/>
+  </g>
+  <g fill="#000">
+    <!-- sesame seeds, cut out of the top bun -->
+    <ellipse cx="37" cy="31" rx="1.6" ry="2.6" transform="rotate(-30 37 31)"/>
+    <ellipse cx="52.5" cy="26.5" rx="1.6" ry="2.6"/>
+    <ellipse cx="68" cy="31" rx="1.6" ry="2.6" transform="rotate(30 68 31)"/>
+    <ellipse cx="29" cy="40" rx="1.6" ry="2.6" transform="rotate(-40 29 40)"/>
+    <ellipse cx="45" cy="38" rx="1.6" ry="2.6" transform="rotate(-12 45 38)"/>
+    <ellipse cx="60" cy="38" rx="1.6" ry="2.6" transform="rotate(12 60 38)"/>
+    <ellipse cx="76" cy="40" rx="1.6" ry="2.6" transform="rotate(40 76 40)"/>
+  </g>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="105" height="105" viewBox="0 0 105 105">
+<title>Adaptation test — hooked raptor claw</title>
+<desc>Original vector drawing informed by the supplied hooked claw reference: long leftward tip, arched upper surface and knobby root. Black silhouette and transparent ridge only.</desc>
+<path fill="#000000" fill-rule="evenodd" d="M6 37
+ C18 18 36 9 54 12
+ C75 15 90 34 95 57
+ L98 70 Q99 77 93 79
+ L83 79 Q79 80 77 85
+ Q75 92 68 92 L58 90
+ Q52 89 53 81 L55 71
+ Q61 66 62 57
+ C64 43 53 33 39 30
+ C28 28 16 31 6 37 Z
+ M16 30 C30 17 46 16 60 21
+ C77 28 87 45 90 62
+ Q88 65 84 65
+ C82 46 72 30 57 25
+ C44 20 29 22 16 30 Z
+ M58 77 Q64 72 65 64
+ Q67 73 62 79 L60 85 Q56 85 58 77 Z"/>
+</svg>

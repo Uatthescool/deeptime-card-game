@@ -26,4 +26,12 @@ Thumbs.db
 
 # Prototype card images (some contain art that is not cleared for use)
 design/prototype-cards/
-design/work/
+
+# The card tools' scratch images, logs and font cache; the tools themselves are kept
+design/work/*
+!design/work/*.ts
+!design/work/*.mjs
+!design/work/*.sh
+
+# Exported bundles: rebuilt from the files here, and they carry every card's art
+design/exports/

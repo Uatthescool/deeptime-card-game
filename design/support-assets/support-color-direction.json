@@ -1,0 +1,34 @@
+{
+  "status": "User-agreed category color direction; exact shades and textures pending visual review",
+  "sharedGeometry": "All Support cards use the same overall frame geometry.",
+  "categories": {
+    "instant-event": {
+      "colorFamily": "Rich purple",
+      "inspiration": "Fusion-inspired classic trading-card purple",
+      "character": "Dramatic, sudden, high-impact",
+      "selectedIcon": "Original meteor, edge cleanup"
+    },
+    "continuous-event": {
+      "colorFamily": "Deep blue",
+      "inspiration": "Ritual-inspired classic trading-card blue",
+      "character": "Stable, persistent, field-defining",
+      "selectedIcon": "Original flag, edge cleanup and corrected placement"
+    },
+    "adaptation": {
+      "colorFamily": "Dark black or charcoal",
+      "accents": "Restrained yellow-gold or amber",
+      "texture": "Subtle organic texture",
+      "inspiration": "XYZ-inspired dark classic trading-card palette",
+      "character": "Biological specialization and evolutionary traits",
+      "selectedIcon": "Hooked raptor claw"
+    },
+    "concept": {
+      "colorFamily": "Cool scientific grey",
+      "inspiration": "Laboratory equipment, archival documents, museum displays, medical diagrams, academic reference material",
+      "character": "Scientific, archival, scholarly",
+      "selectedIcon": "Light bulb, cleaned and optically centered"
+    }
+  },
+  "designPrinciple": "Borrow immediate readability from familiar color families without copying another game's frames. Reinterpret through fossils, geology, anatomy, research and natural-history imagery within a unified card system.",
+  "exactColorValues": null
+}

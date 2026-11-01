@@ -1,0 +1,16 @@
+{
+  "status": "Approved by user \u2014 locked Adaptation charcoal / amber",
+  "dimensions": [
+    1049,
+    1499
+  ],
+  "source": "C:\\Dev\\prehistoric-card-game\\design\\period-textures\\Jurassic.png",
+  "method": "Deterministic charcoal ramp; amber on sparse high-relief highlights; no image generation",
+  "ramp": {
+    "deep_shadow": "#090a0b",
+    "shadow": "#151617",
+    "mid_charcoal": "#282827",
+    "highlight": "#444036"
+  },
+  "accent": "#926f33"
+}

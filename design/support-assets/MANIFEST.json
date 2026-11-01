@@ -1,0 +1,250 @@
+{
+  "icons/README.txt": {
+    "bytes": 672,
+    "sha256": "23294d680f4aa0475b77a21321c30ec0e0fa74ed5927e3f203057de888f752ac"
+  },
+  "icons/SELECTIONS.json": {
+    "bytes": 373,
+    "sha256": "1ab87963fba4102512a37ba206daafd0717160b613587ce8f5eb9185752a251c"
+  },
+  "icons/adaptation-128.png": {
+    "bytes": 2461,
+    "sha256": "bfaa25c64951ead2695c992c5ccc7bbfd563b02c7075a2496b2439426326bf4c"
+  },
+  "icons/adaptation-32.png": {
+    "bytes": 592,
+    "sha256": "dd9a5d11de18fb45be92cd0868a87b06940d077c2e02489c6cc690ff0ba8febe"
+  },
+  "icons/adaptation-mask.png": {
+    "bytes": 1464,
+    "sha256": "fcb33dc0b6c08c3d208f5b8f13cf13954d0d844cc69ee5f1a72ccba7cfc171f2"
+  },
+  "icons/adaptation.png": {
+    "bytes": 1959,
+    "sha256": "d01dead72d5eb13b7e040209abd6505aa6c8fcbd34964a0b94d64957ed5782fd"
+  },
+  "icons/adaptation.svg": {
+    "bytes": 746,
+    "sha256": "b304e31e049e07efd73d9da19af910fcf860ebae280c17e805e072b7cddbbbfe"
+  },
+  "icons/adaptation@4x.png": {
+    "bytes": 9409,
+    "sha256": "87829da3317de2dc10d1d330b72e0cc22c087231748d24a68b933ca5ff5efa3c"
+  },
+  "icons/centering-check.json": {
+    "bytes": 274,
+    "sha256": "f8435fda8fcff5eb30ee5fd2db68be34f6151f6398fe1b95067d2c66a06decb0"
+  },
+  "icons/concept-128.png": {
+    "bytes": 1905,
+    "sha256": "fc20d3b63d1746eceaa71f3e290b09ed3bdc0e9b7a08f4417c5ec12c9eaa69ec"
+  },
+  "icons/concept-32.png": {
+    "bytes": 555,
+    "sha256": "281e1f6ec7a199531f53afad2bbdd9c6e2dc760412d7d486803a3b315e77ac9a"
+  },
+  "icons/concept-mask.png": {
+    "bytes": 1084,
+    "sha256": "159ddef01fe8788f674bd94a97ca4df5415a3c9beab8a84b762123eab495c75b"
+  },
+  "icons/concept.png": {
+    "bytes": 1434,
+    "sha256": "dafb0ff2fbac51d0a3d7fe64e70c488d285bdd82edaa4282024bbf53ac507982"
+  },
+  "icons/concept.svg": {
+    "bytes": 1045,
+    "sha256": "d52330c31e5de5611cbf29156753a481c7894a7f2b42db5a2f8a7b240dd6ca4b"
+  },
+  "icons/concept@4x.png": {
+    "bytes": 7031,
+    "sha256": "95cdd8940fa30956af413c6dbee68993507fc9877a1685f0824f8dcc1670376e"
+  },
+  "icons/continuous-event-128.png": {
+    "bytes": 1694,
+    "sha256": "1d70ec2e5a75520e2f2fc524a7345b90fddfdbca4cd805fe122bf97aa6d5f25a"
+  },
+  "icons/continuous-event-32.png": {
+    "bytes": 448,
+    "sha256": "0f0b315ed622b24dd85925ef2c2c65e08d353b48dda3127ee89597ec2efe9ac4"
+  },
+  "icons/continuous-event-mask.png": {
+    "bytes": 1039,
+    "sha256": "1974a82fa2eee87df5eef2a3f784b5cc573ff5157c5876ba7ea05dd2e3ebafe3"
+  },
+  "icons/continuous-event.png": {
+    "bytes": 1420,
+    "sha256": "3eddbe2d756dbf948cb39155e10517384541b921fd847b4d3369e5e00c8bfc8c"
+  },
+  "icons/continuous-event.svg": {
+    "bytes": 1708,
+    "sha256": "236e53b66aa588e7f67807f5264c3ecb5717249199acb8975ac01e5937564eb0"
+  },
+  "icons/continuous-event@4x.png": {
+    "bytes": 6473,
+    "sha256": "8d55e0f4aa6c8ec354dba55f16667bd499d34b4affcabcb946dfd643918cb74c"
+  },
+  "icons/instant-event-128.png": {
+    "bytes": 2100,
+    "sha256": "17d126b63ecd767fcae05aa5756637965fc23d52a57a98e034df11cf09accdc2"
+  },
+  "icons/instant-event-32.png": {
+    "bytes": 574,
+    "sha256": "f2b86c6519c824d66fe99ca96dd0e43ff92f88a77aea92aa5a27db6aad93789d"
+  },
+  "icons/instant-event-mask.png": {
+    "bytes": 1436,
+    "sha256": "20d2dc1e81ab24e57d515b9f4df4bf551af36055da32d6fe053817a727a769ad"
+  },
+  "icons/instant-event.png": {
+    "bytes": 1897,
+    "sha256": "e61410c056c966c494284e0dbd8b7726e3fafaac714302570f858f41e2946c15"
+  },
+  "icons/instant-event.svg": {
+    "bytes": 6668,
+    "sha256": "d90a3283e21920cef335f7d64cea639d2bd96f1956a36bd61fee2ce6bd3d1c6b"
+  },
+  "icons/instant-event@4x.png": {
+    "bytes": 8883,
+    "sha256": "ecb34de5bc6eb417a252e4f5ea5b47ff320523f45df3887acf7176a3171c8bd8"
+  },
+  "icons/selected-icons-proof.png": {
+    "bytes": 106124,
+    "sha256": "8ebc5467fa7b581309b89ea32563e044505fc01a82500798d94b2711fde609ba"
+  },
+  "reference/Jurassic-texture.png": {
+    "bytes": 2876676,
+    "sha256": "1b61622c422c0ff67a36604b4e1f023ccee50ce7cc94f830e6b0289cb0a9d63c"
+  },
+  "reference/Prehistoric_Card_Master_Template_Geometry_v3_1024x1434.png": {
+    "bytes": 312712,
+    "sha256": "dae48bee4b66c0dc47672f593a1368e96ac46beb6eaa93890c4549b8c30da9f3"
+  },
+  "reference/Prehistoric_Card_Master_Template_Geometry_v3_1462x2048.png": {
+    "bytes": 686810,
+    "sha256": "d3e73cdc4f490de715accef2caf7be48272edaf86916290ab8029165bd33ee33"
+  },
+  "reference/diet_and_support_fit.png": {
+    "bytes": 201290,
+    "sha256": "c353f595cfff641bcc70017bb62de3da077e497e2f1c5dbb21f7a2d8580dd886"
+  },
+  "sources/icons/adaptation-hooked-claw/build.py": {
+    "bytes": 4161,
+    "sha256": "dcf624e776a265d7438ae1d688b100e1b0d4d7a750fd08e1288e184de1f5fb99"
+  },
+  "sources/icons/finalize_concept.py": {
+    "bytes": 6143,
+    "sha256": "c495aea67ace203e8ac7a77271f70a6159bf3733585d6ff438ffdef79db430e1"
+  },
+  "sources/icons/flag-and-feathers/build.py": {
+    "bytes": 8296,
+    "sha256": "ffdd21e8edcfbbb598f8e395bf10befaf01f275b45e10c2c0e77b1f31bbb3245"
+  },
+  "sources/icons/original-cleaned/clean_original.py": {
+    "bytes": 5200,
+    "sha256": "0402b2b048e477175d30f3060828986758e839ad23b1d964a7ff57093ecd28a1"
+  },
+  "sources/textures/adaptations/build.py": {
+    "bytes": 3725,
+    "sha256": "41383d8ea44716d2bbe4bd9142aee62ee8997ee3425d90f28e20d4c5e8115367"
+  },
+  "sources/textures/concepts/build.py": {
+    "bytes": 3214,
+    "sha256": "cab9b35647bf19439bf88806ee79e1fadc99f16203cd392128c940e760aaae65"
+  },
+  "sources/textures/continuous-events/build.py": {
+    "bytes": 3157,
+    "sha256": "79719963fc9ee6c6d7f8ad42192e9d2e4980fe5c570b31c275c359c5a2df366e"
+  },
+  "sources/textures/instant-events/build.py": {
+    "bytes": 3140,
+    "sha256": "789223ad5b9f9983f28c4d14c3e16fdd97eafffa108ff487d54fe9aeac8756b6"
+  },
+  "support-color-direction.json": {
+    "bytes": 1647,
+    "sha256": "ee323f245415984bf1f760ab469b36c5ea0cd237e5548ad5eaf4a1eca20ff12e"
+  },
+  "textures/SELECTIONS.json": {
+    "bytes": 267,
+    "sha256": "bd6b17d0b43288a080b8c46598da9b3452f861627b11607a87e773acc0fb15c0"
+  },
+  "textures/adaptations/Adaptations-charcoal-amber-preview.png": {
+    "bytes": 540739,
+    "sha256": "14c398ec6db6f48bf53eff7a3a9f199c5c2798e72fe3dd18593d9e00691eaa81"
+  },
+  "textures/adaptations/Adaptations-charcoal-amber.png": {
+    "bytes": 1856570,
+    "sha256": "b4f5e3c32bd9157c007179d9266931e5431de3f2a2d9ccc36f7e9b964f63ae26"
+  },
+  "textures/adaptations/README.txt": {
+    "bytes": 612,
+    "sha256": "9c0f28abf5d6fedcf4614f3ebec9363e0b64b4d8de6e4bd3423bb147899b2af6"
+  },
+  "textures/adaptations/palette.json": {
+    "bytes": 475,
+    "sha256": "b6f1af68a3e49f7c6374028af6000169935fc67d11d414756c37b800cfa2dafa"
+  },
+  "textures/adaptations/texture-comparison.png": {
+    "bytes": 695638,
+    "sha256": "4f81270febfe8aff9b55a9b928a48ec8856329e0bef442851bc44ffa042aab2e"
+  },
+  "textures/concepts/Concepts-scientific-grey-preview.png": {
+    "bytes": 571727,
+    "sha256": "fb9928aade913958f7a94c6fcc240d2c039b4187e5d4ca37fd1c31c92a298c17"
+  },
+  "textures/concepts/Concepts-scientific-grey.png": {
+    "bytes": 1951959,
+    "sha256": "f8f3d743410c274421ab647d3d1c8ad000d979f7765d5f0890b58470b3728b73"
+  },
+  "textures/concepts/README.txt": {
+    "bytes": 599,
+    "sha256": "6317f0ebe827c54f441227efdb78633bbfdddee5c4bccce2559cfe31d8121525"
+  },
+  "textures/concepts/palette.json": {
+    "bytes": 461,
+    "sha256": "6003f8c0e6508886da336e53f0fc268de6c9a6fd83c9527e4ec0c8a1dde5ddbe"
+  },
+  "textures/concepts/texture-comparison.png": {
+    "bytes": 726809,
+    "sha256": "2b8a00e83bd5ad2c9bf0cad9da5c32528b6df4f73746b30ddbf241e9a0ff5ba8"
+  },
+  "textures/continuous-events/Continuous-Events-blue-preview.png": {
+    "bytes": 606784,
+    "sha256": "e96c68797944e00a023bcb3185ba92cbc611e7d152adfaedf7cb0593402eb2eb"
+  },
+  "textures/continuous-events/Continuous-Events-blue.png": {
+    "bytes": 2145162,
+    "sha256": "b813b6822bb1c9d4274f96158ff5d2d1309cf92a1d245227d16c0857b376d7b1"
+  },
+  "textures/continuous-events/README.txt": {
+    "bytes": 584,
+    "sha256": "fbe3a87d52e207c9db435c4d8c85c71f06e26cd477b69b8069c1505bfbe8e778"
+  },
+  "textures/continuous-events/palette.json": {
+    "bytes": 425,
+    "sha256": "5a9e1c94b228ead90620b43fc4e09a8a2cf9eca2ba9924d41d00a2de62a46d1e"
+  },
+  "textures/continuous-events/texture-comparison.png": {
+    "bytes": 724722,
+    "sha256": "dc2467cceb30c56cffde9ad5e4eedc89323225cfecc05350c92a8d510a2226ad"
+  },
+  "textures/instant-events/Instant-Events-purple-preview.png": {
+    "bytes": 645374,
+    "sha256": "18ea858899237f19860221c60f24426770c00c7b1a38dfa8c3337664ceb1ab87"
+  },
+  "textures/instant-events/Instant-Events-purple.png": {
+    "bytes": 2213764,
+    "sha256": "06048313763d1cc3aa675d344d538e565147b85a117a0a85ad77ee99b8531e4b"
+  },
+  "textures/instant-events/README.txt": {
+    "bytes": 571,
+    "sha256": "a345246bdc4837386a0f72c78f83eac8af1ed206cd2a848bf294821b8c503313"
+  },
+  "textures/instant-events/palette.json": {
+    "bytes": 426,
+    "sha256": "4734330bacf6d092fd1139daeea733564a47eeca4d5e0623162ff0848458a39d"
+  },
+  "textures/instant-events/texture-comparison.png": {
+    "bytes": 744267,
+    "sha256": "ef328fe01db4a6264ed920c51114dd37adfcb08965151d9e6e78b50eea232883"
+  }
+}

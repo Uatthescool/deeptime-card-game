@@ -1,0 +1,15 @@
+{
+  "status": "Review draft \u2014 cool scientific grey family agreed; exact shade not locked",
+  "dimensions": [
+    1049,
+    1499
+  ],
+  "source": "C:\\Dev\\prehistoric-card-game\\design\\period-textures\\Jurassic.png",
+  "method": "Deterministic cool-grey color ramp of existing fossil texture; no image generation",
+  "ramp": {
+    "deep_shadow": "#323940",
+    "shadow": "#5d6772",
+    "mid_grey": "#96a0aa",
+    "highlight": "#d3dbe1"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "status": "Approved by user \u2014 locked Continuous Event blue",
+  "dimensions": [
+    1049,
+    1499
+  ],
+  "source": "C:\\Dev\\prehistoric-card-game\\design\\period-textures\\Jurassic.png",
+  "method": "Deterministic color ramp of existing fossil texture; no image generation",
+  "ramp": {
+    "deep_shadow": "#0a162d",
+    "shadow": "#142b55",
+    "mid_blue": "#204885",
+    "highlight": "#4e81b6"
+  }
+}
