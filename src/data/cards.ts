@@ -12,6 +12,13 @@ import {
   DECK_3_UNIQUE_CREATURES,
   DECK_3_UNIQUE_KEYS,
 } from "./deck-3.ts";
+import {
+  DECK_4_INHERITED_SUPPORT_KEYS,
+  DECK_4_NEW_SUPPORTS,
+  DECK_4_SHARED_CREATURE_KEYS,
+  DECK_4_UNIQUE_CREATURES,
+  DECK_4_UNIQUE_KEYS,
+} from "./deck-4.ts";
 import { GENERAL_POOL_CANDIDATES } from "./general-pool.ts";
 import type { CardDefinition, CreatureCard, DeckKey, ImplementationRegister, SupportCard } from "./types.ts";
 
@@ -116,9 +123,38 @@ export const GENERAL_POOL: CardDefinition[] = [
   ...GENERAL_POOL_CANDIDATES,
 ].filter((card) => !DECK_2_UNIQUE_KEYS.has(card.key) && !DECK_3_UNIQUE_KEYS.has(card.key));
 
+/**
+ * Deck 4 is unfinished: it can be inspected, but it isn't in DECKS, so no player can
+ * select it. Its shared cards keep their own entries in Deck 3 and the General Pool.
+ */
+export const DECK_4_INFO = {
+  number: 4,
+  name: "Ice Age Mammals",
+  summary: "Mammals that survive the Ice Age, built around Herds, semi-aquatic whales and the Ice Age Event.",
+};
+
+const findCard = (sources: CardDefinition[], key: string) => {
+  const card = sources.find((candidate) => candidate.key === key);
+  if (!card) throw new Error(`Deck 4 includes "${key}", which does not exist.`);
+  return card;
+};
+
+export const DECK_4: CreatureCard[] = [
+  ...DECK_4_SHARED_CREATURE_KEYS.map((key) => findCard([...DECK_3, ...GENERAL_POOL], key) as CreatureCard),
+  ...DECK_4_UNIQUE_CREATURES,
+].sort(byLevelThenName);
+
+export const DECK_4_SUPPORTS: SupportCard[] = [
+  ...DECK_4_INHERITED_SUPPORT_KEYS.map(
+    (key) => findCard([...SUPPORTS, ...DECK_2_NEW_SUPPORTS, ...DECK_3_NEW_SUPPORTS], key) as SupportCard,
+  ),
+  ...DECK_4_NEW_SUPPORTS,
+];
+export const DECK_4_DECK: CardDefinition[] = [...DECK_4, ...DECK_4_SUPPORTS];
+
 /** Every distinct card definition the game knows about, keyed by card key. */
 export const CARD_LIBRARY: ReadonlyMap<string, CardDefinition> = new Map(
-  [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL].map((card) => [card.key, card]),
+  [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
 );
 
 /**
@@ -213,6 +249,11 @@ export function validateCardData(): string[] {
     for (const combo of combos) {
       expect(combo.with in TAG_RULES, `The ${tag} Combo names "${combo.with}", which has no Tag rule.`);
     }
+  }
+  expect(unique(DECK_4_DECK), "Deck 4 contains a duplicate card; decks are singleton.");
+  expect(DECK_4_DECK.length <= 40, `Deck 4 has ${DECK_4_DECK.length} cards; a deck holds at most 40.`);
+  for (const card of [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL]) {
+    expect(!DECK_4_UNIQUE_KEYS.has(card.key), `Deck 4 defines "${card.key}", which another deck already defines.`);
   }
   for (const key of DECK_3_INHERITED_SUPPORT_KEYS) {
     expect(

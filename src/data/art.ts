@@ -17,33 +17,46 @@ export type ArtSource =
   | "pending";
 
 /**
- * Removed from the site: these images were sourced from the web without a
- * recorded license. They show the "Artwork pending" frame until replaced.
+ * Cards with no artwork: new cards whose art hasn't been made yet, and cards
+ * whose images were removed from the site because they were sourced from the
+ * web without a recorded license. They show the "Artwork pending" frame.
  */
 export const PENDING_ARTWORK_KEYS: ReadonlySet<string> = new Set([
   "abiogenesis",
   "allosaurus",
+  "ambulocetus",
   "autotomy",
   "baryonyx",
+  "basilosaurus",
   "biogenesis",
   "cambrian-explosion",
   "carnian-pluvial-episode",
+  "castoroides",
   "competitive-exclusion-principle",
   "compsognathus",
   "convergent-evolution",
   "cynognathus",
   "dig-site-excavation",
   "genetic-drift",
+  "glyptodon",
+  "hippopotamus",
   "hoatzin",
+  "hyaenodon",
+  "ice-age",
   "inostrancevia",
+  "mastodon",
   "microraptor",
   "natovenator",
+  "pakicetus",
+  "phiomia",
   "rapid-speciation",
+  "steppe-bison",
   "superpredators",
   "torvosaurus",
   "tyrannosaurus-rex",
   "utahraptor",
   "velociraptor",
+  "woolly-rhino",
   "yutyrannus",
 ]);
 

@@ -298,7 +298,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     period: "Quaternary",
     periodColor: "Ice White",
     gameplayTaxon: "Synapsid",
-    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Cetacean", "Odontocete", "Delphinid"],
+    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Cetacean", "Odontocete", "Delphinid"],
     tags: ["Aquatic", "Pack Hunter", "Apex Predator", "Resourceful"],
     visualTags: ["Countershaded", "Dorsal Fin", "Flippers"],
     flavorText:
@@ -346,7 +346,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     period: "Neogene",
     periodColor: "Golden Ochre",
     gameplayTaxon: "Synapsid",
-    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Cetacean", "Odontocete", "Physeteroid"],
+    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Cetacean", "Odontocete", "Physeteroid"],
     tags: ["Aquatic", "Apex Predator", "Specialized", "Diver"],
     visualTags: ["Massive Teeth", "Flippers"],
     flavorText:
@@ -362,7 +362,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     period: "Quaternary",
     periodColor: "Ice White",
     gameplayTaxon: "Synapsid",
-    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Cetacean", "Mysticete", "Balaenopterid"],
+    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Cetacean", "Mysticete", "Balaenopterid"],
     tags: ["Aquatic", "Filter Feeder", "Specialized", "Gigantic"],
     visualTags: ["Baleen", "Ventral Grooves", "Paired Blowholes", "Flippers", "Tail Flukes"],
     flavorText:

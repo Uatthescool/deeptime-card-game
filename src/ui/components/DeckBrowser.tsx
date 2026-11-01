@@ -10,6 +10,10 @@ import {
   DECK_3,
   DECK_3_DECK,
   DECK_3_SUPPORTS,
+  DECK_4,
+  DECK_4_DECK,
+  DECK_4_INFO,
+  DECK_4_SUPPORTS,
   DECK_INFO,
   type DeckKey,
   GENERAL_POOL,
@@ -134,6 +138,23 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
               </section>
             );
           })}
+          <section className="pool-section general-pool">
+            <header className="pool-section-header">
+              <div>
+                <small>Not playable · Work in progress</small>
+                <h2>
+                  Deck {DECK_4_INFO.number}: {DECK_4_INFO.name}
+                </h2>
+                <p>
+                  {DECK_4_INFO.summary} Still being designed: {DECK_4.length} Creatures and {DECK_4_SUPPORTS.length} of
+                  18 Supports so far. It can be inspected, but it can’t be selected during setup yet.
+                </p>
+              </div>
+              <span>{DECK_4_DECK.length} of 40 cards</span>
+            </header>
+            {group(`Deck ${DECK_4_INFO.number} Creatures`, DECK_4)}
+            {group(`Deck ${DECK_4_INFO.number} Supports`, DECK_4_SUPPORTS)}
+          </section>
           <section className="pool-section general-pool">
             <header className="pool-section-header">
               <div>

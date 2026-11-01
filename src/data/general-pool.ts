@@ -464,7 +464,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     periodColor: "Ice Blue",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Proboscidean", "Elephantid"],
-    tags: ["Gigantic", "Retaliation"],
+    tags: ["Gigantic", "Retaliation", "Herd"],
     visualTags: ["Tusks", "Hair", "Quadrupedal"],
     flavorText:
       "Woolly mammoths combined dense hair, insulating fat, small ears, and long curved tusks to survive and forage across the cold steppe environments of the Pleistocene.",
