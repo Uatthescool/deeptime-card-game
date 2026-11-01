@@ -429,7 +429,9 @@ test("every card's artwork source is recorded and matches the files on disk", ()
     }
   }
   for (const card of inspectableCards) {
-    if (card.kind !== "creature" || !card.cardFace) continue;
+    // Every Support has a finished face; a Creature has one once it's been made.
+    if (card.kind !== "creature") assert.ok(card.cardFace, `${card.name} has no card face`);
+    if (!card.cardFace) continue;
     assert.equal(
       existsSync(new URL(`../../public${card.cardFace}`, import.meta.url)),
       true,

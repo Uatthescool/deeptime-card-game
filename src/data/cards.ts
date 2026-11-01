@@ -168,7 +168,7 @@ export function artworkPath(card: CardDefinition): string | undefined {
 
 /** The finished card face for a card, if it has one. Resolve with `assetUrl` before use. */
 export function cardFacePath(card: CardDefinition): string | undefined {
-  return card.kind === "creature" ? card.cardFace : undefined;
+  return card.cardFace;
 }
 
 /**

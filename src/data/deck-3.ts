@@ -400,6 +400,7 @@ export const DECK_3_NEW_SUPPORTS: Array<EventCard | AdaptationCard> = [
     rules:
       "Play this card in any unlocked Niche on either side instead of an Event Zone. It may fill an empty Niche, or it may override a Creature in that Niche only if that Creature counts as Aquatic for Event effects. This does not count as playing a Creature and does not use your normal Creature play. Normal restrictions and effects involving that Creature being overridden still apply. Drought occupies and locks only that Niche through the end of your next turn. While Drought remains there, the Creature in the directly opposing Niche gets -1 Battle Level and contributes 1 less Victory Level; neither value can fall below 0. Then send Drought to your History Pile.",
     note: "Semi-Aquatic qualifies because it counts as Aquatic for Events. The penalty belongs to the directly opposing Niche: moving the affected Creature away removes it, and a later occupant becomes affected. Drought never locks the other Niche in the lane.",
+    cardFace: "/card-faces/drought.webp",
     status: STATUS,
   },
   {
@@ -410,6 +411,7 @@ export const DECK_3_NEW_SUPPORTS: Array<EventCard | AdaptationCard> = [
     rules:
       "Attach to a Creature on either side of the board only if that Creature has no adjacent friendly Creatures. The attached Creature gets -1 Battle Level and contributes +1 Victory Level. It cannot move, and its controller cannot play, place, or move a Creature into either adjacent Niche. It cannot be overridden by a Creature with Gigantic. If the attached Creature has Gigantic, Island Dwarfism's modifiers become -2 Battle Level and +2 Victory Levels instead.",
     note: "Normal Adaptation-Slot restrictions apply. When the attached Creature leaves play, Island Dwarfism is sent to its owner's History Pile under the general Adaptation rule.",
+    cardFace: "/card-faces/island-dwarfism.webp",
     status: STATUS,
   },
   {
@@ -420,6 +422,7 @@ export const DECK_3_NEW_SUPPORTS: Array<EventCard | AdaptationCard> = [
     rules:
       "Declare a Time Period. Send all Creatures from the declared Time Period to their owners' History Piles. Until the start of your next turn, all Creatures from the immediately succeeding Time Period get +1 Battle Level. End all Continuous Events and send them to their owners' History Piles. End your turn without entering your Battle Phase.",
     note: "The authoritative sequence is Cambrian, Ordovician, Silurian, Devonian, Carboniferous, Permian, Triassic, Jurassic, Cretaceous, Paleogene, Neogene, and Quaternary. Quaternary has no succeeding Time Period and creates no Battle Level modifier. The card is an Instantaneous Event; only its temporary global modifier persists after resolution.",
+    cardFace: "/card-faces/geological-boundary.webp",
     status: STATUS,
   },
 ];

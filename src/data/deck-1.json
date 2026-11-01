@@ -656,6 +656,7 @@
       "name": "Cambrian Explosion",
       "rules": "Each Level 0 Creature contributes +1 additional Victory Level. Each player draws 1 additional card at the start of their turn. When you play this card, if you control a Level 0 Creature, draw 1 card.",
       "note": "The Victory bonus changes Victory contribution only; it does not change Level for override or battle purposes. The conditional entry draw occurs only when this card is played.",
+      "cardFace": "/card-faces/cambrian-explosion.webp",
       "status": "Locked"
     },
     {
@@ -665,6 +666,7 @@
       "name": "Superpredators",
       "rules": "Carnivore and Omnivore Creatures may Hunt any opposing Creature regardless of Diet.",
       "note": "Does not grant additional Hunts and does not ignore non-Diet restrictions.",
+      "cardFace": "/card-faces/superpredators.webp",
       "status": "Locked"
     },
     {
@@ -674,6 +676,7 @@
       "name": "Wildfire",
       "rules": "Play this card in an unlocked Niche on your side instead of your Event Zone. It may fill an empty Niche or override a Creature you control in that Niche regardless of Level and without requiring normal override matches. This does not count as playing a Creature or use your normal Creature play. Normal restrictions and effects involving your Creature being overridden still apply. When Wildfire enters the Niche, send the opposing Creature in that lane and its attached Adaptation to its owner’s History Pile. Neither player may play, place, move, or override a Creature into that lane through the end of your next turn. Then send Wildfire to your History Pile.",
       "note": "Wildfire uses your Event play but never occupies the Event Zone. It cannot override an opposing Creature; its effect removes that Creature after Wildfire enters your own Niche. Raptorial can prevent Wildfire from overriding your Creature, while Autotomy and Living Fossil process that friendly override normally.",
+      "cardFace": "/card-faces/wildfire.webp",
       "status": "Locked"
     },
     {
@@ -683,6 +686,7 @@
       "name": "Carnian Pluvial Episode",
       "rules": "Once during each of your Development Phases, you may send 1 Creature you control without Dinosaur in its Taxa to its owner's History Pile. If you do, search your deck for a Creature with Dinosaur in its Taxa and Printed Level 2 or lower, reveal it, add it to your hand, then shuffle your deck.",
       "note": "It may be activated during the Development Phase in which it is played. Activating it does not use the normal Creature play or Event play. A Dinosaur is identified through its Taxa, so birds cannot be sent as the cost. It cannot be activated at the 10-card hand limit.",
+      "cardFace": "/card-faces/carnian-pluvial-episode.webp",
       "status": "Locked"
     },
     {
@@ -692,6 +696,7 @@
       "eligibility": "aquatic-or-lepidosaur",
       "rules": "Attach to an Aquatic Creature or an eligible Creature with Lepidosaur in its Taxa. If the attached Creature would be destroyed in a Hunt, send Autotomy to its owner’s History Pile instead. That Creature is not destroyed, but it cannot Hunt during its controller’s next Battle Phase. When the attached Creature is overridden, draw 1 card.",
       "note": "Semi-Aquatic does not qualify. Preventing battle destruction does not draw a card. The skipped Battle Phase clears the restriction even if the Creature had no legal target.",
+      "cardFace": "/card-faces/autotomy.webp",
       "status": "Locked"
     },
     {
@@ -701,6 +706,7 @@
       "eligibility": "raptorial-claws",
       "rules": "Attach to an eligible Creature with the hidden Raptorial Claws Visual Tag. It gets +1 Battle Level while Hunting.",
       "note": "Eligibility is hidden card data and is independent of the visible Raptorial Tag.",
+      "cardFace": "/card-faces/raptorial-claws.webp",
       "status": "Locked"
     },
     {
@@ -710,6 +716,7 @@
       "eligibility": "level-2-or-lower",
       "rules": "Attach only to a Level 2 or lower Creature. If the attached Creature is a Herbivore, it cannot initiate a Hunt. The first time it is Hunted each turn, flip the Battle Coin: one or more red Rex results force the Hunt to end in a tie; black reverse results resolve it normally. If it already has Elusive, flip two coins total. This does not grant Elusive for overriding or Tag matching. If the attached Creature is a Carnivore or Omnivore, whenever it initiates a Hunt, flip the Battle Coin and give it +1 Battle Level for each red Rex result during that Hunt. If it also has Ambush, flip two coins total.",
       "note": "Defensive double flipping succeeds if either coin shows red Rex. Offensive Ambush results range from +0 to +2 Battle Level. Coin modifiers affect Battle Level only.",
+      "cardFace": "/card-faces/cryptic-camouflage.webp",
       "status": "Locked"
     },
     {
@@ -718,6 +725,7 @@
       "name": "Convergent Evolution",
       "rules": "During your next override this turn, if the incoming Creature and current occupant share an eligible Tag and already match in at least one of Primary Taxon, Diet, or Time Period, choose one of those three categories in which they do not match. Treat that category as matching for this override.",
       "note": "Apex Predator, Generalist, Living Fossil, Specialized, and Transitional are not eligible shared Tags. The normal Level rule still applies.",
+      "cardFace": "/card-faces/convergent-evolution.webp",
       "status": "Locked"
     },
     {
@@ -726,6 +734,7 @@
       "name": "Rapid Speciation",
       "rules": "Play only before you have played a Creature this turn. As this card resolves, use your Creature play to override one of your Creatures with a Creature from your hand exactly 2 Levels higher. The override must still satisfy the normal 3-of-4 matching requirement.",
       "note": "The incoming Creature is newly played and follows normal Hunt-timing restrictions.",
+      "cardFace": "/card-faces/rapid-speciation.webp",
       "status": "Locked"
     },
     {
@@ -733,6 +742,7 @@
       "kind": "concept",
       "name": "Biogenesis",
       "rules": "Draw 1 card for every Niche filled on your side of the board.",
+      "cardFace": "/card-faces/biogenesis.webp",
       "status": "Locked"
     },
     {
@@ -741,6 +751,7 @@
       "name": "Evolutionary Radiation",
       "rules": "You cannot play this card on your first turn. Choose 1 of the following effects for which you meet the prerequisite, or choose both if you meet both prerequisites:\n\n• If you control no Level 0 Creatures: Play 1 Level 0 Creature from your hand into an empty, unlocked Niche.\n• If you control no Level 1 Creatures: Play 1 Level 1 Creature from your hand into an empty, unlocked Niche.\n\nIf you choose both effects, play those Creatures into different Niches and continue your Development Phase, but skip your Battle Phase this turn. Neither of these plays counts as your normal Creature play.",
       "note": "The prerequisites are checked when this card begins resolving. Playing the first Creature does not invalidate the other effect. After the first play, you may finish resolving the card and retain your Battle Phase, or resolve the other effect and skip Battle.",
+      "cardFace": "/card-faces/evolutionary-radiation.webp",
       "status": "Locked"
     },
     {
@@ -749,6 +760,7 @@
       "name": "Whale Fall",
       "rules": "Send a Level 2 or Level 3 Creature from your hand to your History Pile and draw 2 cards. If it was Aquatic, draw 1 additional card.",
       "note": "Semi-Aquatic counts as Aquatic for this Concept effect.",
+      "cardFace": "/card-faces/whale-fall.webp",
       "status": "Locked"
     },
     {
@@ -756,6 +768,7 @@
       "kind": "concept",
       "name": "Natural Selection",
       "rules": "As an additional cost to play this card, send a Creature card from your hand to your History Pile. Search your deck for a Creature card, reveal it, and add it to your hand. Then shuffle your deck.",
+      "cardFace": "/card-faces/natural-selection.webp",
       "status": "Locked"
     },
     {
@@ -763,6 +776,7 @@
       "kind": "concept",
       "name": "Genetic Drift",
       "rules": "Shuffle your hand into your deck and draw 5 cards. After you draw, send one of those drawn cards from your hand to your History Pile.",
+      "cardFace": "/card-faces/genetic-drift.webp",
       "status": "Locked"
     },
     {
@@ -770,6 +784,7 @@
       "kind": "concept",
       "name": "Dig Site Excavation",
       "rules": "Choose a card in your History Pile other than Dig Site Excavation and add it to your hand.",
+      "cardFace": "/card-faces/dig-site-excavation.webp",
       "status": "Locked"
     },
     {
@@ -778,6 +793,7 @@
       "name": "Semelparity",
       "rules": "As an additional cost to play this card, choose a Level 0 Creature card from your hand or your side of the board and send it to its owner’s History Pile. Draw 2 cards. If that Creature was in play, you may play another Level 0 Creature from your hand into an empty, unlocked Niche on your side. This does not count as your normal Creature play. If you do, continue your Development Phase, but skip your Battle Phase this turn.",
       "note": "If the chosen Creature occupied a Niche, its attached Adaptation goes to History normally. The optional replacement resolves normal entry effects and does not use the normal Creature play or empty-Niche fill. Declining the replacement preserves the Battle Phase.",
+      "cardFace": "/card-faces/semelparity.webp",
       "status": "Locked"
     },
     {
@@ -786,6 +802,7 @@
       "name": "Obligate Migration",
       "rules": "Choose one Creature on either side of the board and move it to a different empty Niche on the same side. Move its attached Adaptation with it.",
       "note": "This movement does not count as filling or overriding a Niche and does not trigger Charge, Cranial Display, Burrower, or another entry effect.",
+      "cardFace": "/card-faces/obligate-migration.webp",
       "status": "Locked"
     },
     {
@@ -794,6 +811,7 @@
       "name": "Abiogenesis",
       "rules": "Choose 1 of the following effects:\n• Search your deck for a Level 0 Creature, add it to your hand, and shuffle your deck.\n• Play a Level 0 Creature from your hand into an empty, unlocked Niche on your side. This does not count as your normal Creature play. Continue your Development Phase, but skip your Battle Phase this turn.",
       "note": "The placement effect resolves normal entry effects. It does not use the normal Creature play or the turn's ordinary empty-Niche fill.",
+      "cardFace": "/card-faces/abiogenesis.webp",
       "status": "Locked"
     }
   ],
@@ -858,6 +876,7 @@
       "rules": "While your deck contains no cards, if there is exactly one Apex Predator on the board, that Creature contributes +4 additional Victory Levels.",
       "note": "Retired from Deck 1 after playtesting showed that its payoff arrived too late and too inconsistently. Preserved here for future deck construction or rework.",
       "artwork": "/artwork/competitive-exclusion-principle.webp",
+      "cardFace": "/card-faces/competitive-exclusion-principle.webp",
       "status": "Not playable · Work in progress"
     }
   ]

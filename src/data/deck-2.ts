@@ -539,6 +539,7 @@ export const DECK_2_NEW_SUPPORTS: Array<AdaptationCard | ConceptCard | EventCard
     rules:
       "Attach only to a Saurischian Creature. When you override the attached Creature with another Saurischian Creature, if either Creature has Gigantic, the overriding Creature may be exactly 2 Printed Levels higher. All normal override-match requirements still apply.",
     note: "Birds count as Saurischian. Air Sacs changes only the allowed Level jump and never supplies an override category.",
+    cardFace: "/card-faces/air-sacs.webp",
     status: STATUS,
   },
   {
@@ -549,6 +550,7 @@ export const DECK_2_NEW_SUPPORTS: Array<AdaptationCard | ConceptCard | EventCard
     rules:
       "Attach only to an Herbivore with Armament or Retaliation. It gets +1 Battle Level while defending. If it has both Tags, it destroys the attacking Creature on successful defenses, including ties. If it is a Stegosaur, it also contributes +1 Victory Level.",
     note: "Stampede inverts defensive Tag effects only; this defensive Adaptation never becomes an attacking bonus.",
+    cardFace: "/card-faces/thagomizer.webp",
     status: STATUS,
   },
   {
@@ -559,6 +561,7 @@ export const DECK_2_NEW_SUPPORTS: Array<AdaptationCard | ConceptCard | EventCard
     rules:
       "Attach only to an Ornithischian Creature. When you override the attached Creature with another Ornithischian Creature, attach this Adaptation to the new Creature instead of sending it to your History Pile, then draw 1 card. When this card is sent to your History Pile for any reason, draw 1 card.",
     note: "Its transfer is the explicit exception to the general rule that an attached Adaptation leaves with its Creature.",
+    cardFace: "/card-faces/dental-battery.webp",
     status: STATUS,
   },
   {
@@ -569,6 +572,7 @@ export const DECK_2_NEW_SUPPORTS: Array<AdaptationCard | ConceptCard | EventCard
     rules:
       "Once per turn during your Development Phase, you may move the attached Creature to an empty adjacent friendly Niche. This movement does not trigger effects that activate when a Creature enters a Niche.",
     note: "The Adaptation moves with its Creature. Graviportal and other movement restrictions still apply.",
+    cardFace: "/card-faces/facultative-quadrupedality.webp",
     status: STATUS,
   },
   {
@@ -577,6 +581,7 @@ export const DECK_2_NEW_SUPPORTS: Array<AdaptationCard | ConceptCard | EventCard
     name: "Genetic Mutations",
     rules: "Add a random Adaptation card from your deck to your hand. Then shuffle your deck.",
     note: "The selection is made only from Adaptations currently remaining in your deck. If none remain, add nothing.",
+    cardFace: "/card-faces/genetic-mutations.webp",
     status: STATUS,
   },
   {
@@ -587,6 +592,7 @@ export const DECK_2_NEW_SUPPORTS: Array<AdaptationCard | ConceptCard | EventCard
     rules:
       "Starting with your leftmost Creature and proceeding counter-clockwise around the board, each Herbivore Hunts the Creature in its opposing Niche, if able. Resolve each Hunt before proceeding to the next Creature. If an eligible Creature leaves play before its Hunt, skip it. These Hunts ignore Diet, and Herbivores that entered play this turn may Hunt. During these Hunts, effects of Tags that apply while their Creature is defending also apply while that Creature is attacking. Any survival clause attached to such an effect applies to the opposing Creature instead. This does not apply to Adaptations or effects governing Hunt eligibility. After this effect resolves, end your turn without entering your Battle Phase.",
     note: "All Herbivores on both sides participate. Shell, Osteoderm, Dermal Armor, Retaliation, Bastion, and the Cold-added Gigantic defense effect invert; targeting and Hunt-permission effects do not.",
+    cardFace: "/card-faces/stampede.webp",
     status: STATUS,
   },
 ];

@@ -97,9 +97,11 @@ describe("App", () => {
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "Spinosaurus card" })).not.toBeInTheDocument();
 
-    // Support cards have no finished face yet, so they only pin in the inspector.
+    // Support cards have finished faces too.
     await user.click(browserCard("Wildfire"));
-    expect(screen.queryByRole("dialog", { name: /card$/ })).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole("dialog", { name: "Wildfire card" })).getByRole("img", { name: "Wildfire card" }),
+    ).toHaveAttribute("src", expect.stringContaining("/card-faces/wildfire.webp"));
   });
 
   test("the card anatomy tutorial lights every part it explains, step by step, and is marked done", async () => {

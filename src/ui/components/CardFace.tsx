@@ -85,14 +85,20 @@ export function CardFace({ card, compact = false, selected = false }: CardFacePr
     .filter(Boolean)
     .join(" ");
 
-  if (creature?.cardFace) {
+  if (card.cardFace) {
     return (
       <article className={`${className} canonical-card-face`} aria-label={`${card.name}, ${typeLabel(card)}`}>
-        <img src={assetUrl(creature.cardFace)} alt="" aria-hidden="true" draggable={false} decoding="async" />
+        <img src={assetUrl(card.cardFace)} alt="" aria-hidden="true" draggable={false} decoding="async" />
         <FaceArtCredit card={card} />
         <span className="card-accessible-copy">
-          {card.name}. Scientific name: {creature.scientificName}. Level {creature.printedLevel}. {creature.period}.{" "}
-          {creature.diet}. Taxa: {creature.taxa.join(", ")}. Tags: {creature.tags.join(", ")}. {creature.flavorText}
+          {card.kind === "creature" ? (
+            <>
+              {card.name}. Scientific name: {card.scientificName}. Level {card.printedLevel}. {card.period}. {card.diet}
+              . Taxa: {card.taxa.join(", ")}. Tags: {card.tags.join(", ")}. {card.flavorText}
+            </>
+          ) : (
+            `${card.name}. ${typeLabel(card)}. ${card.rules}`
+          )}
         </span>
       </article>
     );

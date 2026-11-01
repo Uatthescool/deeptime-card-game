@@ -235,6 +235,7 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | ConceptCard)[] = [
     rules:
       "For overrides, Synapsids from the Paleogene, Neogene, or Quaternary match every Time Period. Creatures from the Cambrian, Triassic, Jurassic, or Cretaceous contribute 1 less Victory Level. When Ice Age leaves your Event Zone, your Creatures contribute no Victory Levels until the end of your third turn after it left.",
     note: "Working wording; its effects are not built into the game yet.",
+    cardFace: "/card-faces/ice-age.webp",
     status: STATUS,
   },
   {
@@ -245,6 +246,7 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | ConceptCard)[] = [
     rules:
       "Send a Level 0 or 1 Creature on the board to its owner’s History Pile. If it was yours, you may search your deck for up to two Creatures that share at least two taxa listed AFTER its Primary Taxon, reveal them, add them to your hand, then shuffle your deck. If it was your opponent’s, send the Event in your Event Zone, if any, to your History Pile.",
     note: "Working wording; its effects are not built into the game yet.",
+    cardFace: "/card-faces/paleocene-eocene-thermal-maximum.webp",
     status: STATUS,
   },
   {
@@ -257,6 +259,7 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | ConceptCard)[] = [
       FEEDBACK_LOOP_NAMES.map((name) => `• ${name}`).join("\n"),
     ].join("\n\n"),
     note: "Working wording; its effects are not built into the game yet. Snowball Earth, The Great Dying and The Great Oxidation Event aren't cards yet.",
+    cardFace: "/card-faces/feedback-loops.webp",
     status: STATUS,
   },
 ];

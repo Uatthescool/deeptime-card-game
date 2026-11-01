@@ -47,6 +47,7 @@ export type EventCard = {
   rules: string;
   note?: string;
   artwork?: string;
+  cardFace?: string;
   status: CardStatus;
 };
 
@@ -65,6 +66,7 @@ export type AdaptationCard = {
     | "ornithischian"
     | "any";
   artwork?: string;
+  cardFace?: string;
   status: CardStatus;
 };
 
@@ -75,6 +77,7 @@ export type ConceptCard = {
   rules: string;
   note?: string;
   artwork?: string;
+  cardFace?: string;
   status: CardStatus;
 };
 
