@@ -98,7 +98,8 @@ export function CardFace({ card, compact = false, selected = false }: CardFacePr
     );
   }
 
-  const hasLongTitleWord = card.name.split(/\s+/).some((word) => word.length >= 16);
+  // A line can break after a dash, so "Paleocene–Eocene" is two words here.
+  const hasLongTitleWord = card.name.split(/[\s–-]+/).some((word) => word.length >= 16);
   return (
     <article className={className} aria-label={`${card.name}, ${typeLabel(card)}`}>
       <div className="card-topline">

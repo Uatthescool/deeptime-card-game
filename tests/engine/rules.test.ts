@@ -392,7 +392,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 122);
+  assert.equal(inspectableCards.length, 124);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -471,7 +471,7 @@ test("Deck 4 can be inspected but not selected while it is unfinished", () => {
     [0, 1, 2, 3, 4].map((level) => DECK_4.filter((card) => card.printedLevel === level).length),
     [3, 7, 7, 4, 1],
   );
-  assert.equal(DECK_4_SUPPORTS.length, 13);
+  assert.equal(DECK_4_SUPPORTS.length, 15);
   assert.ok(DECK_4.every((card) => card.taxa.includes("Synapsid")));
   // Its new cards are marked unplayable; the cards it shares keep their own status.
   assert.equal(CARD_LIBRARY.get("mastodon")?.status, "Not playable · Work in progress");

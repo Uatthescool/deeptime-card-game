@@ -1,4 +1,4 @@
-import type { CreatureCard, Diet, EventCard, Period } from "./types";
+import type { ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
 
 /** Deck 4 is still being designed: it can be inspected, but no player can select it yet. */
 const STATUS = "Not playable · Work in progress" as const;
@@ -200,7 +200,7 @@ export const DECK_4_SHARED_CREATURE_KEYS = [
   "blue-whale",
 ] as const;
 
-/** 12 of the deck's 18 Supports; with Ice Age that leaves 5 still to design. */
+/** 12 of the deck's 18 Supports; with its 3 new ones that leaves 3 still to design. */
 export const DECK_4_INHERITED_SUPPORT_KEYS = [
   "wildfire",
   "drought",
@@ -216,7 +216,17 @@ export const DECK_4_INHERITED_SUPPORT_KEYS = [
   "genetic-drift",
 ] as const;
 
-export const DECK_4_NEW_SUPPORTS: EventCard[] = [
+/** Climate events that are feedback loops or their results; some aren't cards yet. */
+const FEEDBACK_LOOP_NAMES = [
+  "Ice Age",
+  "Paleocene–Eocene Thermal Maximum",
+  "Drought",
+  "Snowball Earth",
+  "The Great Dying",
+  "The Great Oxidation Event",
+];
+
+export const DECK_4_NEW_SUPPORTS: (EventCard | ConceptCard)[] = [
   {
     key: "ice-age",
     kind: "event",
@@ -225,6 +235,28 @@ export const DECK_4_NEW_SUPPORTS: EventCard[] = [
     rules:
       "For overrides, Synapsids from the Paleogene, Neogene, or Quaternary match every Time Period. Creatures from the Cambrian, Triassic, Jurassic, or Cretaceous contribute 1 less Victory Level. When Ice Age leaves your Event Zone, your Creatures contribute no Victory Levels until the end of your third turn after it left.",
     note: "Working wording; its effects are not built into the game yet.",
+    status: STATUS,
+  },
+  {
+    key: "paleocene-eocene-thermal-maximum",
+    kind: "event",
+    eventType: "instant",
+    name: "Paleocene–Eocene Thermal Maximum",
+    rules:
+      "Send a Level 0 or 1 Creature on the board to its owner’s History Pile. If it was yours, you may search your deck for up to two Creatures that share at least two taxa listed AFTER its Primary Taxon, reveal them, add them to your hand, then shuffle your deck. If it was your opponent’s, send the Event in your Event Zone, if any, to your History Pile.",
+    note: "Working wording; its effects are not built into the game yet.",
+    status: STATUS,
+  },
+  {
+    key: "feedback-loops",
+    kind: "concept",
+    name: "Feedback Loops",
+    rules: [
+      "Search your deck for a card whose name appears below, reveal it, add it to your hand, then shuffle your deck.",
+      "During your Development Phase, while Feedback Loops is in your History Pile, you may send a card whose name appears below from your hand to your History Pile. If you do, return Feedback Loops to your hand.",
+      FEEDBACK_LOOP_NAMES.map((name) => `• ${name}`).join("\n"),
+    ].join("\n\n"),
+    note: "Working wording; its effects are not built into the game yet. Snowball Earth, The Great Dying and The Great Oxidation Event aren't cards yet.",
     status: STATUS,
   },
 ];
