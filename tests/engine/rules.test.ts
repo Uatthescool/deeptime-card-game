@@ -182,7 +182,7 @@ function putGeneralCreatureInHand(
   key: string,
   overrides: Partial<CreatureCard> = {},
 ) {
-  const definition = GENERAL_POOL.find((card) => card.key === key);
+  const definition = CARD_LIBRARY.get(key);
   assert.equal(definition?.kind, "creature");
   const card: CardInstance = {
     uid: `${playerId}-general-${key}-${game.players[playerId].hand.length}`,
@@ -276,11 +276,18 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     SUPPORTS.some((card) => card.key === "wildfire"),
     true,
   );
-  assert.equal(GENERAL_POOL.length, 19);
+  assert.equal(GENERAL_POOL.length, 11);
   assert.ok(
-    ["competitive-exclusion-principle", "lystrosaurus", "purussaurus", "dire-wolf"].every((key) =>
+    ["competitive-exclusion-principle", "purussaurus", "epicyon"].every((key) =>
       GENERAL_POOL.some((card) => card.key === key),
     ),
+  );
+  // The pool only holds cards that aren't in a deck, Deck 4 included.
+  assert.equal(
+    GENERAL_POOL.some((card) =>
+      [...Object.values(DECKS).flat(), ...DECK_4_DECK].some((deckCard) => deckCard.key === card.key),
+    ),
+    false,
   );
   assert.ok(GENERAL_POOL.every((card) => card.status === "Not playable · Work in progress"));
   assert.equal(DECK_3.length, 22);

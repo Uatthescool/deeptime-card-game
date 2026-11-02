@@ -161,13 +161,13 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
                 <small>Not playable · Work in progress</small>
                 <h2>General Pool</h2>
                 <p>
-                  Candidate cards outside the three playable decks. They are available for inspection but never enter
-                  either player’s deck.
+                  Candidate cards that aren’t in any deck. They are available for inspection but never enter either
+                  player’s deck.
                 </p>
               </div>
               <span>{GENERAL_POOL.length} cards</span>
             </header>
-            {group("Candidate cards outside playable decks", GENERAL_POOL)}
+            {group("Candidate cards outside the decks", GENERAL_POOL)}
           </section>
         </section>
         <aside className="deck-browser-sidewall">

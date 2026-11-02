@@ -117,15 +117,20 @@ export const DECK_LABELS: Record<DeckKey, string> = Object.fromEntries(
   DECK_KEYS.map((key) => [key, `Deck ${DECK_INFO[key].number} · ${DECK_INFO[key].name}`]),
 ) as Record<DeckKey, string>;
 
-/** Candidate cards outside the playable decks: inspectable, never dealt. */
-export const GENERAL_POOL: CardDefinition[] = [
-  ...IMPLEMENTATION_REGISTER.generalPool,
-  ...GENERAL_POOL_CANDIDATES,
-].filter((card) => !DECK_2_UNIQUE_KEYS.has(card.key) && !DECK_3_UNIQUE_KEYS.has(card.key));
+/** Candidate cards, including the Creatures Deck 4 borrows, before cards in a deck are taken out. */
+const POOL_CANDIDATES: CardDefinition[] = [...IMPLEMENTATION_REGISTER.generalPool, ...GENERAL_POOL_CANDIDATES];
+
+/** Candidate cards that aren't in any deck: inspectable, never dealt. */
+export const GENERAL_POOL: CardDefinition[] = POOL_CANDIDATES.filter(
+  (card) =>
+    !DECK_2_UNIQUE_KEYS.has(card.key) &&
+    !DECK_3_UNIQUE_KEYS.has(card.key) &&
+    !(DECK_4_SHARED_CREATURE_KEYS as readonly string[]).includes(card.key),
+);
 
 /**
  * Deck 4 is unfinished: it can be inspected, but it isn't in DECKS, so no player can
- * select it. Its shared cards keep their own entries in Deck 3 and the General Pool.
+ * select it. Its shared Creatures are defined in Deck 3 and the General Pool candidates.
  */
 export const DECK_4_INFO = {
   number: 4,
@@ -140,7 +145,7 @@ const findCard = (sources: CardDefinition[], key: string) => {
 };
 
 export const DECK_4: CreatureCard[] = [
-  ...DECK_4_SHARED_CREATURE_KEYS.map((key) => findCard([...DECK_3, ...GENERAL_POOL], key) as CreatureCard),
+  ...DECK_4_SHARED_CREATURE_KEYS.map((key) => findCard([...DECK_3, ...POOL_CANDIDATES], key) as CreatureCard),
   ...DECK_4_UNIQUE_CREATURES,
 ].sort(byLevelThenName);
 

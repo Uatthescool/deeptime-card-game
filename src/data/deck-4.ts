@@ -185,7 +185,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
   }),
 ];
 
-/** Creatures Deck 4 shares with Deck 3 and the General Pool. */
+/** Creatures Deck 4 borrows from Deck 3 and the General Pool candidates. */
 export const DECK_4_SHARED_CREATURE_KEYS = [
   "lystrosaurus",
   "thrinaxodon",
