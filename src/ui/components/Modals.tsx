@@ -243,6 +243,14 @@ const CONCEPT_PROMPTS: Record<string, { title: string; copy: string }> = {
     title: "Choose an empty Niche",
     copy: "Place the selected Creature into an empty, unlocked Niche. You must skip your Battle Phase this turn.",
   },
+  "deep-sea-gigantism-card": {
+    title: "Choose an Aquatic Gigantic Creature",
+    copy: "Level 1 is free. Level 2 or 3 ends your turn without a Battle Phase, and Level 3 also skips your next Draw Phase.",
+  },
+  "deep-sea-gigantism-lane": {
+    title: "Choose the Creature it replaces",
+    copy: "The override ignores Level, the Aquatic gate and matching. It doesn’t use your normal Creature play.",
+  },
 };
 
 export function ConceptChoiceModal({ game, dispatch }: { game: GameState; dispatch: Dispatch }) {

@@ -108,6 +108,8 @@ export type PlayerState = {
   overreachTriggeredTurn: number | null;
   overreachQueuedDraws: number;
   overreachDueTurn: number | null;
+  /** The turn whose Start-of-Turn Draw Phase this player skips (Deep-Sea Gigantism). */
+  skipDrawPhaseTurn?: number | null;
   allowances: TurnAllowances;
   biome: BiomeState;
 };
@@ -194,7 +196,9 @@ export type ConceptChoiceKind =
   | "abiogenesis-mode"
   | "abiogenesis-search"
   | "abiogenesis-placement-card"
-  | "abiogenesis-placement-lane";
+  | "abiogenesis-placement-lane"
+  | "deep-sea-gigantism-card"
+  | "deep-sea-gigantism-lane";
 
 export type PendingConceptChoice = {
   card: ConceptInstance;

@@ -5,7 +5,10 @@ import {
   canActInDevelopment,
   creatureCanEnterNiche,
   creatureCanMoveByEffect,
+  effectiveHasTag,
   hasEnterableEmptyNiche,
+  hasIslandDwarfism,
+  islandDwarfismBlocksEntry,
   hasNoAdjacentFriendly,
   HAND_LIMIT,
   nicheIsLocked,
@@ -306,6 +309,31 @@ export function abiogenesisModes(state: GameState) {
 }
 
 /**
+ * Niches Deep-Sea Gigantism may play `card` into: occupied, unlocked Niches on the player's side. It ignores
+ * every override requirement, but Raptorial and Island Dwarfism still stop the override.
+ */
+export function deepSeaGigantismLanes(state: GameState, playerId: PlayerId, card: CardInstance): number[] {
+  const creature = card.definition;
+  if (
+    creature.kind !== "creature" ||
+    creature.printedLevel > 3 ||
+    !countsAsAquatic(creature) ||
+    !effectiveHasTag(creature, "Gigantic")
+  ) {
+    return [];
+  }
+  return state.players[playerId].lanes.flatMap((lane, index) =>
+    lane.creature &&
+    !nicheIsLocked(state, playerId, index) &&
+    !islandDwarfismBlocksEntry(state, playerId, index) &&
+    !hasIslandDwarfism(lane) &&
+    lane.creature.cannotOverrideOnTurn !== state.turnNumber
+      ? [index]
+      : [],
+  );
+}
+
+/**
  * Concepts with a mandatory choice may be played only when that choice can be
  * made. Returns why it can't, or null when the choice is available.
  */
@@ -344,6 +372,10 @@ function missingRequiredChoice(state: GameState, key: string): Reason | null {
       )
         ? null
         : missing("Needs a Creature that can move and an empty Niche on the same side of the board.");
+    case "deep-sea-gigantism":
+      return player.hand.some((card) => deepSeaGigantismLanes(state, state.activePlayer, card).length)
+        ? null
+        : missing("Needs an Aquatic Gigantic Creature of Level 3 or lower in your hand and a Creature it can replace.");
     case "abiogenesis": {
       const { canSearch, canPlace } = abiogenesisModes(state);
       return canSearch || canPlace

@@ -399,7 +399,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 124);
+  assert.equal(inspectableCards.length, 125);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -1529,6 +1529,125 @@ test("Abiogenesis places a Level 0 from hand, preserves the normal Creature play
   assert.ok(game.log.some((line) => line.includes("skipped the Battle Phase")));
 });
 
+/** Puts a card from the whole library onto `playerId`'s side, for Creatures outside their deck. */
+function placeLibraryCreature(game: GameState, playerId: PlayerId, lane: number, key: string) {
+  const definition = CARD_LIBRARY.get(key) as CreatureCard;
+  const card: CardInstance = { uid: `${playerId}-library-${key}`, owner: playerId, definition };
+  game.players[playerId].lanes[lane].creature = creatureInPlay(card);
+  return card;
+}
+
+/** A Deck 3 game with Alpha's opening hand shuffled back, so each test chooses the hand. */
+function deckThreeGame() {
+  const game = readyGame(["deck-3", "deck-3"]);
+  game.players[0].deck.push(...game.players[0].hand);
+  game.players[0].hand = [];
+  return game;
+}
+
+function playDeepSeaGigantism(game: GameState, creatureUid: string, lane: number) {
+  const concept = putInHand(game, 0, "deep-sea-gigantism");
+  game = playConcept(game, concept.uid);
+  assert.equal(game.pendingConceptChoice?.kind, "deep-sea-gigantism-card");
+  game = chooseConceptOption(game, creatureUid);
+  assert.equal(game.pendingConceptChoice?.kind, "deep-sea-gigantism-lane");
+  return chooseConceptOption(game, String(lane));
+}
+
+test("Deep-Sea Gigantism replaces Obligate Migration in Deck 3", () => {
+  assert.ok(DECK_3_SUPPORTS.some((card) => card.key === "deep-sea-gigantism"));
+  assert.equal(
+    DECK_3_SUPPORTS.some((card) => card.key === "obligate-migration"),
+    false,
+  );
+  assert.ok(SUPPORTS.some((card) => card.key === "obligate-migration"));
+});
+
+test("Deep-Sea Gigantism plays a Level 3 over a Level 0, ends the turn and skips the next Draw Phase", () => {
+  let game = deckThreeGame();
+  placeCreature(game, 0, 0, "horseshoe-crab");
+  const leedsichthys = putInHand(game, 0, "leedsichthys");
+  // A normal override can't jump three Levels.
+  assert.equal(legalCreatureLanes(game, 0, leedsichthys).includes(0), false);
+
+  game = playDeepSeaGigantism(game, leedsichthys.uid, 0);
+  assert.equal(game.players[0].lanes[0].creature?.card.uid, leedsichthys.uid);
+  // The turn ends once Filter Feeder's entry effect has resolved.
+  assert.equal(game.phase, "development");
+  game = chooseFilterFeederTop(game, game.pendingFilterFeeder!.cardUids[0]);
+  assert.ok(game.players[0].history.some((card) => card.definition.key === "horseshoe-crab"));
+  assert.ok(game.players[0].history.some((card) => card.definition.key === "deep-sea-gigantism"));
+  assert.equal(game.phase, "handoff");
+  assert.equal(game.activePlayer, 1);
+  assert.equal(
+    game.log.some((line) => line.includes("entered the Battle Phase")),
+    false,
+  );
+
+  // The opponent's turn passes normally; then Alpha's Draw Phase is skipped, once.
+  game = acknowledgeHandoff(game);
+  game = endTurn(game);
+  const handBefore = game.players[0].hand.length;
+  const deckBefore = game.players[0].deck.length;
+  game = acknowledgeHandoff(game);
+  assert.equal(game.phase, "development");
+  // Nothing was drawn; the one new card is Horseshoe Crab returning through Living Fossil.
+  assert.equal(game.players[0].deck.length, deckBefore);
+  assert.deepEqual(
+    game.players[0].hand.slice(handBefore).map((card) => card.definition.key),
+    ["horseshoe-crab"],
+  );
+  assert.ok(game.log.some((line) => line.includes("skipped the Start-of-Turn Draw Phase")));
+  assert.equal(game.players[0].skipDrawPhaseTurn, null);
+});
+
+test("Deep-Sea Gigantism ignores Level, the Aquatic gate and matching, and a Level 1 play is free", () => {
+  let game = deckThreeGame();
+  placeLibraryCreature(game, 0, 1, "tyrannosaurus-rex");
+  const parapuzosia = putInHand(game, 0, "parapuzosia");
+  const nautilus = putInHand(game, 0, "nautilus");
+
+  game = playDeepSeaGigantism(game, parapuzosia.uid, 1);
+  assert.equal(game.players[0].lanes[1].creature?.card.uid, parapuzosia.uid);
+  assert.ok(game.players[0].history.some((card) => card.definition.key === "tyrannosaurus-rex"));
+  assert.equal(game.phase, "development");
+  assert.equal(game.players[0].allowances.creaturePlayed, false);
+  assert.equal(game.players[0].allowances.skipBattlePhase, false);
+  assert.equal(game.players[0].skipDrawPhaseTurn, null);
+  // The normal Creature play is still available.
+  assert.ok(legalCreatureLanes(game, 0, nautilus).includes(0));
+});
+
+test("Deep-Sea Gigantism at Level 2 ends the turn but keeps the next draw", () => {
+  let game = deckThreeGame();
+  placeCreature(game, 0, 2, "nautilus");
+  const jaekelopterus = putInHand(game, 0, "jaekelopterus");
+  game = playDeepSeaGigantism(game, jaekelopterus.uid, 2);
+  assert.equal(game.players[0].lanes[2].creature?.card.uid, jaekelopterus.uid);
+  assert.equal(game.phase, "handoff");
+  assert.equal(game.players[0].skipDrawPhaseTurn, null);
+});
+
+test("Deep-Sea Gigantism refuses Blue Whale, empty Niches and Island Dwarfism", () => {
+  const game = deckThreeGame();
+  placeCreature(game, 0, 0, "horseshoe-crab");
+  placeCreature(game, 0, 2, "nautilus");
+  attachAdaptation(game, 0, 0, "island-dwarfism");
+  const concept = putInHand(game, 0, "deep-sea-gigantism");
+  const blueWhale = putInHand(game, 0, "blue-whale");
+  assert.equal(canPlayConcept(game, concept), false);
+
+  const leedsichthys = putInHand(game, 0, "leedsichthys");
+  assert.equal(canPlayConcept(game, concept), true);
+  const played = playConcept(game, concept.uid);
+  const creatures = getConceptChoiceOptions(played).map((option) => option.id);
+  assert.deepEqual(creatures, [leedsichthys.uid]);
+  assert.equal(creatures.includes(blueWhale.uid), false);
+  const lanes = getConceptChoiceOptions(chooseConceptOption(played, leedsichthys.uid)).map((option) => option.id);
+  // Only Niche 3 is offered: Niche 1 has Island Dwarfism and the rest are empty.
+  assert.deepEqual(lanes, ["2"]);
+});
+
 test("Abiogenesis remains playable for its placement effect when no Level 0 remains in the deck", () => {
   let game = readyGame();
   const abiogenesis = putInHand(game, 0, "abiogenesis");
@@ -2259,7 +2378,7 @@ test("Herd resolves before Nesting, triggers once per player, and Nesting ends t
   assert.equal(game.pendingHerd, null, "the nested Herd bearer cannot trigger Herd a second time that turn");
   assert.equal(game.activePlayer, 1);
   assert.equal(game.phase, "handoff");
-  assert.ok(game.log.some((line) => line.includes("turn ends after Nesting")));
+  assert.ok(game.log.some((line) => line.includes("turn ends now that all entry effects have resolved")));
 });
 
 test("Specialized Deimatic protects Therizinosaurus through two opposing turns", () => {

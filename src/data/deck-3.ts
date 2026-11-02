@@ -1,4 +1,4 @@
-import type { AdaptationCard, CreatureCard, Diet, EventCard, Period } from "./types";
+import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
 
 const STATUS = "Locked" as const;
 
@@ -386,12 +386,11 @@ export const DECK_3_INHERITED_SUPPORT_KEYS = [
   "evolutionary-radiation",
   "semelparity",
   "autotomy",
-  "obligate-migration",
   "cryptic-camouflage",
   "wildfire",
 ] as const;
 
-export const DECK_3_NEW_SUPPORTS: Array<EventCard | AdaptationCard> = [
+export const DECK_3_NEW_SUPPORTS: Array<EventCard | AdaptationCard | ConceptCard> = [
   {
     key: "drought",
     kind: "event",
@@ -423,6 +422,16 @@ export const DECK_3_NEW_SUPPORTS: Array<EventCard | AdaptationCard> = [
       "Declare a Time Period. Send all Creatures from the declared Time Period to their owners' History Piles. Until the start of your next turn, all Creatures from the immediately succeeding Time Period get +1 Battle Level. End all Continuous Events and send them to their owners' History Piles. End your turn without entering your Battle Phase.",
     note: "The authoritative sequence is Cambrian, Ordovician, Silurian, Devonian, Carboniferous, Permian, Triassic, Jurassic, Cretaceous, Paleogene, Neogene, and Quaternary. Quaternary has no succeeding Time Period and creates no Battle Level modifier. The card is an Instantaneous Event; only its temporary global modifier persists after resolution.",
     cardFace: "/card-faces/geological-boundary.webp",
+    status: STATUS,
+  },
+  {
+    key: "deep-sea-gigantism",
+    kind: "concept",
+    name: "Deep-Sea Gigantism",
+    rules:
+      "Play an Aquatic Gigantic Creature of Level 3 or lower from your hand into an unlocked Niche you control that holds a Creature, overriding it while ignoring every override requirement. This does not count as your normal Creature play. Normal effects involving your Creature being overridden still apply. If the Creature is Level 2 or higher, end your turn without entering your Battle Phase. If it is Level 3, also skip the Start-of-Turn Draw Phase of your next turn.",
+    note: "It ignores the Level step, the Aquatic gate and the 3-of-4 match. Raptorial and Island Dwarfism can still prevent the override. Semi-Aquatic counts as Aquatic for this Concept. A skipped Draw Phase skips every draw in it, including Cambrian Explosion's and Overreach's.",
+    cardFace: "/card-faces/deep-sea-gigantism.webp",
     status: STATUS,
   },
 ];

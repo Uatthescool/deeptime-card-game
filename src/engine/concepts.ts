@@ -9,13 +9,14 @@ import {
   hasEnterableEmptyNiche,
   moveCardFromHand,
   moveLaneOccupant,
+  nextTurnForPlayer,
   placeCreatureFromHand,
   sendCardToHistory,
   sendCreatureToHistory,
   takeDeckCard,
 } from "./core.ts";
 import { queueEntryEffects } from "./entry-effects.ts";
-import { abiogenesisModes, canPlayConcept, evolutionaryRadiationLevels } from "./queries.ts";
+import { abiogenesisModes, canPlayConcept, deepSeaGigantismLanes, evolutionaryRadiationLevels } from "./queries.ts";
 import { randomInt, shuffle } from "./rng.ts";
 import { finishResolution } from "./turn.ts";
 import type {
@@ -128,6 +129,8 @@ export function playConcept(original: GameState, cardUid: string): GameState {
       return choose(state, moved, "obligate-migration-source");
     case "abiogenesis":
       return choose(state, moved, "abiogenesis-mode");
+    case "deep-sea-gigantism":
+      return choose(state, moved, "deep-sea-gigantism-card");
     default:
       return completeConcept(state, moved);
   }
@@ -275,6 +278,22 @@ export function getConceptChoiceOptions(state: GameState): ChoiceOption[] {
       return player.deck.filter(isLevelZeroCreature).map(creatureOption);
     case "abiogenesis-placement-card":
       return player.hand.filter(isLevelZeroCreature).map(creatureOption);
+    case "deep-sea-gigantism-card":
+      return player.hand
+        .filter((card) => deepSeaGigantismLanes(state, state.activePlayer, card).length)
+        .map(creatureOption);
+    case "deep-sea-gigantism-lane": {
+      const card = player.hand.find((held) => held.uid === pending.selectedCardUid);
+      if (!card) return [];
+      return deepSeaGigantismLanes(state, state.activePlayer, card).map((index) => {
+        const occupant = player.lanes[index]!.creature!.card.definition;
+        return {
+          id: String(index),
+          label: `Niche ${index + 1}`,
+          detail: `Replace ${occupant.name} (Level ${occupant.printedLevel})`,
+        };
+      });
+    }
   }
 }
 
@@ -497,6 +516,34 @@ export function chooseConceptOption(original: GameState, optionId: string): Game
         state,
         `Abiogenesis placed ${card.definition.name} into Niche ${laneIndex + 1} without using the normal Creature play; ${player.name} must skip the Battle Phase this turn.`,
       );
+      queueEntryEffects(state, active, laneIndex);
+      return completeConcept(state, pending.card);
+    }
+
+    case "deep-sea-gigantism-card":
+      pending.selectedCardUid = optionId;
+      pending.kind = "deep-sea-gigantism-lane";
+      return state;
+
+    case "deep-sea-gigantism-lane": {
+      const laneIndex = Number(optionId);
+      const replaced = player.lanes[laneIndex]!.creature!.card.definition.name;
+      sendCreatureToHistory(state, active, laneIndex, "override");
+      player.allowances.overriddenLanes.push(laneIndex);
+      const card = placeCreatureFromHand(state, active, pending.selectedCardUid!, laneIndex)!;
+      const level = card.definition.printedLevel;
+      addLog(
+        state,
+        `Deep-Sea Gigantism played ${card.definition.name} over ${replaced} in Niche ${laneIndex + 1}, ignoring every override requirement and without using the normal Creature play.`,
+      );
+      if (level >= 2) {
+        state.endTurnAfterEntryEffects = true;
+        addLog(state, `${player.name}'s turn will end without a Battle Phase once its entry effects resolve.`);
+      }
+      if (level === 3) {
+        player.skipDrawPhaseTurn = nextTurnForPlayer(state, active);
+        addLog(state, `${player.name} will skip the Start-of-Turn Draw Phase of their next turn.`);
+      }
       queueEntryEffects(state, active, laneIndex);
       return completeConcept(state, pending.card);
     }

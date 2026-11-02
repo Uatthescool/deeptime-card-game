@@ -36,6 +36,7 @@ export const PENDING_ARTWORK_KEYS: ReadonlySet<string> = new Set([
   "compsognathus",
   "convergent-evolution",
   "cynognathus",
+  "deep-sea-gigantism",
   "dig-site-excavation",
   "feedback-loops",
   "genetic-drift",

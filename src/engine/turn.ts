@@ -104,6 +104,7 @@ export function createGame(
     overreachTriggeredTurn: null,
     overreachQueuedDraws: 0,
     overreachDueTurn: null,
+    skipDrawPhaseTurn: null,
     allowances: emptyAllowances(),
     biome: createBiomeState(biomes[id]),
   });
@@ -157,8 +158,11 @@ function overreachDue(state: GameState, player: PlayerState) {
   return player.overreachDueTurn !== null && player.overreachDueTurn <= state.turnNumber;
 }
 
+const skipsDrawPhase = (state: GameState, player: PlayerState) => player.skipDrawPhaseTurn === state.turnNumber;
+
 function scheduledStartPhaseDraws(state: GameState) {
   const player = state.players[state.activePlayer];
+  if (skipsDrawPhase(state, player)) return 0;
   return 1 + activeCambrianExplosions(state) + (overreachDue(state, player) ? player.overreachQueuedDraws : 0);
 }
 
@@ -287,18 +291,32 @@ function beginTurn(state: GameState) {
     return;
   }
 
-  drawOne(state, state.activePlayer, "normal Start Phase");
+  // Deep-Sea Gigantism skips the whole Draw Phase, with every draw it would include.
+  const skipDraws = skipsDrawPhase(state, player);
+  if (skipDraws) {
+    player.skipDrawPhaseTurn = null;
+    addLog(state, `${player.name} skipped the Start-of-Turn Draw Phase because of Deep-Sea Gigantism.`);
+  } else {
+    drawOne(state, state.activePlayer, "normal Start Phase");
+  }
   returnLivingFossils(state, state.activePlayer);
 
-  const cambrians = activeCambrianExplosions(state);
+  const cambrians = skipDraws ? 0 : activeCambrianExplosions(state);
   for (let draw = 0; draw < cambrians; draw += 1) drawOne(state, state.activePlayer, "Cambrian Explosion");
 
   if (overreachDue(state, player)) {
     const queued = player.overreachQueuedDraws;
     player.overreachQueuedDraws = 0;
     player.overreachDueTurn = null;
-    for (let draw = 0; draw < queued; draw += 1) drawOne(state, state.activePlayer, "Overreach");
-    if (queued) addLog(state, `${player.name} resolved ${queued} queued Overreach ${queued === 1 ? "draw" : "draws"}.`);
+    if (!skipDraws) {
+      for (let draw = 0; draw < queued; draw += 1) drawOne(state, state.activePlayer, "Overreach");
+    }
+    if (queued) {
+      addLog(
+        state,
+        `${player.name} ${skipDraws ? "lost" : "resolved"} ${queued} queued Overreach ${queued === 1 ? "draw" : "draws"}.`,
+      );
+    }
   }
 
   state.phase = "development";
@@ -367,7 +385,7 @@ export function finishResolution(state: GameState): GameState {
   if (state.pendingStampede) return continueStampede(state);
   if (state.endTurnAfterEntryEffects) {
     state.endTurnAfterEntryEffects = false;
-    addLog(state, `${state.players[state.activePlayer].name}'s turn ends after Nesting resolved all entry effects.`);
+    addLog(state, `${state.players[state.activePlayer].name}'s turn ends now that all entry effects have resolved.`);
     return endTurn(state);
   }
   if (state.phase === "battle" && state.players[state.activePlayer].allowances.skipBattlePhase) {
