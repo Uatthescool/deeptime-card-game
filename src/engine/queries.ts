@@ -118,6 +118,13 @@ export function adaptationEligible(card: AdaptationCard, creature: CreatureCard)
       );
     case "aquatic-or-lepidosaur":
       return creature.tags.includes("Aquatic") || creature.taxa.includes("Lepidosaur");
+    case "aerial-or-aquatic-synapsid-carnivore":
+      return (
+        (creature.tags.includes("Aerial") || creature.tags.includes("Aquatic")) &&
+        creature.gameplayTaxon === "Synapsid" &&
+        creature.diet === "Carnivore" &&
+        !creature.tags.includes("Filter Feeder")
+      );
   }
 }
 

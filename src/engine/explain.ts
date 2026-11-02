@@ -94,6 +94,8 @@ export function explainPlacement(
 const ELIGIBILITY_TEXT: Record<AdaptationCard["eligibility"], string> = {
   any: "Attaches to any Creature.",
   "aquatic-or-lepidosaur": "Attaches only to an Aquatic Creature or a Lepidosaur.",
+  "aerial-or-aquatic-synapsid-carnivore":
+    "Attaches only to an Aerial or Aquatic Synapsid Carnivore that isn't a Filter Feeder.",
   "raptorial-claws": "Attaches only to a Creature with Raptorial Claws.",
   "level-2-or-lower": "Attaches only to a Creature of Level 2 or lower.",
   saurischian: "Attaches only to a Saurischian Creature.",

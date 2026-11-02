@@ -64,6 +64,7 @@ export type AdaptationCard = {
     | "saurischian"
     | "herbivore-armament-retaliation"
     | "ornithischian"
+    | "aerial-or-aquatic-synapsid-carnivore"
     | "any";
   artwork?: string;
   cardFace?: string;

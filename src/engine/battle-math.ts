@@ -1,4 +1,10 @@
-import { hasPrintedAquatic, tagEffectMultiplier } from "../data/cards.ts";
+import {
+  type CreatureCard,
+  DEFENSIVE_ADAPTATION_KEYS,
+  DEFENSIVE_TAGS,
+  hasPrintedAquatic,
+  tagEffectMultiplier,
+} from "../data/cards.ts";
 import {
   clone,
   effectiveHasTag,
@@ -16,6 +22,7 @@ import type {
   CreatureInPlay,
   FoundCreature,
   GameState,
+  LaneState,
   PlayerId,
   Reason,
   Verdict,
@@ -29,6 +36,24 @@ function activeSuperpredators(state: GameState) {
 
 function hasCrypticCamouflage(state: GameState, creature: CreatureInPlay, laneIndex: number) {
   return state.players[creature.card.owner].lanes[laneIndex]?.attachment?.definition.key === "cryptic-camouflage";
+}
+
+/** Echolocation: Hunts by the attached Creature ignore the defender's defensive Tags and Adaptations. */
+export function huntIgnoresDefenses(state: GameState, playerId: PlayerId, laneIndex: number) {
+  return state.players[playerId].lanes[laneIndex]?.attachment?.definition.key === "echolocation";
+}
+
+const defenseIgnored = (ignoreDefenses: boolean, tag: string) => ignoreDefenses && tag in DEFENSIVE_TAGS;
+
+/** Whether a defending Creature has `tag` in this Hunt; a Hunt that ignores defenses removes every defensive Tag. */
+export function defendsWithTag(creature: CreatureCard, tag: string, ignoreDefenses: boolean) {
+  return !defenseIgnored(ignoreDefenses, tag) && effectiveHasTag(creature, tag);
+}
+
+/** The key of a defender's Adaptation in this Hunt; a Hunt that ignores defenses skips defensive Adaptations. */
+export function defendingAdaptationKey(lane: LaneState, ignoreDefenses: boolean) {
+  const key = lane.attachment?.definition.key;
+  return key && ignoreDefenses && DEFENSIVE_ADAPTATION_KEYS.has(key) ? undefined : key;
 }
 
 type HuntOptions = { ignoreDiet?: boolean; ignoreEntryTurn?: boolean };
@@ -81,19 +106,25 @@ function targetBlockers(
 ): Reason[] {
   const attackerDef = attacker.card.definition;
   const targetDef = target.card.definition;
+  const ignoreDefenses = huntIgnoresDefenses(state, attacker.card.owner, attackerLane);
   const blockers: Reason[] = [];
   if (attackerDef.tags.includes("Elusive") && targetDef.printedLevel >= 1) {
     blockers.push(reason("elusive-attacker", `${attackerDef.name} is Elusive, so it can Hunt only Level 0 Creatures.`));
   }
-  if (effectiveHasTag(targetDef, "Gigantic") && attackerDef.printedLevel <= 1) {
+  if (defendsWithTag(targetDef, "Gigantic", ignoreDefenses) && attackerDef.printedLevel <= 1) {
     blockers.push(
       reason("gigantic-target", `${targetDef.name} is Gigantic: only Level 2 or higher Creatures can Hunt it.`),
     );
   }
-  if (target.burrowedUntilTurn !== null && state.turnNumber < target.burrowedUntilTurn) {
+  if (
+    !defenseIgnored(ignoreDefenses, "Burrower") &&
+    target.burrowedUntilTurn !== null &&
+    state.turnNumber < target.burrowedUntilTurn
+  ) {
     blockers.push(reason("burrowed", `${targetDef.name} is Burrowed until Turn ${target.burrowedUntilTurn}.`));
   }
   if (
+    !defenseIgnored(ignoreDefenses, "Deimatic") &&
     state.activePlayer !== target.card.owner &&
     target.deimaticProtectedThroughTurn !== null &&
     state.turnNumber <= target.deimaticProtectedThroughTurn
@@ -106,6 +137,7 @@ function targetBlockers(
     );
   }
   if (
+    !defenseIgnored(ignoreDefenses, "Cranial Display") &&
     attacker.attackBarriers.some(
       (barrier) => barrier.targetUid === target.card.uid && barrier.expiresOnTurn === state.turnNumber,
     )
@@ -276,6 +308,8 @@ export function calculateBattleNumbers(
   const attackerNotes: string[] = [];
   const defenderNotes: string[] = [];
   const sameLane = attackerFound.laneIndex === defenderFound.laneIndex;
+  const ignoreDefenses = huntIgnoresDefenses(state, attackerFound.playerId, attackerFound.laneIndex);
+  const defenderHas = (tag: string) => defendsWithTag(defenderDef, tag, ignoreDefenses);
 
   if (
     attackerDef.tags.includes("Solitary") &&
@@ -352,7 +386,7 @@ export function calculateBattleNumbers(
   }
   if (
     state.players[defenderFound.playerId].biome.key === "cold" &&
-    effectiveHasTag(defenderDef, "Gigantic") &&
+    defenderHas("Gigantic") &&
     !effectiveHasTag(attackerDef, "Gigantic") &&
     !attackerDef.tags.includes("Bruiser")
   ) {
@@ -381,7 +415,7 @@ export function calculateBattleNumbers(
   }
 
   if (
-    defenderDef.tags.includes("Aerial") &&
+    defenderHas("Aerial") &&
     !overrideTags(attackerDef).has("Aerial") &&
     !attackerDef.tags.includes("Ambush") &&
     !attackerDef.tags.includes("Sovereign")
@@ -397,35 +431,31 @@ export function calculateBattleNumbers(
 
   // Reactive defense Tags. Crushing Bite reduces only this pool.
   let defenderTagDefenseBonus = 0;
-  if (defenderDef.tags.includes("Shell") || defenderDef.tags.includes("Dermal Armor")) {
+  if (defenderHas("Shell") || defenderHas("Dermal Armor")) {
     defenderOwnReactiveBonus += 1;
     defenderTagDefenseBonus += 1;
-    defenderNotes.push(`${defenderDef.tags.includes("Shell") ? "Shell" : "Dermal Armor"} +1`);
+    defenderNotes.push(`${defenderHas("Shell") ? "Shell" : "Dermal Armor"} +1`);
   }
-  if (defenderDef.tags.includes("Osteoderm")) {
+  if (defenderHas("Osteoderm")) {
     const bonus = 2 * tagEffectMultiplier(defenderDef, "Osteoderm");
     defenderTagDefenseBonus += bonus;
     defenderNotes.push(`Osteoderm +${bonus}`);
   }
-  if (
-    defenderDef.tags.includes("Bastion") &&
-    defenderDef.printedLevel <= 1 &&
-    defender.bastionDefendedTurn !== state.turnNumber
-  ) {
+  if (defenderHas("Bastion") && defenderDef.printedLevel <= 1 && defender.bastionDefendedTurn !== state.turnNumber) {
     const bonus = 2 * tagEffectMultiplier(defenderDef, "Bastion");
     defenderOwnReactiveBonus += bonus;
     defenderTagDefenseBonus += bonus;
     defenderNotes.push(`Bastion +${bonus}`);
   }
   const defenderBastions =
-    defenderDef.printedLevel <= 1
+    defenderDef.printedLevel <= 1 && !defenseIgnored(ignoreDefenses, "Bastion")
       ? adjacentHighBastionCount(state, defenderFound.playerId, defenderFound.laneIndex)
       : 0;
   if (defenderBastions) {
     defenderTagDefenseBonus += defenderBastions;
     defenderNotes.push(`Adjacent Bastion +${defenderBastions}`);
   }
-  if (defenderFound.lane.attachment?.definition.key === "thagomizer") {
+  if (defendingAdaptationKey(defenderFound.lane, ignoreDefenses) === "thagomizer") {
     defenderLevel += 1;
     defenderNotes.push("Thagomizer +1");
   }
@@ -512,12 +542,13 @@ export function calculateBattleCoinPlan(
 ): BattleCoinPlan {
   const attackerDef = attacker.creature.card.definition;
   const defenderDef = defender.creature.card.definition;
+  const ignoreDefenses = huntIgnoresDefenses(state, attacker.playerId, attacker.laneIndex);
   const offensiveCamouflage =
     attacker.lane.attachment?.definition.key === "cryptic-camouflage" &&
     (attackerDef.diet === "Carnivore" || attackerDef.diet === "Omnivore");
   const defensiveCamouflage =
-    defender.lane.attachment?.definition.key === "cryptic-camouflage" && defenderDef.diet === "Herbivore";
-  const nativeElusive = defenderDef.tags.includes("Elusive");
+    defendingAdaptationKey(defender.lane, ignoreDefenses) === "cryptic-camouflage" && defenderDef.diet === "Herbivore";
+  const nativeElusive = defendsWithTag(defenderDef, "Elusive", ignoreDefenses);
   const evasionAvailable = defender.creature.elusiveUsedTurn !== state.turnNumber;
   const evades = evasionAvailable && (nativeElusive || defensiveCamouflage);
 

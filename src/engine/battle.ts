@@ -1,7 +1,10 @@
-import { tagEffectMultiplier } from "../data/cards.ts";
+import { DEFENSIVE_TAGS, tagEffectMultiplier } from "../data/cards.ts";
 import {
   calculateBattleCoinPlan,
   calculateBattleNumbers,
+  defendingAdaptationKey,
+  defendsWithTag,
+  huntIgnoresDefenses,
   createBattlePreview,
   legalAttackTargets,
 } from "./battle-math.ts";
@@ -146,22 +149,20 @@ function tryAutotomy(state: GameState, found: FoundCreature) {
   return true;
 }
 
-function hasLethalThagomizer(found: FoundCreature) {
+function hasLethalThagomizer(found: FoundCreature, ignoreDefenses: boolean) {
   const definition = found.creature.card.definition;
   return (
-    found.lane.attachment?.definition.key === "thagomizer" &&
+    defendingAdaptationKey(found.lane, ignoreDefenses) === "thagomizer" &&
     definition.tags.includes("Armament") &&
     definition.tags.includes("Retaliation")
   );
 }
 
-const HARD_DEFENSE_TAGS = new Set(["Shell", "Osteoderm", "Dermal Armor"]);
-
 function resolveKillTags(state: GameState, killer: FoundCreature, defeated: CreatureInstance) {
   const killerDefinition = killer.creature.card.definition;
   if (
     killerDefinition.tags.includes("Durophagy") &&
-    defeated.definition.tags.some((tag) => HARD_DEFENSE_TAGS.has(tag))
+    defeated.definition.tags.some((tag) => DEFENSIVE_TAGS[tag]?.hard)
   ) {
     const draws = tagEffectMultiplier(killerDefinition, "Durophagy");
     for (let index = 0; index < draws; index += 1) drawOne(state, killer.playerId, "Durophagy");
@@ -237,7 +238,8 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
   );
   const attackerDef = attacker.creature.card.definition;
   const defenderDef = defender.creature.card.definition;
-  if (defenderDef.tags.includes("Bastion") && defenderDef.printedLevel <= 1) {
+  const ignoreDefenses = huntIgnoresDefenses(state, attacker.playerId, attacker.laneIndex);
+  if (defendsWithTag(defenderDef, "Bastion", ignoreDefenses) && defenderDef.printedLevel <= 1) {
     defender.creature.bastionDefendedTurn = state.turnNumber;
   }
   if (pending.origin === "stampede" && attackerDef.tags.includes("Bastion") && attackerDef.printedLevel <= 1) {
@@ -271,8 +273,8 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
   addLog(state, `${attackerName} committed a Hunt against ${defenderName}.`);
 
   if (tied) {
-    const thagomizerKill = hasLethalThagomizer(defender);
-    const retaliationDestroysAttacker = defenderDef.tags.includes("Retaliation") || thagomizerKill;
+    const thagomizerKill = hasLethalThagomizer(defender, ignoreDefenses);
+    const retaliationDestroysAttacker = defendsWithTag(defenderDef, "Retaliation", ignoreDefenses) || thagomizerKill;
     const stampedeRetaliationDestroysDefender =
       pending.origin === "stampede" && attackerDef.tags.includes("Retaliation");
     addLog(state, `${attackerName} ${numbers.attackerLevel} vs. ${defenderName} ${numbers.defenderLevel}: tie.`);
@@ -311,7 +313,7 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
   } else if (numbers.attackerLevel < numbers.defenderLevel) {
     // Shell, Dermal Armor, and Bastion spare a losing attacker that was within the defensive bonus.
     const savedByDefense =
-      !hasLethalThagomizer(defender) &&
+      !hasLethalThagomizer(defender, ignoreDefenses) &&
       numbers.defenderOwnReactiveBonus > 0 &&
       numbers.attackerLevel >= numbers.defenderLevel - numbers.defenderOwnReactiveBonus;
     if (tryAutotomy(state, attacker)) {

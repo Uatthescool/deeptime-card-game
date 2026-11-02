@@ -1,4 +1,4 @@
-import type { ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
+import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
 
 /** Deck 4 is still being designed: it can be inspected, but no player can select it yet. */
 const STATUS = "Not playable · Work in progress" as const;
@@ -200,7 +200,7 @@ export const DECK_4_SHARED_CREATURE_KEYS = [
   "blue-whale",
 ] as const;
 
-/** 12 of the deck's 18 Supports; with its 3 new ones that leaves 3 still to design. */
+/** 12 of the deck's 18 Supports; with its 4 new ones that leaves 2 still to design. */
 export const DECK_4_INHERITED_SUPPORT_KEYS = [
   "wildfire",
   "drought",
@@ -226,7 +226,7 @@ const FEEDBACK_LOOP_NAMES = [
   "The Great Oxidation Event",
 ];
 
-export const DECK_4_NEW_SUPPORTS: (EventCard | ConceptCard)[] = [
+export const DECK_4_NEW_SUPPORTS: (EventCard | AdaptationCard | ConceptCard)[] = [
   {
     key: "ice-age",
     kind: "event",
@@ -260,6 +260,17 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | ConceptCard)[] = [
     ].join("\n\n"),
     note: "Working wording; its effects are not built into the game yet. Snowball Earth, The Great Dying and The Great Oxidation Event aren't cards yet.",
     cardFace: "/card-faces/feedback-loops.webp",
+    status: STATUS,
+  },
+  {
+    key: "echolocation",
+    kind: "adaptation",
+    name: "Echolocation",
+    eligibility: "aerial-or-aquatic-synapsid-carnivore",
+    rules:
+      "Attach only to an Aerial or Aquatic Synapsid Carnivore that isn't a Filter Feeder. When the attached Creature Hunts, ignore the defending Creature's defensive Tags and defensive Adaptations.",
+    note: "Defensive Tags: Shell, Dermal Armor, Osteoderm, Bastion, Retaliation, Elusive, Aerial, Burrower, Deimatic, Gigantic and Cranial Display. Defensive Adaptations: Cryptic Camouflage and Thagomizer. An ignored Tag has no effect during that Hunt, including its survival clause, an adjacent Bastion's bonus and Gigantic's Cold Biome bonus. Semi-Aquatic doesn't count as Aquatic for Adaptations, and Glider doesn't count as Aerial here.",
+    cardFace: "/card-faces/echolocation.webp",
     status: STATUS,
   },
 ];

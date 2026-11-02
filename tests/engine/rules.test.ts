@@ -399,7 +399,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 125);
+  assert.equal(inspectableCards.length, 126);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -480,7 +480,7 @@ test("Deck 4 can be inspected but not selected while it is unfinished", () => {
     [0, 1, 2, 3, 4].map((level) => DECK_4.filter((card) => card.printedLevel === level).length),
     [3, 7, 7, 4, 1],
   );
-  assert.equal(DECK_4_SUPPORTS.length, 15);
+  assert.equal(DECK_4_SUPPORTS.length, 16);
   assert.ok(DECK_4.every((card) => card.taxa.includes("Synapsid")));
   // Its new cards are marked unplayable; the cards it shares keep their own status.
   assert.equal(CARD_LIBRARY.get("mastodon")?.status, "Not playable · Work in progress");
@@ -1530,8 +1530,14 @@ test("Abiogenesis places a Level 0 from hand, preserves the normal Creature play
 });
 
 /** Puts a card from the whole library onto `playerId`'s side, for Creatures outside their deck. */
-function placeLibraryCreature(game: GameState, playerId: PlayerId, lane: number, key: string) {
-  const definition = CARD_LIBRARY.get(key) as CreatureCard;
+function placeLibraryCreature(
+  game: GameState,
+  playerId: PlayerId,
+  lane: number,
+  key: string,
+  overrides: Partial<CreatureCard> = {},
+) {
+  const definition = { ...(CARD_LIBRARY.get(key) as CreatureCard), ...overrides };
   const card: CardInstance = { uid: `${playerId}-library-${key}`, owner: playerId, definition };
   game.players[playerId].lanes[lane].creature = creatureInPlay(card);
   return card;
@@ -2713,4 +2719,115 @@ test("Engulf triggers while defending and Specialized doubles only its Victory b
   game = chooseEngulf(game, true);
   assert.equal(game.players[0].lanes[0].engulfed?.uid, nautilus.card.uid);
   assert.equal(cardVictoryLevel(game, blackSwallower), 2, "Specialized doubles Engulf's +1 Victory bonus to +2");
+});
+
+/** Attaches a library Adaptation to `playerId`'s Creature in `lane`, for Adaptations outside their deck. */
+function attachLibraryAdaptation(game: GameState, playerId: PlayerId, lane: number, key: string) {
+  const definition = CARD_LIBRARY.get(key) as AdaptationCard;
+  const card = { uid: `${playerId}-library-${key}`, owner: playerId, definition };
+  game.players[playerId].lanes[lane].attachment = card;
+  return card;
+}
+
+test("Echolocation attaches only to Aerial or Aquatic Synapsid Carnivores that aren't Filter Feeders", () => {
+  const echolocation = CARD_LIBRARY.get("echolocation") as AdaptationCard;
+  assert.ok(DECK_4_SUPPORTS.includes(echolocation));
+  const eligible = (key: string) => adaptationEligible(echolocation, CARD_LIBRARY.get(key) as CreatureCard);
+  assert.ok(["orca", "livyatan", "basilosaurus"].every(eligible));
+  assert.equal(eligible("blue-whale"), false, "Filter Feeders can't hold it");
+  assert.equal(eligible("pakicetus"), false, "Semi-Aquatic doesn't count as Aquatic for Adaptations");
+  assert.equal(eligible("smilodon"), false, "a land Carnivore can't hold it");
+  assert.equal(eligible("mosasaurus"), false, "an Aquatic reptile can't hold it");
+  assert.equal(eligible("hoatzin"), false, "an Aerial bird can't hold it");
+
+  let game = readyGame(["deck-3", "deck-3"]);
+  placeLibraryCreature(game, 0, 0, "orca");
+  placeLibraryCreature(game, 0, 1, "blue-whale");
+  const card = { uid: "0-hand-echolocation", owner: 0 as PlayerId, definition: echolocation };
+  game.players[0].hand.push(card);
+  assert.deepEqual(legalAdaptationTargets(game, card), [{ playerId: 0, laneIndex: 0 }]);
+  game = playAdaptation(game, card.uid, 0);
+  assert.equal(game.players[0].lanes[0].attachment?.definition.key, "echolocation");
+});
+
+test("Echolocation ignores defensive Battle Level Tags, Retaliation and defensive Adaptations", () => {
+  let game = readyGame(["deck-2", "deck-2"]);
+  game.phase = "battle";
+  game.players[1].biome.key = "temperate";
+  const livyatan = placeLibraryCreature(game, 0, 0, "livyatan");
+  const mammoth = placeLibraryCreature(game, 1, 0, "woolly-mammoth");
+  const glyptodon = placeLibraryCreature(game, 1, 1, "glyptodon");
+  const stegosaurus = placeCreature(game, 1, 2, "stegosaurus");
+  attachAdaptation(game, 1, 2, "thagomizer");
+  const defending = (uid: string) => inspectBattleLevel(game, uid, "defender", livyatan.uid);
+  assert.equal(defending(glyptodon.uid), 3, "Osteoderm adds 2");
+  assert.equal(defending(stegosaurus.card.uid), 4, "Thagomizer adds 1");
+  game.players[1].biome.key = "cold";
+  assert.equal(defending(mammoth.uid), 4, "Gigantic's Cold Biome bonus adds 1");
+
+  attachLibraryAdaptation(game, 0, 0, "echolocation");
+  assert.equal(defending(glyptodon.uid), 1);
+  assert.equal(defending(stegosaurus.card.uid), 3);
+  assert.equal(defending(mammoth.uid), 3);
+
+  // A tie with Woolly Mammoth no longer triggers Retaliation.
+  game.players[1].biome.key = "temperate";
+  game = previewBattle(game, livyatan.uid, mammoth.uid);
+  assert.equal(game.pendingBattle?.attackerLevel, 3);
+  assert.equal(game.pendingBattle?.defenderLevel, 3);
+  game = commitBattle(game);
+  assert.equal(game.players[0].lanes[0].creature?.card.uid, livyatan.uid);
+  assert.equal(game.players[1].lanes[0].creature?.card.uid, mammoth.uid);
+  assert.ok(game.log.some((line) => line.includes("Neither Creature was destroyed")));
+});
+
+test("Echolocation ignores Aerial, Elusive and Cryptic Camouflage evasion", () => {
+  let game = readyGame();
+  game.phase = "battle";
+  const orca = placeLibraryCreature(game, 0, 0, "orca");
+  const hoatzin = placeCreature(game, 1, 0, "hoatzin");
+  attachAdaptation(game, 1, 0, "cryptic-camouflage");
+  game = previewBattle(game, orca.uid, hoatzin.card.uid);
+  assert.equal(game.pendingBattle?.attackerLevel, 1, "Aerial defense takes 1");
+  assert.equal(battleNeedsElusiveFlip(game), true);
+  game = cancelBattlePreview(game);
+
+  attachLibraryAdaptation(game, 0, 0, "echolocation");
+  game = previewBattle(game, orca.uid, hoatzin.card.uid);
+  assert.equal(game.pendingBattle?.attackerLevel, 2);
+  assert.equal(battleNeedsElusiveFlip(game), false);
+  game = commitBattle(game);
+  assert.equal(game.players[1].lanes[0].creature, null);
+
+  // Native Elusive is ignored as well.
+  game = readyGame();
+  game.phase = "battle";
+  const elusiveOrca = placeLibraryCreature(game, 0, 0, "orca", { diet: "Omnivore" });
+  const microraptor = placeCreature(game, 1, 0, "microraptor");
+  microraptor.card.definition = { ...microraptor.card.definition, diet: "Herbivore" };
+  game = previewBattle(game, elusiveOrca.uid, microraptor.card.uid);
+  assert.equal(battleNeedsElusiveFlip(game), true);
+  game = cancelBattlePreview(game);
+  attachLibraryAdaptation(game, 0, 0, "echolocation");
+  game = previewBattle(game, elusiveOrca.uid, microraptor.card.uid);
+  assert.equal(battleNeedsElusiveFlip(game), false);
+});
+
+test("Echolocation Hunts past Burrowed, Deimatic, Cranial Display and Gigantic", () => {
+  const game = readyGame();
+  game.phase = "battle";
+  game.turnNumber = 3;
+  const hunter = placeLibraryCreature(game, 0, 0, "orca", { printedLevel: 1 });
+  const burrowed = placeLibraryCreature(game, 1, 0, "steppe-bison");
+  const deimatic = placeLibraryCreature(game, 1, 1, "castoroides");
+  const deterring = placeLibraryCreature(game, 1, 2, "phiomia");
+  const gigantic = placeLibraryCreature(game, 1, 3, "mastodon");
+  game.players[1].lanes[0].creature!.burrowedUntilTurn = 4;
+  game.players[1].lanes[1].creature!.deimaticProtectedThroughTurn = 4;
+  game.players[0].lanes[0].creature!.attackBarriers.push({ targetUid: deterring.uid, expiresOnTurn: 3 });
+  const protectedUids = [burrowed.uid, deimatic.uid, deterring.uid, gigantic.uid];
+  assert.deepEqual(legalAttackTargets(game, hunter.uid), []);
+
+  attachLibraryAdaptation(game, 0, 0, "echolocation");
+  assert.deepEqual(legalAttackTargets(game, hunter.uid), protectedUids);
 });

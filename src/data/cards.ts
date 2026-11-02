@@ -42,6 +42,30 @@ export const SUPPORTS = IMPLEMENTATION_REGISTER.supports;
 export const TAG_RULES = IMPLEMENTATION_REGISTER.tagRules;
 export const TAG_COMBOS = IMPLEMENTATION_REGISTER.tagCombos;
 
+/** How a defensive Tag protects its Creature while it is Hunted. */
+export type DefenseKind = "battle-level" | "retaliation" | "evasion" | "hunt-eligibility";
+
+/**
+ * Defensive Tags: a behind-the-scenes flag that no card face shows. Echolocation ignores all of them.
+ * Stampede turns the Battle Level and Retaliation kinds into attacks; `hard` marks Durophagy's hard defenses.
+ */
+export const DEFENSIVE_TAGS: Readonly<Record<string, { kind: DefenseKind; hard?: true }>> = {
+  Shell: { kind: "battle-level", hard: true },
+  "Dermal Armor": { kind: "battle-level", hard: true },
+  Osteoderm: { kind: "battle-level", hard: true },
+  Bastion: { kind: "battle-level" },
+  Retaliation: { kind: "retaliation" },
+  Elusive: { kind: "evasion" },
+  Aerial: { kind: "evasion" },
+  Burrower: { kind: "hunt-eligibility" },
+  Deimatic: { kind: "hunt-eligibility" },
+  Gigantic: { kind: "hunt-eligibility" },
+  "Cranial Display": { kind: "hunt-eligibility" },
+};
+
+/** Adaptations that carry the same flag for their defensive effects. */
+export const DEFENSIVE_ADAPTATION_KEYS: ReadonlySet<string> = new Set(["cryptic-camouflage", "thagomizer"]);
+
 /** The Combos on `tag`, each marked active when `card` also has its partner Tag. */
 export function tagCombos(card: CreatureCard, tag: string) {
   const tags = expandedTagNames(card);
@@ -254,6 +278,15 @@ export function validateCardData(): string[] {
     for (const combo of combos) {
       expect(combo.with in TAG_RULES, `The ${tag} Combo names "${combo.with}", which has no Tag rule.`);
     }
+  }
+  for (const tag of Object.keys(DEFENSIVE_TAGS)) {
+    expect(tag in TAG_RULES, `"${tag}" is flagged as defensive but has no Tag rule.`);
+  }
+  for (const key of DEFENSIVE_ADAPTATION_KEYS) {
+    expect(
+      CARD_LIBRARY.get(key)?.kind === "adaptation",
+      `"${key}" is flagged as a defensive Adaptation but isn't an Adaptation.`,
+    );
   }
   expect(unique(DECK_4_DECK), "Deck 4 contains a duplicate card; decks are singleton.");
   expect(DECK_4_DECK.length <= 40, `Deck 4 has ${DECK_4_DECK.length} cards; a deck holds at most 40.`);
