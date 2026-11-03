@@ -10,6 +10,7 @@ import { BiomePregame, OpeningDealOverlay, type PregameState } from "./component
 import { type SetupChoices, SetupScreen } from "./components/SetupScreen.tsx";
 import { TutorialsMenu } from "./components/Tutorials.tsx";
 import { clearSavedGame, loadSavedGame, savedGameSummary } from "./save.ts";
+import { startRecording } from "./watcher.ts";
 
 type Screen =
   | { kind: "setup" }
@@ -91,6 +92,7 @@ export function App() {
             ...(pregame.seed === null ? {} : { seed: pregame.seed }),
             computer: pregame.opponent === "person" ? null : { seat: 1, difficulty: pregame.opponent },
           });
+          startRecording(game, { players: pregame.players, biomes: pregame.choices, decks: pregame.decks });
           setScreen({ kind: "game", game, resumed: false, gameId: game.seed + Date.now() });
           setDeal({ players: pregame.players, decks: pregame.decks, choices: pregame.choices, dealt: 0 });
         }}

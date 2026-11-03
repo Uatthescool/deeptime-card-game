@@ -21,17 +21,27 @@ import {
   actingPlayer,
   applyAction,
   createGame,
-  type GameAction,
   otherPlayer,
   type PlayerId,
   victoryTotals,
 } from "../src/engine/index.ts";
+import {
+  type CardBoardStats,
+  createTracker,
+  emptyBoardStats,
+  type Ending,
+  ending,
+  finishTracking,
+  type GameTracker,
+  trackAction,
+} from "./game-stats.ts";
 
 const REPORTS = "reports";
 const GAMES_FILE = `${REPORTS}/balance-games.jsonl`;
 const SUMMARY_FILE = `${REPORTS}/balance-summary.json`;
 const GAMES_CSV = `${REPORTS}/balance-games.csv`;
 const CARDS_CSV = `${REPORTS}/balance-cards.csv`;
+const CURVE_CSV = `${REPORTS}/balance-victory-curve.csv`;
 const BASE_SEED = 50_000;
 const MAX_STEPS = 6000;
 
@@ -42,8 +52,6 @@ const lockedBiomes = process.argv.includes("--locked-biomes");
 const PAIRINGS = DECK_KEYS.flatMap((north) =>
   DECK_KEYS.filter((south) => !lockedBiomes || south !== north).map((south): [DeckKey, DeckKey] => [north, south]),
 );
-
-type Ending = "victory" | "tipping-point" | "exhaustion" | "forfeit" | "hand-lock" | "concede" | "other" | "unfinished";
 
 export type GameRecord = {
   game: number;
@@ -57,30 +65,10 @@ export type GameRecord = {
   totals: [number, number];
   /** Keys of the cards each player played from hand. */
   played: [string[], string[]];
+  board?: GameTracker["board"];
+  timeline?: GameTracker["timeline"];
   ms: number;
 };
-
-const PLAYS = new Set<GameAction["type"]>([
-  "playCreature",
-  "playAquaticOverride",
-  "playAdaptation",
-  "playEvent",
-  "playWildfire",
-  "playDrought",
-  "playConcept",
-]);
-
-function ending(reason: string | null, finished: boolean, winner: PlayerId | null): Ending {
-  if (!finished) return "unfinished";
-  if (!reason) return "other";
-  if (/reached \d+ Victory Levels/.test(reason)) return "victory";
-  if (/Tipping Point/.test(reason)) return "tipping-point";
-  if (/Both decks ran out/.test(reason)) return "exhaustion";
-  if (/forfeited/.test(reason)) return "forfeit";
-  if (/Hand-Lock/.test(reason)) return "hand-lock";
-  if (/conceded/.test(reason)) return "concede";
-  return winner === null ? "exhaustion" : "other";
-}
 
 /** Game `index` of the run: every ordered deck pairing equally often, Biomes at random unless locked. */
 function configure(index: number) {
@@ -105,7 +93,7 @@ export function playOne(index: number): GameRecord {
   let state = createGame("North", "South", biomes, decks, { seed });
   const first = state.activePlayer;
   const randoms = [aiRandom(seed * 31 + 1), aiRandom(seed * 31 + 2)] as const;
-  const played: [string[], string[]] = [[], []];
+  const tracker = createTracker();
   for (let step = 0; step < MAX_STEPS && state.phase !== "game-over"; step += 1) {
     // A defender may reroll its own coin before the attacker resolves the Hunt.
     const defender = state.pendingBattle?.coins ? otherPlayer(actingPlayer(state)) : null;
@@ -113,12 +101,11 @@ export function playOne(index: number): GameRecord {
     const seat = reroll ? defender! : actingPlayer(state);
     const action = reroll ?? chooseAction(state, seat, { difficulty: "normal", random: randoms[seat] });
     if (!action) break;
-    if (PLAYS.has(action.type) && "cardUid" in action) {
-      const card = state.players[seat].hand.find((entry) => entry.uid === action.cardUid);
-      if (card) played[seat].push(card.definition.key);
-    }
-    state = applyAction(state, action);
+    const next = applyAction(state, action);
+    trackAction(tracker, state, seat, action, next);
+    state = next;
   }
+  finishTracking(tracker, state);
   const finished = state.phase === "game-over";
   return {
     game: index,
@@ -130,7 +117,7 @@ export function playOne(index: number): GameRecord {
     ending: ending(state.winReason, finished, state.winner),
     turns: state.turnNumber,
     totals: victoryTotals(state),
-    played,
+    ...tracker,
     ms: Math.round(performance.now() - started),
   };
 }
@@ -257,7 +244,10 @@ function gamesCsv(records: GameRecord[]) {
 
 /** One row per card in each deck: how often it was played, and how its player fared with and without it. */
 function cardsCsv(records: GameRecord[]) {
-  const stats = new Map<string, { deck: DeckKey; key: string; inDeck: Tally; played: Tally; notPlayed: Tally }>();
+  const stats = new Map<
+    string,
+    { deck: DeckKey; key: string; inDeck: Tally; played: Tally; notPlayed: Tally; board: CardBoardStats }
+  >();
   for (const game of records) {
     if (game.ending === "unfinished") continue;
     for (const seat of [0, 1] as const) {
@@ -266,16 +256,22 @@ function cardsCsv(records: GameRecord[]) {
       const playedHere = new Set(game.played[seat]);
       for (const key of new Set(DECKS[deck].map((card) => card.key))) {
         const id = `${deck}|${key}`;
-        if (!stats.has(id)) stats.set(id, { deck, key, inDeck: tally(), played: tally(), notPlayed: tally() });
+        if (!stats.has(id)) {
+          stats.set(id, { deck, key, inDeck: tally(), played: tally(), notPlayed: tally(), board: emptyBoardStats() });
+        }
         const entry = stats.get(id)!;
         record(entry.inDeck, result);
         record(playedHere.has(key) ? entry.played : entry.notPlayed, result);
+        const line = game.board?.[seat][key];
+        if (line)
+          for (const field of Object.keys(line) as Array<keyof CardBoardStats>) entry.board[field] += line[field];
       }
     }
   }
   const round = (value: number | null) => (value === null ? "" : Math.round(value * 1000) / 1000);
+  const per = (count: number, of: number) => (of ? round(count / of) : "");
   return csv(
-    [...stats.values()].map((entry) => ({
+    [...stats.values()].map(({ board, ...entry }) => ({
       deck: DECK_LABELS[entry.deck],
       card: CARD_LIBRARY.get(entry.key)?.name ?? entry.key,
       kind: CARD_LIBRARY.get(entry.key)?.kind ?? "",
@@ -284,7 +280,56 @@ function cardsCsv(records: GameRecord[]) {
       play_rate: round(entry.played.games / Math.max(1, entry.inDeck.games)),
       win_rate_played: round(rate(entry.played)),
       win_rate_not_played: round(rate(entry.notPlayed)),
+      entered_per_game: per(board.entered, entry.inDeck.games),
+      hunts_per_entry: per(board.hunts, board.entered),
+      hunt_win_rate: per(board.huntWins, board.hunts),
+      hunted_per_entry: per(board.hunted, board.entered),
+      survived_hunt_rate: per(board.survivedHunts, board.hunted),
+      lost_to_hunt: per(board.lostToHunt, board.entered),
+      lost_hunting: per(board.lostHunting, board.entered),
+      lost_to_override: per(board.lostToOverride, board.entered),
+      lost_to_effect: per(board.lostToEffect, board.entered),
+      turns_in_play_per_entry: per(board.turnsInPlay, board.entered),
+      ended_in_play_per_entry: per(board.endedInPlay, board.entered),
+      final_victory_when_ended_in_play: per(board.finalVictory, board.endedInPlay),
     })),
+  );
+}
+
+/** Each deck's average Victory total and Creature count at the end of each turn, for games still going. */
+function curveCsv(records: GameRecord[]) {
+  const sums = new Map<
+    string,
+    { deck: DeckKey; turn: number; games: number; victory: number; creatures: number; wins: number }
+  >();
+  for (const game of records) {
+    if (game.ending === "unfinished") continue;
+    for (const point of game.timeline ?? []) {
+      for (const seat of [0, 1] as const) {
+        const deck = game.decks[seat];
+        if (deck === game.decks[otherPlayer(seat)]) continue;
+        const id = `${deck}|${point.turn}`;
+        if (!sums.has(id)) sums.set(id, { deck, turn: point.turn, games: 0, victory: 0, creatures: 0, wins: 0 });
+        const entry = sums.get(id)!;
+        entry.games += 1;
+        entry.victory += point.victory[seat];
+        entry.creatures += point.creatures[seat];
+        if (game.winner === seat) entry.wins += 1;
+      }
+    }
+  }
+  const round = (value: number) => Math.round(value * 100) / 100;
+  return csv(
+    [...sums.values()]
+      .sort((a, b) => a.deck.localeCompare(b.deck) || a.turn - b.turn)
+      .map((entry) => ({
+        deck: DECK_LABELS[entry.deck],
+        turn: entry.turn,
+        games_still_going: entry.games,
+        average_victory: round(entry.victory / entry.games),
+        average_creatures: round(entry.creatures / entry.games),
+        eventual_win_rate: round(entry.wins / entry.games),
+      })),
   );
 }
 
@@ -293,6 +338,7 @@ function writeReports(records: GameRecord[]) {
   writeFileSync(SUMMARY_FILE, JSON.stringify(summary, null, 2));
   writeFileSync(GAMES_CSV, gamesCsv(records));
   writeFileSync(CARDS_CSV, cardsCsv(records));
+  writeFileSync(CURVE_CSV, curveCsv(records));
   return summary;
 }
 

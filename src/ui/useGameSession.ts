@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { applyAction, checkInvariants, type DrawEvent, type GameAction, type GameState } from "../engine/index.ts";
 import { saveGame } from "./save.ts";
+import { recordAction } from "./watcher.ts";
 
 const DRAW_ANIMATION_MS = 680;
 
@@ -17,35 +18,39 @@ export function useGameSession(initial: GameState, { persist = true }: { persist
   // Genetic Drift's mandatory discard resolves before its five draws animate.
   const deferredDraws = useRef<DrawEvent[]>([]);
 
-  const dispatch = useCallback((action: GameAction) => {
-    const current = gameRef.current;
-    const next = applyAction(current, action);
+  const dispatch = useCallback(
+    (action: GameAction) => {
+      const current = gameRef.current;
+      const next = applyAction(current, action);
 
-    if (import.meta.env.DEV) {
-      const problems = checkInvariants(next);
-      if (problems.length) console.error("Game invariant violated after", action, problems);
-    }
+      if (import.meta.env.DEV) {
+        const problems = checkInvariants(next);
+        if (problems.length) console.error("Game invariant violated after", action, problems);
+      }
 
-    const latestDrawId = current.drawEvents.at(-1)?.id ?? 0;
-    const newDraws = next.drawEvents.filter((event) => event.id > latestDrawId);
-    const driftPending = next.pendingConceptChoice?.kind === "genetic-drift-discard";
-    if (newDraws.length) {
-      if (driftPending) deferredDraws.current.push(...newDraws);
-      else setDrawQueue((queue) => [...queue, ...newDraws]);
-    }
-    if (
-      current.pendingConceptChoice?.kind === "genetic-drift-discard" &&
-      !driftPending &&
-      deferredDraws.current.length
-    ) {
-      const released = deferredDraws.current;
-      deferredDraws.current = [];
-      setDrawQueue((queue) => [...queue, ...released]);
-    }
+      const latestDrawId = current.drawEvents.at(-1)?.id ?? 0;
+      const newDraws = next.drawEvents.filter((event) => event.id > latestDrawId);
+      const driftPending = next.pendingConceptChoice?.kind === "genetic-drift-discard";
+      if (newDraws.length) {
+        if (driftPending) deferredDraws.current.push(...newDraws);
+        else setDrawQueue((queue) => [...queue, ...newDraws]);
+      }
+      if (
+        current.pendingConceptChoice?.kind === "genetic-drift-discard" &&
+        !driftPending &&
+        deferredDraws.current.length
+      ) {
+        const released = deferredDraws.current;
+        deferredDraws.current = [];
+        setDrawQueue((queue) => [...queue, ...released]);
+      }
 
-    gameRef.current = next;
-    setGame(next);
-  }, []);
+      if (persist) recordAction(current, action, next);
+      gameRef.current = next;
+      setGame(next);
+    },
+    [persist],
+  );
 
   useEffect(() => {
     if (!drawQueue.length) return;

@@ -20,6 +20,7 @@
     "check": "npm run typecheck && npm run lint && npm run test",
     "playtest": "vite-node tools/playtest.ts",
     "balance": "vite-node tools/balance.ts",
+    "playlog": "vite-node tools/playlog.ts",
     "images": "vite-node tools/optimize-images.ts"
   },
   "dependencies": {

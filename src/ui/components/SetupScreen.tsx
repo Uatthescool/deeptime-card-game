@@ -12,6 +12,7 @@ import { DIFFICULTY_NAMES } from "../../ai/ai.ts";
 import { type Difficulty, parseSeedLabel } from "../../engine/index.ts";
 import type { SavedGameSummary } from "../save.ts";
 import { CardFace } from "./CardFace.tsx";
+import { WatcherPanel } from "./WatcherPanel.tsx";
 
 /** Who plays the second seat: another person at the same device, or the computer at a difficulty. */
 export type Opponent = "person" | Difficulty;
@@ -207,6 +208,7 @@ export function SetupScreen({
             Artwork credits
           </button>
         </div>
+        <WatcherPanel />
       </section>
       <aside className="sample-card-wrap" aria-hidden="true">
         {featured && <CardFace card={featured} />}

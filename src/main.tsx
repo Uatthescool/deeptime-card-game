@@ -5,6 +5,9 @@ import "./styles/reset.css";
 import "./styles/app.css";
 import { App } from "./ui/App.tsx";
 import { ErrorBoundary } from "./ui/components/ErrorBoundary.tsx";
+import { applyWatcherSwitch } from "./ui/watcher.ts";
+
+applyWatcherSwitch();
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element.");
