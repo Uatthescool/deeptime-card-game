@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { BIOMES, type BiomeKey } from "../data/biomes.ts";
+import type { BiomeKey } from "../data/biomes.ts";
+import { deckBiome } from "../data/cards.ts";
 import { createGame, type GameState } from "../engine/index.ts";
 import { Credits } from "./components/Credits.tsx";
 import { DeckBrowser } from "./components/DeckBrowser.tsx";
 import { GameScreen } from "./components/GameScreen.tsx";
 import { LessonExperience } from "./components/Lesson.tsx";
-import { BiomePregame, OpeningDealOverlay, type PregameState } from "./components/Pregame.tsx";
+import { BiomeReveal, OpeningDealOverlay, type PregameState } from "./components/Pregame.tsx";
 import { type SetupChoices, SetupScreen } from "./components/SetupScreen.tsx";
 import { TutorialsMenu } from "./components/Tutorials.tsx";
 import { clearSavedGame, loadSavedGame, savedGameSummary } from "./save.ts";
@@ -19,12 +20,7 @@ type Screen =
 
 type Overlay = "cards" | "lesson" | "credits" | "tutorials" | null;
 
-type OpeningDeal = {
-  players: [string, string];
-  decks: PregameState["decks"];
-  choices: [BiomeKey | null, BiomeKey | null];
-  dealt: number;
-};
+type OpeningDeal = { players: [string, string]; decks: PregameState["decks"]; dealt: number };
 
 const OPENING_CARDS = 10;
 
@@ -59,42 +55,26 @@ export function App() {
     return (
       <>
         <GameScreen key={screen.gameId} initialGame={screen.game} resumed={screen.resumed} onExit={toSetup} />
-        {deal && (
-          <OpeningDealOverlay players={deal.players} decks={deal.decks} choices={deal.choices} dealt={deal.dealt} />
-        )}
+        {deal && <OpeningDealOverlay players={deal.players} decks={deal.decks} dealt={deal.dealt} />}
       </>
     );
   }
 
   if (screen.kind === "pregame") {
     const pregame = screen.pregame;
-    const update = (next: Partial<PregameState>) => setScreen({ kind: "pregame", pregame: { ...pregame, ...next } });
     return (
-      <BiomePregame
+      <BiomeReveal
         state={pregame}
-        onSelect={(biome) => update({ selected: biome })}
-        onConfirm={() => {
-          if (!pregame.selected) return;
-          const picked: PregameState["choices"] = [...pregame.choices];
-          picked[pregame.chooser] = pregame.selected;
-          if (pregame.opponent !== "person") {
-            // The computer picks its Biome sight unseen, as a second person would.
-            picked[1] = BIOMES[Math.floor(Math.random() * BIOMES.length)]!.key;
-            update({ choices: picked, selected: null, stage: "reveal" });
-            return;
-          }
-          update({ choices: picked, selected: null, stage: pregame.chooser === 0 ? "handoff" : "reveal" });
-        }}
-        onContinue={() => update({ chooser: 1, selected: null, stage: "select" })}
         onBack={toSetup}
         onDeal={() => {
-          const game = createGame(pregame.players[0], pregame.players[1], pregame.choices, pregame.decks, {
+          const biomes: [BiomeKey, BiomeKey] = [deckBiome(pregame.decks[0]), deckBiome(pregame.decks[1])];
+          const game = createGame(pregame.players[0], pregame.players[1], biomes, pregame.decks, {
             ...(pregame.seed === null ? {} : { seed: pregame.seed }),
             computer: pregame.opponent === "person" ? null : { seat: 1, difficulty: pregame.opponent },
           });
-          startRecording(game, { players: pregame.players, biomes: pregame.choices, decks: pregame.decks });
+          startRecording(game, { players: pregame.players, biomes, decks: pregame.decks });
           setScreen({ kind: "game", game, resumed: false, gameId: game.seed + Date.now() });
-          setDeal({ players: pregame.players, decks: pregame.decks, choices: pregame.choices, dealt: 0 });
+          setDeal({ players: pregame.players, decks: pregame.decks, dealt: 0 });
         }}
       />
     );
@@ -107,10 +87,7 @@ export function App() {
         savedGame={savedGame}
         onStart={(next) => {
           setChoices(next);
-          setScreen({
-            kind: "pregame",
-            pregame: { ...next, chooser: 0, choices: [null, null], selected: null, stage: "select" },
-          });
+          setScreen({ kind: "pregame", pregame: next });
         }}
         onResume={() => {
           const game = loadSavedGame();

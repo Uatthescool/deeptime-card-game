@@ -64,7 +64,8 @@ test("the watcher is off and hidden unless switched on from the address", () => 
   expect(window.location.search).toBe("");
 });
 
-test("a recorded game replays to exactly the same ending", () => {
+// A whole game is played, which can take a while when the simulation suites are using every core.
+test("a recorded game replays to exactly the same ending", { timeout: 120_000 }, () => {
   window.history.replaceState(null, "", "/?watcher=on");
   applyWatcherSwitch();
   // Games without a computer opponent are never recorded.

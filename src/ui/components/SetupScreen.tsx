@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { biomeByKey } from "../../data/biomes.ts";
 import {
   CARD_LIBRARY,
   DECK_INFO,
@@ -158,6 +159,10 @@ export function SetupScreen({
                     </option>
                   ))}
                 </select>
+                <small className="deck-biome">
+                  Biome: {biomeByKey(DECK_INFO[decks[index]].biome).name} ·{" "}
+                  {biomeByKey(DECK_INFO[decks[index]].biome).abilityName}
+                </small>
                 <small className="deck-summary">{DECK_INFO[decks[index]].summary}</small>
               </label>
             ))}
@@ -202,7 +207,7 @@ export function SetupScreen({
         <div className="setup-foot">
           <span>Created by Merrick McMorris</span>
           <span>{vsComputer ? "1 player vs. the computer" : "2 players · one device"}</span>
-          <span>Choose any 40-card deck independently</span>
+          <span>Each deck plays in its own Biome</span>
           <span>{vsComputer ? "The computer never sees your hand" : "Hands hidden on handoff"}</span>
           <button className="link-button" type="button" onClick={onCredits}>
             Artwork credits

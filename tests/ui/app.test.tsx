@@ -29,18 +29,19 @@ afterEach(() => {
 });
 
 async function dealGame(user: ReturnType<typeof userEvent.setup>) {
+  await user.selectOptions(screen.getByRole("combobox", { name: "Player two deck" }), "deck-2");
   await user.click(screen.getByRole("button", { name: "Play Now" }));
-  await user.click(screen.getByRole("button", { name: "Choose Tropical" }));
-  await user.click(screen.getByRole("button", { name: "Confirm selection" }));
-  await user.click(screen.getByRole("button", { name: /choose my Biome/ }));
-  await user.click(screen.getByRole("button", { name: "Choose Cold" }));
-  await user.click(screen.getByRole("button", { name: "Confirm selection" }));
+  // Each deck brings its own Biome, so there is nothing to pick: Deck 1 plays in Arid, Deck 2 in Tropical.
+  expect(screen.getByText("The ecosystems are set.")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Arid" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Tropical" })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /^Choose / })).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Draw opening hands" }));
   await act(() => vi.runAllTimersAsync());
 }
 
 describe("App", () => {
-  test("setup, private Biome selection, deal, and handoff lead to a playable hand", async () => {
+  test("setup, the Biome reveal, deal, and handoff lead to a playable hand", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<App />);
@@ -118,7 +119,7 @@ describe("App", () => {
     expect(screen.getByRole("button", { name: /Anatomy of a card/ })).toHaveTextContent("✓ Done");
   });
 
-  test("the table tutorial walks the Biome choice and a staged board without touching a saved game", async () => {
+  test("the table tutorial walks the Biome reveal and a staged board without touching a saved game", async () => {
     const saved = applyAction(createGame("A", "B", [null, null], ["deck-1", "deck-2"], { seed: 9 }), {
       type: "acknowledgeHandoff",
     });
@@ -318,15 +319,13 @@ async function letComputerPlay() {
 }
 
 describe("against the computer", () => {
-  test("setup to first move: the computer picks its own Biome and nobody passes the device", async () => {
+  test("setup to first move: both decks play in their own Biomes and nobody passes the device", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<App />);
     await user.click(screen.getByRole("radio", { name: /Computer · Easy/ }));
     await user.click(screen.getByRole("button", { name: "Play Now" }));
-    // Cold: no start-of-turn choice for the person, so play runs straight to their Development Phase.
-    await user.click(screen.getByRole("button", { name: "Choose Cold" }));
-    await user.click(screen.getByRole("button", { name: "Confirm selection" }));
+    // Arid: no start-of-turn choice for the person, so play runs straight to their Development Phase.
     expect(screen.getByText("The ecosystems are set.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Draw opening hands" }));
     await letComputerPlay();
@@ -337,6 +336,7 @@ describe("against the computer", () => {
     expect(screen.getByText(/Player One’s (Development|Battle) Phase/)).toBeInTheDocument();
     expect(screen.queryByText("Private hand sealed for handoff")).not.toBeInTheDocument();
     expect(loadSavedGame()?.computer).toEqual({ seat: 1, difficulty: "easy" });
+    expect(loadSavedGame()?.players.map((player) => player.biome.key)).toEqual(["arid", "arid"]);
   });
 
   test("on the computer's turn the person can watch but not move", async () => {

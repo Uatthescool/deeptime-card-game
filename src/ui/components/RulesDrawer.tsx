@@ -1,5 +1,14 @@
-import { BIOMES } from "../../data/biomes.ts";
-import { IMPLEMENTATION_REGISTER, TAG_COMBOS, TAG_RULES } from "../../data/cards.ts";
+import { biomeByKey, BIOMES } from "../../data/biomes.ts";
+import { DECK_INFO, DECK_KEYS, IMPLEMENTATION_REGISTER, TAG_COMBOS, TAG_RULES } from "../../data/cards.ts";
+
+/** "Deck 1 plays in Arid, Deck 2 in Tropical and Deck 3 in Aquatic", from the deck data. */
+const DECK_BIOME_LIST = DECK_KEYS.map(
+  (key, index) =>
+    `Deck ${DECK_INFO[key].number}${index === 0 ? " plays" : ""} in ${biomeByKey(DECK_INFO[key].biome).name}`,
+).reduce(
+  (list, entry, index, all) => (index === 0 ? entry : `${list}${index === all.length - 1 ? " and" : ","} ${entry}`),
+  "",
+);
 
 export function RulesDrawer({ onClose }: { onClose: () => void }) {
   return (
@@ -41,8 +50,8 @@ export function RulesDrawer({ onClose }: { onClose: () => void }) {
       <section>
         <h3>Biomes</h3>
         <p>
-          Each player privately chooses a Biome before opening hands are dealt. Both choices are then revealed and
-          remain active for the entire game.
+          Each deck comes with its own Biome: {DECK_BIOME_LIST}. Both players’ Biomes are shown before opening hands are
+          dealt and stay active for the entire game.
         </p>
         <dl className="tag-glossary">
           {BIOMES.map((biome) => (

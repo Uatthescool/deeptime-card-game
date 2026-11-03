@@ -1,12 +1,12 @@
 import { applyAction, createGame, type GameState } from "../engine/index.ts";
 
 /**
- * A real game, staged: Player Two (Aquatic) went first and filled a Niche, and it is now Player One’s (Temperate) second
+ * A real game, staged: Player Two (Deck 3, Aquatic) went first and filled a Niche, and it is now Player One’s (Deck 1, Arid) second
  * turn, just after their Start Phase draw. The first seed that stages cleanly is used, so it is the same every time.
  */
 export function boardTutorialGame(): GameState {
   for (let seed = 1; seed < 1000; seed += 1) {
-    let game = createGame("Player One", "Player Two", ["temperate", "aquatic"], ["deck-1", "deck-1"], { seed });
+    let game = createGame("Player One", "Player Two", ["arid", "aquatic"], ["deck-1", "deck-3"], { seed });
     if (game.activePlayer !== 1) continue;
     game = applyAction(game, { type: "acknowledgeHandoff" });
     const starter = game.players[1].hand.find(

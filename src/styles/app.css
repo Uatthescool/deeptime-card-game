@@ -1194,6 +1194,18 @@ button:disabled {
   display: grid;
   align-content: center;
 }
+.biome-reveal-seat {
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+}
+.biome-reveal-seat > small {
+  color: #dca456;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
 .biome-reveal-grid {
   width: min(940px, 100%);
   margin: 1.5rem auto;
@@ -4232,6 +4244,12 @@ button:disabled {
   .biome-selection-footer .primary-button {
     width: 100%;
   }
+  .biome-footer-actions {
+    flex-direction: column-reverse;
+  }
+  .biome-footer-actions button {
+    min-width: 0;
+  }
   .biome-reveal-grid {
     grid-template-columns: 1fr;
   }
@@ -4577,6 +4595,12 @@ button.event-slot small {
   color: #c9b089;
 }
 
+.deck-biome {
+  color: #dca456;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
 .deck-summary {
   color: #93a298;
   font-size: 0.68rem;

@@ -15,7 +15,7 @@ import { boardTutorialGame } from "../tutorialGames.ts";
 import { FaceArtCredit } from "./CardFace.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { GameScreen, type MobileView } from "./GameScreen.tsx";
-import { BiomePregame } from "./Pregame.tsx";
+import { BiomeReveal } from "./Pregame.tsx";
 
 const DONE_KEY = "pcg.tutorials.done";
 
@@ -130,7 +130,7 @@ export function TutorialPlayer({
     <Dialog label={`Tutorial: ${tutorial.title}`} className="tutorial-player">
       <div className={`tutorial-scene scene-${scene}`} ref={sceneRef}>
         {scene === "card-anatomy" && <CardAnatomyScene />}
-        {scene === "biome-choice" && <BiomeChoiceScene />}
+        {scene === "biome-reveal" && <BiomeRevealScene />}
         {scene === "board" && <BoardScene view={phone ? (written.phone?.view ?? "board") : undefined} />}
       </div>
       <Spotlight
@@ -361,24 +361,12 @@ function CardAnatomyScene() {
   );
 }
 
-/** The Biome choice screen as a player first sees it, with Temperate picked. */
-function BiomeChoiceScene() {
+/** The screen before the deal, showing Deck 1 in Arid against Deck 3 in Aquatic. */
+function BiomeRevealScene() {
   const noop = () => {};
   return (
-    <BiomePregame
-      state={{
-        players: ["Player One", "Player Two"],
-        decks: ["deck-1", "deck-1"],
-        seed: null,
-        opponent: "person",
-        chooser: 0,
-        choices: [null, null],
-        selected: "temperate",
-        stage: "select",
-      }}
-      onSelect={noop}
-      onConfirm={noop}
-      onContinue={noop}
+    <BiomeReveal
+      state={{ players: ["Player One", "Player Two"], decks: ["deck-1", "deck-3"], seed: null, opponent: "person" }}
       onDeal={noop}
       onBack={noop}
     />

@@ -20,6 +20,7 @@ import {
   DECK_4_UNIQUE_KEYS,
 } from "./deck-4.ts";
 import { GENERAL_POOL_CANDIDATES } from "./general-pool.ts";
+import type { BiomeKey } from "./biomes.ts";
 import type { CardDefinition, CreatureCard, DeckKey, ImplementationRegister, SupportCard } from "./types.ts";
 
 export * from "./types.ts";
@@ -119,23 +120,30 @@ export const DECKS: Record<DeckKey, CardDefinition[]> = {
 
 export const DECK_KEYS = Object.keys(DECKS) as DeckKey[];
 
-export const DECK_INFO: Record<DeckKey, { number: number; name: string; summary: string }> = {
+/** Each deck is played in its own Biome. */
+export const DECK_INFO: Record<DeckKey, { number: number; name: string; summary: string; biome: BiomeKey }> = {
   "deck-1": {
     number: 1,
     name: "Theropod Predators",
     summary: "Carnivore board control built around Apex Predators and decisive Hunts.",
+    biome: "arid",
   },
   "deck-2": {
     number: 2,
     name: "Herbivore Development",
     summary: "Armored Herbivores that develop the board and grow toward Dreadnoughtus.",
+    biome: "tropical",
   },
   "deck-3": {
     number: 3,
     name: "Aquatic Carnivores",
     summary: "Marine hunters that use the closed Aquatic override ecosystem.",
+    biome: "aquatic",
   },
 };
+
+/** The Biome a deck is always played in. */
+export const deckBiome = (deck: DeckKey): BiomeKey => DECK_INFO[deck].biome;
 
 export const DECK_LABELS: Record<DeckKey, string> = Object.fromEntries(
   DECK_KEYS.map((key) => [key, `Deck ${DECK_INFO[key].number} · ${DECK_INFO[key].name}`]),

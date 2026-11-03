@@ -8,8 +8,8 @@ export type TutorialGroup = "science" | "play";
 /** A paragraph, or a term with its explanation (shown as a list). */
 export type TutorialCopy = string | { term: string; text: string };
 
-/** What a tutorial plays over: a card, the Biome choice screen, or a staged game board. */
-export type TutorialScene = "card-anatomy" | "biome-choice" | "board";
+/** What a tutorial plays over: a card, the Biomes shown before the deal, or a staged game board. */
+export type TutorialScene = "card-anatomy" | "biome-reveal" | "board";
 
 export type TutorialStep = {
   /** The lit part: a `data-tutorial-target` name, or names separated by spaces for a part inside another part. */
@@ -180,30 +180,28 @@ export const TUTORIALS: TutorialDefinition[] = [
     scene: "board",
     steps: [
       {
-        scene: "biome-choice",
+        scene: "biome-reveal",
         target: "biome-grid",
-        title: "Choose your Biome",
+        title: "Your deck’s Biome",
         body: [
-          "Before any cards are dealt, each player secretly chooses one of five Biomes. Yours changes the rules on your side of the table for the whole game.",
+          "Every deck comes with its own Biome. Yours changes the rules on your side of the table for the whole game.",
+          "Before any cards are dealt, both players’ Biomes are shown side by side.",
         ],
       },
       {
-        scene: "biome-choice",
-        target: "biome-temperate",
+        scene: "biome-reveal",
+        target: "biome-arid",
         title: "Reading a Biome",
         body: [
           "Each Biome lists the real environments it stands for, its ability, and the science behind that ability.",
-          "Temperate’s Seasonal Cycle, for example, gives you four Season counters. Once per turn, after you flip a coin, you may spend one to flip that coin again.",
+          "Arid’s Tipping Point, for example, wins you the game at the start of your turn from Turn 26 onward if you have 10 or more Victory Levels and your opponent controls no Creatures.",
         ],
       },
       {
-        scene: "biome-choice",
-        target: "biome-confirm",
-        title: "Lock it in",
-        body: [
-          "Confirm your choice. With two players on one device, you then pass it over so the other player can choose in private. Against the computer, it chooses without seeing yours.",
-          "Both Biomes are revealed together, and then the opening hands are dealt.",
-        ],
+        scene: "biome-reveal",
+        target: "biome-deal",
+        title: "The deal",
+        body: ["Once both players have read the Biomes, draw the opening hands."],
       },
       {
         target: "table",
@@ -217,8 +215,8 @@ export const TUTORIALS: TutorialDefinition[] = [
         target: "player-half",
         title: "Your Biome, on the board",
         body: [
-          "Each half of the table shows its owner’s Biome as a landscape behind the Niches. Yours is Temperate woodland; your opponent’s is Aquatic.",
-          "The badge beside each player’s name says which Biome they chose.",
+          "Each half of the table shows its owner’s Biome as a landscape behind the Niches. Yours is Arid; your opponent’s is Aquatic.",
+          "The badge beside each player’s name says which Biome they are playing in.",
         ],
       },
       {
@@ -226,7 +224,7 @@ export const TUTORIALS: TutorialDefinition[] = [
         phone: { view: "hand" },
         title: "Your Biome’s status",
         body: [
-          "Your Biome’s ability and how much of it is left are shown here: for Temperate, how many Season counters remain.",
+          "Your Biome’s ability is summed up here, along with anything it has left to use, such as Temperate’s Season counters.",
           "Biomes with an ability you use by choice, such as Aquatic, put its buttons here too.",
         ],
       },
