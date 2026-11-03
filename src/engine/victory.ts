@@ -2,9 +2,9 @@ import { type CreatureCard, tagEffectMultiplier } from "../data/cards.ts";
 import {
   activeCambrianExplosions,
   addLog,
-  allCreatures,
   effectiveHasTag,
   findCreature,
+  nicheIsFrozen,
   otherPlayer,
   VICTORY_THRESHOLD,
 } from "./core.ts";
@@ -17,11 +17,13 @@ function isStegosaur(definition: CreatureCard) {
 /** The Victory Levels a Creature in play currently contributes. */
 export function cardVictoryLevel(state: GameState, creature: CreatureInPlay) {
   const definition = creature.card.definition;
+  const found = findCreature(state, creature.card.uid);
+  if (found && nicheIsFrozen(found.lane)) return 0;
   let value = definition.printedLevel;
   if (definition.tags.includes("Apex Predator")) {
-    const apexCount = allCreatures(state).filter((entry) =>
-      entry.card.definition.tags.includes("Apex Predator"),
-    ).length;
+    const apexCount = state.players
+      .flatMap((player) => player.lanes)
+      .filter((lane) => !nicheIsFrozen(lane) && lane.creature?.card.definition.tags.includes("Apex Predator")).length;
     const otherApexPredators = Math.max(0, apexCount - 1);
     const protectedDecrease = definition.tags.includes("Spinal Sail")
       ? Math.max(0, otherApexPredators - 1)
@@ -31,7 +33,6 @@ export function cardVictoryLevel(state: GameState, creature: CreatureInPlay) {
   if (effectiveHasTag(definition, "Gigantic")) value += tagEffectMultiplier(definition, "Gigantic");
   if (definition.printedLevel === 0) value += activeCambrianExplosions(state);
 
-  const found = findCreature(state, creature.card.uid);
   if (found?.lane.engulfed) value += tagEffectMultiplier(definition, "Engulf");
   if (found?.lane.attachment?.definition.key === "thagomizer" && isStegosaur(definition)) value += 1;
   if (found?.lane.attachment?.definition.key === "island-dwarfism") {

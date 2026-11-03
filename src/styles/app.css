@@ -1629,6 +1629,27 @@ button:disabled {
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
+.niche-lane.frozen {
+  position: relative;
+  outline: 2px solid rgba(160, 214, 240, 0.7);
+  outline-offset: -2px;
+  border-radius: 0.6rem;
+  background: rgba(160, 214, 240, 0.08);
+}
+.frozen-tag {
+  position: absolute;
+  z-index: 2;
+  top: 0.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2rem;
+  padding: 0.15rem 0.5rem;
+  background: #a0d6f0;
+  color: #10303f;
+  font-size: 0.55rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
 .empty-niche.lane-locked {
   border-style: solid;
   border-color: #b65a34;
@@ -3742,6 +3763,57 @@ button:disabled {
     serif;
   letter-spacing: 0.1em;
 }
+.great-dying-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0;
+  max-height: 55vh;
+  overflow-y: auto;
+  color: #f0e9dc;
+}
+.great-dying-result {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.7rem;
+  padding: 0.6rem 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+.great-dying-result small {
+  color: #b9c3bb;
+  font-size: 0.6rem;
+}
+.great-dying-result b {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.great-dying-result.survived {
+  border-color: rgba(236, 92, 75, 0.7);
+}
+.great-dying-result.lost {
+  opacity: 0.62;
+}
+.great-dying-result .coin-row {
+  gap: 0.3rem;
+}
+.elusive-coin.mini-coin {
+  --coin-lift: -6px;
+  width: 34px;
+  height: 34px;
+}
+.mini-coin .coin-face {
+  border-width: 3px;
+}
+.mini-coin .rex-mark {
+  font-size: 0.5rem;
+}
+.mini-coin .black-face span {
+  font-size: 0.32rem;
+}
 .elusive-coin.flipping {
   animation: coinFlip 850ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
@@ -3756,7 +3828,7 @@ button:disabled {
     transform: rotateY(0deg) translateY(0);
   }
   45% {
-    transform: rotateY(900deg) translateY(-25px);
+    transform: rotateY(900deg) translateY(var(--coin-lift, -25px));
   }
   to {
     transform: rotateY(1800deg) translateY(0);
@@ -3770,7 +3842,7 @@ button:disabled {
     transform: rotateY(0deg) translateY(0);
   }
   45% {
-    transform: rotateY(990deg) translateY(-25px);
+    transform: rotateY(990deg) translateY(var(--coin-lift, -25px));
   }
   to {
     transform: rotateY(1980deg) translateY(0);

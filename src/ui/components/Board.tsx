@@ -2,6 +2,7 @@ import {
   cardVictoryLevel,
   type CreatureInPlay,
   type GameState,
+  nicheIsFrozen,
   nicheIsLocked,
   type PlayerId,
 } from "../../engine/index.ts";
@@ -125,6 +126,7 @@ export function NicheLane({
   const player = game.players[playerId];
   const lane = player.lanes[laneIndex]!;
   const locked = nicheIsLocked(game, playerId, laneIndex);
+  const frozen = nicheIsFrozen(lane);
   const niche = laneIndex + 1;
 
   let content;
@@ -197,8 +199,16 @@ export function NicheLane({
         onClick={onLaneClick}
         aria-label={`${opponentRow ? "Opponent" : "Your"} Niche ${niche}${locked ? ", locked" : ", empty"}${highlighted ? ", available" : ""}`}
       >
-        <span>{locked ? (lane.drought ? "Drought" : "Wildfire") : `Niche ${niche}`}</span>
-        <small>{locked ? (lane.drought ? "Niche locked" : "Lane locked") : "Empty"}</small>
+        <span>{locked ? (frozen ? "Frozen" : lane.drought ? "Drought" : "Wildfire") : `Niche ${niche}`}</span>
+        <small>
+          {locked
+            ? frozen
+              ? `Through Turn ${lane.frozenUntilTurn}`
+              : lane.drought
+                ? "Niche locked"
+                : "Lane locked"
+            : "Empty"}
+        </small>
       </button>
     );
   }
@@ -219,14 +229,17 @@ export function NicheLane({
     : lane.engulfed
       ? `Engulfed · ${lane.engulfed.definition.name}`
       : locked
-        ? lane.drought
-          ? "Niche locked"
-          : "Lane locked"
+        ? frozen
+          ? "Frozen"
+          : lane.drought
+            ? "Niche locked"
+            : "Lane locked"
         : "Adaptation";
   const slotClass = `adaptation-slot ${slotTarget ? "occupied" : ""} ${lane.engulfed ? "engulfed" : ""} ${locked ? "lane-locked" : ""}`;
 
   return (
-    <div className="niche-lane" onMouseEnter={onExplain} onFocusCapture={onExplain}>
+    <div className={`niche-lane ${frozen ? "frozen" : ""}`} onMouseEnter={onExplain} onFocusCapture={onExplain}>
+      {frozen && lane.creature && <span className="frozen-tag">Frozen through Turn {lane.frozenUntilTurn}</span>}
       {badge && (
         <span className={`lane-badge ${badge.tone}`}>
           <span className="sr-only">Niche {niche}: </span>

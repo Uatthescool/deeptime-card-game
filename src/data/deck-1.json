@@ -227,7 +227,7 @@
     "Aquatic": "This Creature can override, or be overridden by, only a Creature that counts as Aquatic. When the occupied Creature has Aquatic, the two Creatures' Primary Taxa count as matching; if those Taxa already match, Aquatic supplies the Tag category instead.",
     "Propulsion": "After the normal Creature play, this Creature may be played into a second empty Niche as the extra Creature play; doing so ends the Development Phase.",
     "Opportunist": "After your normal Creature play, if your opponent controls a Continuous Event, you may play this Creature from your hand as your extra Creature play. It may fill an empty Niche; if it is Level 1 or Level 2, it may instead perform a legal override. Normal placement, Level progression, matching, and override restrictions apply. Then end your Development Phase.",
-    "Burrower": "This Creature cannot be Hunted until its controller’s next turn or until it initiates a Hunt.",
+    "Burrower": "When this Creature enters play, it is Burrowed until its controller’s next turn or until it initiates a Hunt. While Burrowed, it cannot be interacted with.",
     "Generalist": "When this Creature is the current occupant in an override and two of Diet, Time Period, and Primary Taxon already match, Generalist supplies the Tag match.",
     "Glider": "Counts as Aerial for compatibility without gaining an inherent Aerial effect.",
     "Elusive": "This Creature cannot Hunt Level 1 or higher Creatures. The first time it is Hunted each turn, flip the Elusive coin: red Rex forces a tie; black reverse resolves normally.",

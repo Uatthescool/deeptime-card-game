@@ -61,6 +61,8 @@ export type LaneState = {
   creature: CreatureInPlay | null;
   attachment: AdaptationInstance | null;
   engulfed?: CreatureInstance | null;
+  /** Snowball Earth: the last turn this Niche stays Frozen. */
+  frozenUntilTurn?: number | null;
   wildfire?: LaneEvent | null;
   drought?: LaneEvent | null;
 };
@@ -268,6 +270,7 @@ export type GameState = {
   pendingBiodiversity: { playerId: PlayerId; cardUids: [string, string] } | null;
   pendingFilterFeeder: { playerId: PlayerId; sourceUid: string; cardUids: [string, string] } | null;
   pendingGeologicalBoundary: { card: EventInstance } | null;
+  pendingGreatDying?: PendingGreatDying | null;
   pendingEngulf: { holderPlayer: PlayerId; holderLane: number; defeatedOwner: PlayerId; defeatedUid: string } | null;
   periodAuras: Array<{ owner: PlayerId; period: Period; expiresAtTurnStart: number }>;
   winner: PlayerId | null;
@@ -328,6 +331,19 @@ export type PlacementVerdict = Verdict & {
 };
 
 export type BoardPosition = { playerId: PlayerId; laneIndex: number };
+
+/** One Creature's three Battle Coins in The Great Dying; it survives only if all three show red Rex. */
+export type GreatDyingResult = {
+  uid: string;
+  name: string;
+  playerId: PlayerId;
+  laneIndex: number;
+  coins: [boolean, boolean, boolean];
+  survived: boolean;
+};
+
+/** The Great Dying's results, shown once, and the cards its player still owes from hand. */
+export type PendingGreatDying = { playerId: PlayerId; results: GreatDyingResult[]; remaining: number };
 
 export type FoundCreature = {
   playerId: PlayerId;

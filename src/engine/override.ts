@@ -1,5 +1,13 @@
 import type { CreatureCard, Diet } from "../data/cards.ts";
-import { effectiveHasTag, hasIslandDwarfism, islandDwarfismBlocksEntry, nicheIsLocked, overrideTags } from "./core.ts";
+import {
+  creatureIsUntouchable,
+  effectiveHasTag,
+  hasIslandDwarfism,
+  islandDwarfismBlocksEntry,
+  laneIsFrozen,
+  nicheIsLocked,
+  overrideTags,
+} from "./core.ts";
 import type { ConvergentCategory, GameState, OverrideCheck, PlayerId, Reason } from "./types.ts";
 
 const CONVERGENT_EXCLUDED_TAGS = new Set([
@@ -65,12 +73,17 @@ export function checkOverride(
   const block = (code: string, text: string) => blockers.push({ code, text });
   if (nicheIsLocked(state, playerId, laneIndex)) {
     return blocked(
-      lane?.drought
-        ? { code: "drought", text: "Drought locks this Niche." }
-        : { code: "wildfire", text: "Wildfire locks this entire lane." },
+      laneIsFrozen(state, laneIndex)
+        ? { code: "frozen", text: "Snowball Earth has Frozen this lane." }
+        : lane?.drought
+          ? { code: "drought", text: "Drought locks this Niche." }
+          : { code: "wildfire", text: "Wildfire locks this entire lane." },
     );
   }
   if (!current || !lane?.creature) return blocked({ code: "empty-niche", text: "The Niche is empty." });
+  if (creatureIsUntouchable(lane)) {
+    return blocked({ code: "burrowed", text: `${current.name} is Burrowed and can't be interacted with.` });
+  }
 
   if (lane.creature.cannotOverrideOnTurn === state.turnNumber) {
     block("raptorial", "Raptorial prevents this Creature from being overridden this turn.");

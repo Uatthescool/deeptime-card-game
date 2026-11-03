@@ -1,5 +1,5 @@
 import type { AdaptationCard } from "../data/cards.ts";
-import { clone, hasNoAdjacentFriendly, playerHolds } from "./core.ts";
+import { clone, creatureIsUntouchable, hasNoAdjacentFriendly, playerHolds } from "./core.ts";
 import { developmentGate, explainAquaticOverrideLane, explainCreatureLane } from "./legality.ts";
 import {
   adaptationEligible,
@@ -128,6 +128,9 @@ function explainAdaptationCard(state: GameState, card: CardInstance & { definiti
   const open = eligible.filter(({ lane }) => !lane.attachment && !lane.engulfed);
   if (!open.length) {
     return [reason("adaptation-slots-full", "Every eligible Creature's Adaptation Slot is already occupied.")];
+  }
+  if (open.every(({ lane }) => creatureIsUntouchable(lane))) {
+    return [reason("untouchable", "Every eligible Creature is Frozen or Burrowed, so it can't be interacted with.")];
   }
   if (islandDwarfism && !open.some(({ playerId, laneIndex }) => hasNoAdjacentFriendly(state, playerId, laneIndex))) {
     return [

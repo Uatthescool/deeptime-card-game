@@ -16,7 +16,9 @@ import {
   chooseCarnianPluvialOption,
   chooseConvergentCategory,
   chooseGeologicalBoundaryPeriod,
+  chooseGreatDying,
   geologicalBoundaryOptions,
+  greatDyingOptions,
   getCarnianPluvialOptions,
   moveFacultativeQuadrupedality,
   playAdaptation,
@@ -78,6 +80,7 @@ export type GameAction =
   | { type: "playWildfire"; cardUid: string; laneIndex: number }
   | { type: "playDrought"; cardUid: string; targetPlayer: PlayerId; laneIndex: number }
   | { type: "chooseGeologicalBoundary"; period: Period }
+  | { type: "chooseGreatDying"; optionId: string }
   | { type: "activateCarnianPluvial" }
   | { type: "chooseCarnianPluvial"; optionId: string }
   | { type: "playConcept"; cardUid: string }
@@ -125,6 +128,8 @@ export function applyAction(state: GameState, action: GameAction): GameState {
       return playDrought(state, action.cardUid, action.targetPlayer, action.laneIndex);
     case "chooseGeologicalBoundary":
       return chooseGeologicalBoundaryPeriod(state, action.period);
+    case "chooseGreatDying":
+      return chooseGreatDying(state, action.optionId);
     case "activateCarnianPluvial":
       return activateCarnianPluvialEpisode(state);
     case "chooseCarnianPluvial":
@@ -183,6 +188,9 @@ export function listLegalActions(state: GameState): GameAction[] {
   }
   if (state.pendingGeologicalBoundary) {
     return geologicalBoundaryOptions(state).map((period) => ({ type: "chooseGeologicalBoundary", period }));
+  }
+  if (state.pendingGreatDying) {
+    return greatDyingOptions(state).map((option) => ({ type: "chooseGreatDying", optionId: option.id }));
   }
   if (state.pendingEngulf) {
     return [

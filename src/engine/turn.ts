@@ -139,6 +139,7 @@ export function createGame(
     pendingBiodiversity: null,
     pendingFilterFeeder: null,
     pendingGeologicalBoundary: null,
+    pendingGreatDying: null,
     pendingEngulf: null,
     periodAuras: [],
     winner: null,
@@ -467,6 +468,16 @@ export function endTurn(original: GameState): GameState {
       }
     }
   }
+  const thawed = new Set<number>();
+  for (const side of state.players) {
+    side.lanes.forEach((lane, laneIndex) => {
+      if (typeof lane.frozenUntilTurn === "number" && lane.frozenUntilTurn <= state.turnNumber) {
+        lane.frozenUntilTurn = null;
+        thawed.add(laneIndex);
+      }
+    });
+  }
+  for (const laneIndex of thawed) addLog(state, `Lane ${laneIndex + 1} thawed; Snowball Earth's freeze ended.`);
   if (resolveVictoryThreshold(state)) return state;
   if (resolveFullHandForfeit(state)) return state;
   if (resolveExhaustion(state)) return state;

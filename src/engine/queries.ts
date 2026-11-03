@@ -5,12 +5,14 @@ import {
   canActInDevelopment,
   creatureCanEnterNiche,
   creatureCanMoveByEffect,
+  creatureIsUntouchable,
   effectiveHasTag,
   hasEnterableEmptyNiche,
   hasIslandDwarfism,
   islandDwarfismBlocksEntry,
   hasNoAdjacentFriendly,
   HAND_LIMIT,
+  nicheIsFrozen,
   nicheIsLocked,
   playerHolds,
   adaptationSlotEmpty,
@@ -137,7 +139,7 @@ export function legalAdaptationTargets(state: GameState, card: CardInstance): Bo
   const targetPlayers: PlayerId[] = adaptation.key === "island-dwarfism" ? [0, 1] : [state.activePlayer];
   return targetPlayers.flatMap((playerId) =>
     state.players[playerId].lanes.flatMap((lane, laneIndex) => {
-      if (!lane.creature || !adaptationSlotEmpty(lane)) return [];
+      if (!lane.creature || creatureIsUntouchable(lane) || !adaptationSlotEmpty(lane)) return [];
       if (!adaptationEligible(adaptation, lane.creature.card.definition)) return [];
       if (adaptation.key === "island-dwarfism" && !hasNoAdjacentFriendly(state, playerId, laneIndex)) return [];
       return [{ playerId, laneIndex }];
@@ -197,7 +199,7 @@ export function legalDroughtTargets(state: GameState, card: CardInstance): Board
   if (!canPlayNicheEvent(state, card, "drought")) return [];
   return ([0, 1] as const).flatMap((playerId) =>
     state.players[playerId].lanes.flatMap((lane, laneIndex) => {
-      if (nicheIsLocked(state, playerId, laneIndex)) return [];
+      if (nicheIsLocked(state, playerId, laneIndex) || creatureIsUntouchable(lane)) return [];
       if (!lane.creature) return [{ playerId, laneIndex }];
       if (!countsAsAquatic(lane.creature.card.definition)) return [];
       if (lane.creature.cannotOverrideOnTurn === state.turnNumber) return [];
@@ -209,7 +211,7 @@ export function legalDroughtTargets(state: GameState, card: CardInstance): Board
 export function legalWildfireLanes(state: GameState, card: CardInstance): number[] {
   if (!canPlayNicheEvent(state, card, "wildfire")) return [];
   return state.players[state.activePlayer].lanes.flatMap((lane, index) => {
-    if (nicheIsLocked(state, state.activePlayer, index)) return [];
+    if (nicheIsLocked(state, state.activePlayer, index) || creatureIsUntouchable(lane)) return [];
     if (lane.creature?.cannotOverrideOnTurn === state.turnNumber) return [];
     return [index];
   });
@@ -226,7 +228,7 @@ function hasDinosaurTaxon(card: CardDefinition) {
 export function carnianPluvialCostOptions(state: GameState): ChoiceOption[] {
   return state.players[state.activePlayer].lanes.flatMap((lane, index) => {
     const creature = lane.creature;
-    if (!creature || hasDinosaurTaxon(creature.card.definition)) return [];
+    if (!creature || creatureIsUntouchable(lane) || hasDinosaurTaxon(creature.card.definition)) return [];
     return [
       {
         id: creature.card.uid,
@@ -269,7 +271,9 @@ export function canActivateCarnianPluvialEpisode(state: GameState) {
 
 /** Resourceful raises the Concept allowance to two; multiple instances do not stack. */
 export function conceptAllowance(state: GameState, playerId: PlayerId) {
-  return state.players[playerId].lanes.some((lane) => lane.creature?.card.definition.tags.includes("Resourceful"))
+  return state.players[playerId].lanes.some(
+    (lane) => !nicheIsFrozen(lane) && lane.creature?.card.definition.tags.includes("Resourceful"),
+  )
     ? 2
     : 1;
 }
@@ -331,6 +335,7 @@ export function deepSeaGigantismLanes(state: GameState, playerId: PlayerId, card
   }
   return state.players[playerId].lanes.flatMap((lane, index) =>
     lane.creature &&
+    !creatureIsUntouchable(lane) &&
     !nicheIsLocked(state, playerId, index) &&
     !islandDwarfismBlocksEntry(state, playerId, index) &&
     !hasIslandDwarfism(lane) &&
@@ -370,7 +375,7 @@ function missingRequiredChoice(state: GameState, key: string): Reason | null {
         : missing("Your History Pile has no card to excavate.");
     case "semelparity":
       return player.hand.some(isLevelZeroCreature) ||
-        player.lanes.some((lane) => lane.creature?.card.definition.printedLevel === 0)
+        player.lanes.some((lane) => lane.creature?.card.definition.printedLevel === 0 && !creatureIsUntouchable(lane))
         ? null
         : missing("Needs a Level 0 Creature in your hand or on your side of the board.");
     case "obligate-migration":

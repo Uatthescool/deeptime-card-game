@@ -49,6 +49,7 @@ import {
   cardVictoryLevel,
   checkOverride,
   chooseEngulf,
+  chooseGreatDying,
   chooseFilterFeederTop,
   chooseHerd,
   chooseNesting,
@@ -65,6 +66,8 @@ import {
   endTurn,
   effectiveHasTag,
   getConceptChoiceOptions,
+  GREAT_DYING_CONTINUE,
+  greatDyingOptions,
   getHerdOptions,
   getNestingOptions,
   getCarnianPluvialOptions,
@@ -100,6 +103,7 @@ import {
   type GameState,
   type PlayerId,
 } from "../../src/engine/index.ts";
+import { flipCoin } from "../../src/engine/rng.ts";
 
 function readyGame(decks: [DeckKey, DeckKey] = ["deck-1", "deck-1"]): GameState {
   const game = createGame("Alpha", "Beta", [null, null], decks);
@@ -399,7 +403,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 126);
+  assert.equal(inspectableCards.length, 128);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -480,7 +484,7 @@ test("Deck 4 can be inspected but not selected while it is unfinished", () => {
     [0, 1, 2, 3, 4].map((level) => DECK_4.filter((card) => card.printedLevel === level).length),
     [3, 7, 7, 4, 1],
   );
-  assert.equal(DECK_4_SUPPORTS.length, 16);
+  assert.equal(DECK_4_SUPPORTS.length, 18);
   assert.ok(DECK_4.every((card) => card.taxa.includes("Synapsid")));
   // Its new cards are marked unplayable; the cards it shares keep their own status.
   assert.equal(CARD_LIBRARY.get("mastodon")?.status, "Not playable · Work in progress");
@@ -2830,4 +2834,162 @@ test("Echolocation Hunts past Burrowed, Deimatic, Cranial Display and Gigantic",
 
   attachLibraryAdaptation(game, 0, 0, "echolocation");
   assert.deepEqual(legalAttackTargets(game, hunter.uid), protectedUids);
+});
+
+/** Puts a library Event into `playerId`'s hand, for Events outside their deck. */
+function putLibraryEventInHand(game: GameState, playerId: PlayerId, key: string) {
+  const card = { uid: `${playerId}-library-${key}`, owner: playerId, definition: CARD_LIBRARY.get(key) as EventCard };
+  game.players[playerId].hand.push(card);
+  return card;
+}
+
+test("Burrowed Creatures can't be interacted with", () => {
+  let game = readyGame();
+  const thrinaxodon = placeLibraryCreature(game, 1, 0, "thrinaxodon");
+  game.players[1].lanes[0].creature!.burrowedUntilTurn = 2;
+  const dwarfism = {
+    uid: "0-library-island-dwarfism",
+    owner: 0 as PlayerId,
+    definition: CARD_LIBRARY.get("island-dwarfism") as AdaptationCard,
+  };
+  game.players[0].hand.push(dwarfism);
+  const targets = () => legalAdaptationTargets(game, dwarfism).filter((target) => target.playerId === 1);
+  assert.deepEqual(targets(), []);
+  game.players[1].lanes[0].creature!.burrowedUntilTurn = null;
+  assert.deepEqual(targets(), [{ playerId: 1, laneIndex: 0 }]);
+
+  // Wildfire spares a Burrowed opposing Creature in its lane.
+  game.players[1].lanes[0].creature!.burrowedUntilTurn = 2;
+  const wildfire = putInHand(game, 0, "wildfire");
+  game = playWildfire(game, wildfire.uid, 0);
+  assert.ok(game.players[0].lanes[0].wildfire);
+  assert.equal(game.players[1].lanes[0].creature?.card.uid, thrinaxodon.uid);
+});
+
+test("Snowball Earth freezes both edge lanes through the end of your next turn", () => {
+  let game = readyGame();
+  const frozenHunter = placeCreature(game, 0, 0, "velociraptor");
+  const hunter = placeCreature(game, 0, 2, "allosaurus");
+  const frozenPrey = placeLibraryCreature(game, 1, 4, "steppe-bison");
+  const prey = placeCreature(game, 1, 2, "hoatzin");
+  const snowball = putLibraryEventInHand(game, 0, "snowball-earth");
+  const sapling = putInHand(game, 0, "compsognathus");
+
+  game = playEvent(game, snowball.uid);
+  for (const side of game.players) {
+    assert.deepEqual(
+      side.lanes.map((lane) => lane.frozenUntilTurn ?? null),
+      [3, null, null, null, 3],
+    );
+  }
+  assert.ok(game.players[0].history.some((card) => card.definition.key === "snowball-earth"));
+  assert.equal(game.players[0].event, null, "an Instantaneous Event never enters the Event Zone");
+  assert.equal(cardVictoryLevel(game, game.players[0].lanes[0].creature!), 0);
+  assert.equal(cardVictoryLevel(game, game.players[1].lanes[4].creature!), 0);
+  assert.deepEqual(legalCreatureLanes(game, 0, sapling), [1, 3]);
+
+  game.phase = "battle";
+  assert.deepEqual(legalAttackTargets(game, frozenHunter.card.uid), [], "a Frozen Creature can't Hunt");
+  assert.equal(legalAttackTargets(game, hunter.card.uid).includes(frozenPrey.uid), false);
+  assert.ok(legalAttackTargets(game, hunter.card.uid).includes(prey.card.uid));
+
+  // Still Frozen through Beta's turn and Alpha's next; thawed when Alpha's next turn ends.
+  game = endTurn(game);
+  game = acknowledgeHandoff(game);
+  game = endTurn(game);
+  game = acknowledgeHandoff(game);
+  assert.equal(game.turnNumber, 3);
+  assert.equal(game.players[0].lanes[0].frozenUntilTurn, 3);
+  game = endTurn(game);
+  assert.ok(game.players.every((side) => side.lanes.every((lane) => !lane.frozenUntilTurn)));
+  assert.ok(game.players[0].lanes[0].creature, "the Frozen Creature stays in play");
+});
+
+test("Snowball Earth lasts one turn longer while Ice Age is in play", () => {
+  let game = readyGame();
+  const iceAge = CARD_LIBRARY.get("ice-age") as EventCard;
+  game.players[1].event = { uid: "1-library-ice-age", owner: 1, definition: iceAge };
+  const snowball = putLibraryEventInHand(game, 0, "snowball-earth");
+  game = playEvent(game, snowball.uid);
+  assert.equal(game.players[0].lanes[0].frozenUntilTurn, 4);
+  assert.equal(game.players[1].event?.definition.key, "ice-age", "Ice Age stays in its Event Zone");
+});
+
+/** Sets the game's generator so its next Battle Coins come up as `pattern` (true is red Rex). */
+function forceCoins(game: GameState, pattern: (flips: boolean[]) => boolean, count: number) {
+  for (let seed = 1; seed < 1_000_000; seed += 1) {
+    const probe = { rng: seed };
+    if (pattern(Array.from({ length: count }, () => flipCoin(probe)))) {
+      game.rng = seed;
+      return;
+    }
+  }
+  throw new Error("No seed gives that coin pattern.");
+}
+
+function greatDyingBoard() {
+  const game = readyGame();
+  const survivor = placeCreature(game, 0, 0, "velociraptor");
+  const triassic = placeCreature(game, 0, 1, "herrerasaurus");
+  const victims = [
+    placeCreature(game, 1, 0, "allosaurus"),
+    placeCreature(game, 1, 1, "dimetrodon"),
+    placeCreature(game, 1, 2, "carnotaurus"),
+  ];
+  const burrowed = placeCreature(game, 1, 3, "horseshoe-crab");
+  burrowed.burrowedUntilTurn = 2;
+  // Alpha's own Creature flips first and survives; each opposing Creature misses at least one red Rex.
+  const allRex = (coins: boolean[]) => coins.every(Boolean);
+  forceCoins(
+    game,
+    (flips) => allRex(flips.slice(0, 3)) && [3, 6, 9].every((start) => !allRex(flips.slice(start, start + 3))),
+    12,
+  );
+  return { game, survivor, triassic, victims, burrowed };
+}
+
+test("The Great Dying flips three coins for each Creature and charges cards for the opponent's losses", () => {
+  const { game: start, survivor, triassic, victims, burrowed } = greatDyingBoard();
+  const dying = putLibraryEventInHand(start, 0, "the-great-dying");
+  let game = playEvent(start, dying.uid);
+  const pending = game.pendingGreatDying!;
+  assert.deepEqual(
+    pending.results.map((result) => result.uid),
+    [survivor.card.uid, ...victims.map((victim) => victim.card.uid)],
+    "Level 0 and 1 Triassic Creatures and Burrowed ones don't flip",
+  );
+  assert.deepEqual(
+    pending.results.map((result) => result.survived),
+    [true, false, false, false],
+  );
+  assert.equal(game.players[0].lanes[0].creature?.card.uid, survivor.card.uid);
+  assert.equal(game.players[0].lanes[1].creature?.card.uid, triassic.card.uid);
+  assert.equal(game.players[1].lanes[3].creature?.card.uid, burrowed.card.uid);
+  assert.ok([0, 1, 2].every((lane) => !game.players[1].lanes[lane].creature));
+  assert.ok(game.players[0].allowances.skipBattlePhase);
+
+  // Three opposing losses, minus 1: two cards from hand, chosen one at a time.
+  assert.equal(pending.remaining, 2);
+  const handSize = game.players[0].hand.length;
+  game = chooseGreatDying(game, greatDyingOptions(game)[0]!.id);
+  game = chooseGreatDying(game, greatDyingOptions(game)[0]!.id);
+  assert.equal(game.players[0].hand.length, handSize - 2);
+  assert.deepEqual(
+    greatDyingOptions(game).map((option) => option.id),
+    [GREAT_DYING_CONTINUE],
+  );
+  game = chooseGreatDying(game, GREAT_DYING_CONTINUE);
+  assert.equal(game.pendingGreatDying, null);
+  assert.ok(game.players[0].history.some((card) => card.definition.key === "the-great-dying"));
+});
+
+test("The Great Dying sends the whole hand when it is short of what's owed", () => {
+  const { game: start } = greatDyingBoard();
+  const dying = putLibraryEventInHand(start, 0, "the-great-dying");
+  start.players[0].deck.push(...start.players[0].hand.filter((card) => card.uid !== dying.uid).slice(1));
+  start.players[0].hand = start.players[0].hand.filter((card, index) => card.uid === dying.uid || index === 0);
+  assert.equal(start.players[0].hand.length, 2);
+  const game = playEvent(start, dying.uid);
+  assert.equal(game.players[0].hand.length, 0);
+  assert.equal(game.pendingGreatDying?.remaining, 0);
 });

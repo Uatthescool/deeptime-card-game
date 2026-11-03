@@ -57,6 +57,7 @@ import {
   EntryChoiceModal,
   FilterFeederModal,
   GeologicalBoundaryModal,
+  GreatDyingModal,
   HandoffOverlay,
   WinnerOverlay,
 } from "./Modals.tsx";
@@ -863,6 +864,7 @@ export function GameScreen({
           {game.pendingBiodiversity && <BiodiversityModal game={game} dispatch={dispatch} />}
           {game.pendingFilterFeeder && <FilterFeederModal game={game} dispatch={dispatch} />}
           {game.pendingGeologicalBoundary && <GeologicalBoundaryModal game={game} dispatch={dispatch} />}
+          {game.pendingGreatDying && <GreatDyingModal game={game} dispatch={dispatch} />}
           {game.pendingEngulf && <EngulfModal game={game} dispatch={dispatch} />}
           {game.pendingConvergentChoice && <ConvergentChoiceModal game={game} dispatch={dispatch} />}
           {(game.pendingHerd || game.pendingNesting) && <EntryChoiceModal game={game} dispatch={dispatch} />}

@@ -11,6 +11,7 @@ import {
   findCreature,
   hasNoAdjacentFriendly,
   huntingDiet,
+  nicheIsFrozen,
   otherPlayer,
   overrideTags,
   resolutionBlocked,
@@ -70,6 +71,9 @@ export function hunterBlockers(
   const name = attacker.card.definition.name;
   const definition = attacker.card.definition;
   const blockers: Reason[] = [];
+  if (nicheIsFrozen(state.players[attacker.card.owner].lanes[attackerLane])) {
+    blockers.push(reason("frozen", `${name} is Frozen and can't Hunt.`));
+  }
   if (attacker.lastAttackTurn === state.turnNumber) {
     blockers.push(reason("already-hunted", `${name} has already Hunted this turn.`));
   }
@@ -108,6 +112,9 @@ function targetBlockers(
   const targetDef = target.card.definition;
   const ignoreDefenses = huntIgnoresDefenses(state, attacker.card.owner, attackerLane);
   const blockers: Reason[] = [];
+  if (nicheIsFrozen(state.players[target.card.owner].lanes[targetLane])) {
+    blockers.push(reason("frozen-target", `${targetDef.name} is Frozen and can't be Hunted.`));
+  }
   if (attackerDef.tags.includes("Elusive") && targetDef.printedLevel >= 1) {
     blockers.push(reason("elusive-attacker", `${attackerDef.name} is Elusive, so it can Hunt only Level 0 Creatures.`));
   }
@@ -285,7 +292,9 @@ function adjacentHighBastionCount(state: GameState, playerId: PlayerId, laneInde
   const lanes = state.players[playerId].lanes;
   return [lanes[laneIndex - 1], lanes[laneIndex + 1]].filter(
     (lane) =>
-      lane?.creature?.card.definition.tags.includes("Bastion") && lane.creature.card.definition.printedLevel >= 2,
+      !nicheIsFrozen(lane) &&
+      lane?.creature?.card.definition.tags.includes("Bastion") &&
+      lane.creature.card.definition.printedLevel >= 2,
   ).length;
 }
 

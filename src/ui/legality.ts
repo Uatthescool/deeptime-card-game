@@ -11,6 +11,7 @@ const EMPTY_NICHE_LABELS: Record<string, string> = {
   "rapid-needs-occupied": "Needs a Creature",
   "aquatic-needs-occupied": "Needs a Creature",
   "creature-already-played": "Creature play used",
+  burrowed: "Burrowed",
 };
 
 export function placementBadge(verdict: PlacementVerdict, occupied: boolean): LaneBadge {
@@ -18,6 +19,7 @@ export function placementBadge(verdict: PlacementVerdict, occupied: boolean): La
   if (verdict.legal) {
     return { tone: "legal", label: occupied ? `${verdict.override?.matchCount ?? 3} of 4 · Replace` : "Fill" };
   }
+  if (codes.includes("frozen")) return { tone: "locked", label: "Frozen" };
   if (codes.some((code) => LOCK_CODES.has(code))) return { tone: "locked", label: "Locked" };
   const hint = verdict.hints.length ? " · idea" : "";
   if (verdict.override?.explanations) return { tone: "blocked", label: `${verdict.override.matchCount} of 4${hint}` };
@@ -28,6 +30,7 @@ export function placementBadge(verdict: PlacementVerdict, occupied: boolean): La
 const HUNT_LABELS: Record<string, string> = {
   "gigantic-target": "Gigantic",
   burrowed: "Burrowed",
+  "frozen-target": "Frozen",
   deimatic: "Deimatic",
   "cranial-display": "Deterred",
   "charge-lane": "Not opposite",

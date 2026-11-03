@@ -97,8 +97,22 @@ export function overrideTags(creature: CreatureCard) {
 // Board geometry and locks
 // ---------------------------------------------------------------------------
 
+/** Snowball Earth: a Frozen Niche and its Creature cannot be interacted with. */
+export function nicheIsFrozen(lane: LaneState | undefined) {
+  return typeof lane?.frozenUntilTurn === "number";
+}
+
+export function laneIsFrozen(state: GameState, laneIndex: number) {
+  return state.players.some((player) => nicheIsFrozen(player.lanes[laneIndex]));
+}
+
+/** Whether nothing can be done with or to this Niche's Creature: it is Frozen or Burrowed. */
+export function creatureIsUntouchable(lane: LaneState | undefined) {
+  return nicheIsFrozen(lane) || typeof lane?.creature?.burrowedUntilTurn === "number";
+}
+
 export function laneIsLocked(state: GameState, laneIndex: number) {
-  return state.players.some((player) => Boolean(player.lanes[laneIndex]?.wildfire));
+  return laneIsFrozen(state, laneIndex) || state.players.some((player) => Boolean(player.lanes[laneIndex]?.wildfire));
 }
 
 export function nicheIsLocked(state: GameState, playerId: PlayerId, laneIndex: number) {
@@ -111,7 +125,10 @@ export function hasIslandDwarfism(lane: LaneState | undefined) {
 
 export function creatureCanMoveByEffect(lane: LaneState | undefined) {
   return Boolean(
-    lane?.creature && !hasIslandDwarfism(lane) && !effectiveHasTag(lane.creature.card.definition, "Graviportal"),
+    lane?.creature &&
+    !creatureIsUntouchable(lane) &&
+    !hasIslandDwarfism(lane) &&
+    !effectiveHasTag(lane.creature.card.definition, "Graviportal"),
   );
 }
 
@@ -352,6 +369,7 @@ export function resolutionBlocked(state: GameState) {
     state.pendingBiodiversity ||
     state.pendingFilterFeeder ||
     state.pendingGeologicalBoundary ||
+    state.pendingGreatDying ||
     state.pendingEngulf,
   );
 }

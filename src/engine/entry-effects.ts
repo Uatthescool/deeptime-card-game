@@ -3,6 +3,7 @@ import {
   addLog,
   adjacentEmptyNiches,
   clone,
+  creatureIsUntouchable,
   findCreature,
   HAND_LIMIT,
   makeCreatureInPlay,
@@ -71,7 +72,12 @@ export function continueEntryEffects(state: GameState) {
 
     if (effect.kind === "cranial-display") {
       const eligibleTargetUids = state.players[otherPlayer(effect.playerId)].lanes
-        .filter((lane) => lane.creature && lane.creature.card.definition.printedLevel <= definition.printedLevel)
+        .filter(
+          (lane) =>
+            lane.creature &&
+            !creatureIsUntouchable(lane) &&
+            lane.creature.card.definition.printedLevel <= definition.printedLevel,
+        )
         .map((lane) => lane.creature!.card.uid);
       if (!eligibleTargetUids.length) {
         addLog(state, `${definition.name} entered with no eligible Cranial Display target.`);

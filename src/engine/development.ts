@@ -2,6 +2,7 @@ import { type Period } from "../data/cards.ts";
 import {
   addLog,
   clone,
+  creatureIsUntouchable,
   drawOne,
   makeCreatureInPlay,
   moveCardFromHand,
@@ -28,7 +29,7 @@ import {
   legalFacultativeDestinations,
   legalWildfireLanes,
 } from "./queries.ts";
-import { shuffle } from "./rng.ts";
+import { flipCoin, shuffle } from "./rng.ts";
 import { continueStampede, endTurn, finishResolution } from "./turn.ts";
 import type {
   AdaptationInstance,
@@ -38,6 +39,8 @@ import type {
   CreatureInstance,
   EventInstance,
   GameState,
+  GreatDyingResult,
+  LaneState,
   PlayerId,
 } from "./types.ts";
 import { resolveVictoryThreshold } from "./victory.ts";
@@ -300,10 +303,13 @@ export function playWildfire(original: GameState, cardUid: string, laneIndex: nu
   const opposingPlayer = otherPlayer(state.activePlayer);
   const opposingLane = state.players[opposingPlayer].lanes[laneIndex]!;
   const ownCreature = ownLane.creature?.card.definition.name;
-  const opposingCreature = opposingLane.creature?.card.definition.name;
+  // A Burrowed opposing Creature can't be interacted with, so Wildfire spares it.
+  const opposingCreature = creatureIsUntouchable(opposingLane)
+    ? undefined
+    : opposingLane.creature?.card.definition.name;
 
   if (ownLane.creature) sendCreatureToHistory(state, state.activePlayer, laneIndex, "override");
-  if (opposingLane.creature) sendCreatureToHistory(state, opposingPlayer, laneIndex, "effect");
+  if (opposingCreature) sendCreatureToHistory(state, opposingPlayer, laneIndex, "effect");
 
   const moved = moveCardFromHand(player, cardUid) as EventInstance;
   ownLane.wildfire = { card: moved, expiresOnTurn: nextTurnForPlayer(state, state.activePlayer) };
@@ -315,6 +321,102 @@ export function playWildfire(original: GameState, cardUid: string, laneIndex: nu
   if (opposingCreature) addLog(state, `Wildfire sent opposing ${opposingCreature} and its Adaptation to History.`);
   addLog(state, `Lane ${laneIndex + 1} is locked through the end of ${player.name}'s next turn.`);
   return finishResolution(state);
+}
+
+/** Snowball Earth: both edge lanes freeze through the end of your next turn, one turn longer with Ice Age in play. */
+function resolveSnowballEarth(state: GameState, moved: EventInstance) {
+  sendCardToHistory(state, moved, "Snowball Earth resolved");
+  const iceAge = state.players.some((side) => side.event?.definition.key === "ice-age");
+  const frozenUntilTurn = nextTurnForPlayer(state, state.activePlayer) + (iceAge ? 1 : 0);
+  for (const side of state.players) {
+    for (const laneIndex of [0, side.lanes.length - 1]) side.lanes[laneIndex]!.frozenUntilTurn = frozenUntilTurn;
+  }
+  addLog(
+    state,
+    `Snowball Earth froze the leftmost and rightmost lanes through Turn ${frozenUntilTurn}${iceAge ? ", one turn longer because Ice Age is in play" : ""}.`,
+  );
+  return finishResolution(state);
+}
+
+/** The Great Dying spares Level 0 and 1 Triassic Creatures, and any Creature that can't be interacted with. */
+function greatDyingSpares(lane: LaneState) {
+  const definition = lane.creature!.card.definition;
+  return creatureIsUntouchable(lane) || (definition.period === "Triassic" && definition.printedLevel <= 1);
+}
+
+/**
+ * The Great Dying flips three Battle Coins for every other Creature at once; only three red Rex results save it.
+ * Its player then sends cards from hand for the opponent's losses, minus 1, and skips the Battle Phase.
+ */
+function resolveGreatDying(state: GameState, moved: EventInstance) {
+  sendCardToHistory(state, moved, "The Great Dying resolved");
+  const active = state.activePlayer;
+  const player = state.players[active];
+  const results: GreatDyingResult[] = [];
+  for (const playerId of [active, otherPlayer(active)]) {
+    state.players[playerId].lanes.forEach((lane, laneIndex) => {
+      if (!lane.creature || greatDyingSpares(lane)) return;
+      const coins: GreatDyingResult["coins"] = [flipCoin(state), flipCoin(state), flipCoin(state)];
+      const { uid } = lane.creature.card;
+      const { name } = lane.creature.card.definition;
+      results.push({ uid, name, playerId, laneIndex, coins, survived: coins.every(Boolean) });
+    });
+  }
+  for (const result of results) {
+    if (!result.survived) sendCreatureToHistory(state, result.playerId, result.laneIndex, "effect");
+  }
+  const lost = results.filter((result) => !result.survived);
+  const opponentLost = lost.filter((result) => result.playerId !== active).length;
+  addLog(
+    state,
+    `The Great Dying flipped for ${results.length} ${results.length === 1 ? "Creature" : "Creatures"}: ${lost.length} went to History and ${results.length - lost.length} survived.`,
+  );
+  player.allowances.skipBattlePhase = true;
+  let remaining = Math.max(0, opponentLost - 1);
+  if (remaining && remaining >= player.hand.length) {
+    for (const card of [...player.hand])
+      sendCardToHistory(state, moveCardFromHand(player, card.uid)!, "The Great Dying");
+    if (remaining) addLog(state, `${player.name} owed ${remaining} and sent their whole hand to History.`);
+    remaining = 0;
+  }
+  state.pendingGreatDying = { playerId: active, results, remaining };
+  return state;
+}
+
+const HAND_KIND = { event: "Event", adaptation: "Adaptation", concept: "Concept" } as const;
+
+export const GREAT_DYING_CONTINUE = "__continue-great-dying__";
+
+/** The Great Dying's choices: the cards still owed from hand, or continuing once none are owed. */
+export function greatDyingOptions(state: GameState): ChoiceOption[] {
+  const pending = state.pendingGreatDying;
+  if (!pending) return [];
+  if (!pending.remaining) return [{ id: GREAT_DYING_CONTINUE, label: "Continue", detail: "No cards are owed." }];
+  return state.players[pending.playerId].hand.map((card) => ({
+    id: card.uid,
+    label: card.definition.name,
+    detail:
+      card.definition.kind === "creature"
+        ? `Level ${card.definition.printedLevel} Creature`
+        : HAND_KIND[card.definition.kind],
+  }));
+}
+
+export function chooseGreatDying(original: GameState, optionId: string): GameState {
+  const state = clone(original);
+  const pending = state.pendingGreatDying;
+  if (!pending || !greatDyingOptions(state).some((option) => option.id === optionId)) return state;
+  if (optionId === GREAT_DYING_CONTINUE) {
+    state.pendingGreatDying = null;
+    addLog(state, `${state.players[pending.playerId].name} skips the Battle Phase this turn.`);
+    return finishResolution(state);
+  }
+  const player = state.players[pending.playerId];
+  const card = moveCardFromHand(player, optionId)!;
+  sendCardToHistory(state, card, "The Great Dying");
+  pending.remaining -= 1;
+  addLog(state, `${player.name} sent ${card.definition.name} from hand to History for The Great Dying.`);
+  return state;
 }
 
 /** Plays an Event to the Event Zone, or resolves an instantaneous Event (Stampede, Geological Boundary). */
@@ -334,6 +436,9 @@ export function playEvent(original: GameState, cardUid: string): GameState {
     addLog(state, "Geological Boundary must declare a Time Period.");
     return state;
   }
+
+  if (moved.definition.key === "snowball-earth") return resolveSnowballEarth(state, moved);
+  if (moved.definition.key === "the-great-dying") return resolveGreatDying(state, moved);
 
   if (moved.definition.key === "stampede") {
     sendCardToHistory(state, moved, "Stampede began resolving");

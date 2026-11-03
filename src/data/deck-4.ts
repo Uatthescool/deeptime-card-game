@@ -200,7 +200,7 @@ export const DECK_4_SHARED_CREATURE_KEYS = [
   "blue-whale",
 ] as const;
 
-/** 12 of the deck's 18 Supports; with its 4 new ones that leaves 2 still to design. */
+/** 12 of the deck's 18 Supports; its 6 new ones fill the rest. */
 export const DECK_4_INHERITED_SUPPORT_KEYS = [
   "wildfire",
   "drought",
@@ -258,8 +258,28 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | AdaptationCard | ConceptCard)[] =
       "During your Development Phase, while Feedback Loops is in your History Pile, you may send a card whose name appears below from your hand to your History Pile. If you do, return Feedback Loops to your hand.",
       FEEDBACK_LOOP_NAMES.map((name) => `• ${name}`).join("\n"),
     ].join("\n\n"),
-    note: "Working wording; its effects are not built into the game yet. Snowball Earth, The Great Dying and The Great Oxidation Event aren't cards yet.",
+    note: "Working wording; its effects are not built into the game yet. The Great Oxidation Event isn't a card yet.",
     cardFace: "/card-faces/feedback-loops.webp",
+    status: STATUS,
+  },
+  {
+    key: "snowball-earth",
+    kind: "event",
+    eventType: "instant",
+    name: "Snowball Earth",
+    rules:
+      "The leftmost and rightmost lanes become Frozen through the end of your next turn. If Ice Age is in play, they stay Frozen through the end of your opponent's turn after that instead. Frozen Niches and their Creatures cannot be interacted with and contribute no Victory Levels.",
+    cardFace: "/card-faces/snowball-earth.webp",
+    status: STATUS,
+  },
+  {
+    key: "the-great-dying",
+    kind: "event",
+    eventType: "instant",
+    name: "The Great Dying",
+    rules:
+      "For each Creature on the board, except Level 0 and Level 1 Triassic Creatures, flip three Battle Coins. Unless all three show red Rex, send that Creature to its owner's History Pile. Then send cards from your hand to your History Pile equal to the number of your opponent's Creatures sent this way, minus 1, and skip your Battle Phase this turn.",
+    cardFace: "/card-faces/the-great-dying.webp",
     status: STATUS,
   },
   {

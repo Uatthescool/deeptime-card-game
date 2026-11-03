@@ -1,5 +1,6 @@
 import {
   islandDwarfismBlocksEntry,
+  laneIsFrozen,
   laneIsLocked,
   nicheIsLocked,
   otherPlayer,
@@ -35,6 +36,7 @@ export function developmentGate(state: GameState, playerId: PlayerId): Reason[] 
 
 /** Why a Creature can't enter this Niche at all, regardless of what occupies it. */
 export function entryBlockers(state: GameState, playerId: PlayerId, laneIndex: number): Reason[] {
+  if (laneIsFrozen(state, laneIndex)) return [reason("frozen", "Snowball Earth has Frozen this lane.")];
   if (laneIsLocked(state, laneIndex)) return [reason("wildfire", "Wildfire locks this entire lane.")];
   if (nicheIsLocked(state, playerId, laneIndex)) return [reason("drought", "Drought locks this Niche.")];
   if (islandDwarfismBlocksEntry(state, playerId, laneIndex)) {

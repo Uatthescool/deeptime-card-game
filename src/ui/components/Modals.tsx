@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   type CardInstance,
   type ChoiceOption,
@@ -9,6 +10,8 @@ import {
   getCarnianPluvialOptions,
   getConceptChoiceOptions,
   getHerdOptions,
+  GREAT_DYING_CONTINUE,
+  greatDyingOptions,
   getNestingOptions,
   otherPlayer,
   VICTORY_THRESHOLD,
@@ -150,6 +153,76 @@ export function GeologicalBoundaryModal({ game, dispatch }: { game: GameState; d
             </button>
           ))}
         </div>
+      </section>
+    </Dialog>
+  );
+}
+
+/** The Great Dying: every flip is shown at once, then any cards owed from hand are chosen one at a time. */
+export function GreatDyingModal({ game, dispatch }: { game: GameState; dispatch: Dispatch }) {
+  const pending = game.pendingGreatDying!;
+  const [flipping, setFlipping] = useState(true);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setFlipping(false), 850);
+    return () => window.clearTimeout(timer);
+  }, []);
+  const lost = pending.results.filter((result) => !result.survived).length;
+  const options = greatDyingOptions(game);
+  return (
+    <Dialog label="The Great Dying" className="battle-overlay">
+      <section className="great-dying-modal battle-modal">
+        <div className="eyebrow">The Great Dying · Instantaneous Event</div>
+        <h2>{flipping ? "Flipping for every Creature…" : `${lost} of ${pending.results.length} went to History.`}</h2>
+        <p>Each Creature survives only if all three of its Battle Coins show red Rex.</p>
+        <div className="great-dying-grid" aria-live="polite">
+          {pending.results.map((result) => (
+            <div
+              key={result.uid}
+              className={`great-dying-result ${flipping ? "" : result.survived ? "survived" : "lost"}`}
+            >
+              <strong>{result.name}</strong>
+              <small>
+                {game.players[result.playerId].name} · Niche {result.laneIndex + 1}
+              </small>
+              <div className="coin-row">
+                {result.coins.map((success, index) => (
+                  <div
+                    key={index}
+                    className={`elusive-coin mini-coin ${flipping ? "flipping" : "result"} ${success ? "rex-success" : "black-failure"}`}
+                    aria-label={flipping ? "Flipping" : success ? "Red Rex" : "Fossil reverse"}
+                  >
+                    <div className="coin-face rex-face">
+                      <span className="rex-mark">REX</span>
+                    </div>
+                    <div className="coin-face black-face">
+                      <span>FOSSIL</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <b>{flipping ? "…" : result.survived ? "Survived" : "To History"}</b>
+            </div>
+          ))}
+        </div>
+        {!flipping &&
+          (pending.remaining ? (
+            <>
+              <p>
+                Send {pending.remaining} more {pending.remaining === 1 ? "card" : "cards"} from your hand to your
+                History Pile.
+              </p>
+              <ChoiceList options={options} onChoose={(optionId) => dispatch({ type: "chooseGreatDying", optionId })} />
+            </>
+          ) : (
+            <div className="modal-actions">
+              <button
+                className="primary-button"
+                onClick={() => dispatch({ type: "chooseGreatDying", optionId: GREAT_DYING_CONTINUE })}
+              >
+                Continue
+              </button>
+            </div>
+          ))}
       </section>
     </Dialog>
   );

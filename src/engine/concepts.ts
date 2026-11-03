@@ -4,6 +4,7 @@ import {
   clone,
   creatureCanEnterNiche,
   creatureCanMoveByEffect,
+  creatureIsUntouchable,
   drawOne,
   enterableEmptyNiches,
   hasEnterableEmptyNiche,
@@ -202,7 +203,7 @@ export function getConceptChoiceOptions(state: GameState): ChoiceOption[] {
         return { ...option, id: `hand:${card.uid}`, detail: `${option.detail} · Hand` };
       });
       const board = player.lanes.flatMap((lane, index) =>
-        lane.creature?.card.definition.printedLevel === 0
+        lane.creature?.card.definition.printedLevel === 0 && !creatureIsUntouchable(lane)
           ? [{ id: `lane:${index}`, label: lane.creature.card.definition.name, detail: `Level 0 · Niche ${index + 1}` }]
           : [],
       );
