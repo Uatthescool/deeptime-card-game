@@ -410,20 +410,20 @@
       "status": "Locked"
     },
     {
-      "key": "diplocaulus",
+      "key": "pelagornis",
       "kind": "creature",
-      "name": "Diplocaulus",
-      "scientificName": "Diplocaulus magnicornis",
+      "name": "Pelagornis",
+      "scientificName": "Pelagornis sandersi",
       "printedLevel": 1,
       "diet": "Carnivore",
-      "period": "Permian",
-      "periodColor": "Slate Gray",
-      "gameplayTaxon": "Amphibian",
-      "taxa": ["Vertebrate","Tetrapod","Amphibian","Lepospondyl","Nectridean","Diplocaulid"],
-      "tags": ["Aquatic", "Small Game Hunter"],
-      "visualTags": [],
-      "flavorText": "Juvenile Diplocaulus had short projections at the rear of the skull that lengthened dramatically with maturity. Hydrodynamic models suggest the adult’s boomerang-shaped head generated lift and high underwater maneuverability, although its actual biological function remains uncertain.",
-      "cardFace": "/card-faces/diplocaulus.webp",
+      "period": "Paleogene",
+      "periodColor": "Magenta",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Avialan","Bird","Pelagornithid"],
+      "tags": ["Aerial", "Semi-Aquatic", "Gigantic"],
+      "visualTags": ["Feathered", "Wings"],
+      "flavorText": "Pelagornis sandersi had one of the largest wingspans of any known flying bird, estimated at roughly 6 to 7 meters. Its jaws were lined with bony, tooth-like spikes called pseudoteeth, which probably helped it grip slippery fish and squid taken from the sea surface.",
+      "cardFace": "/card-faces/pelagornis.webp",
       "status": "Locked"
     },
     {
@@ -877,6 +877,23 @@
       "note": "Retired from Deck 1 after playtesting showed that its payoff arrived too late and too inconsistently. Preserved here for future deck construction or rework.",
       "artwork": "/artwork/competitive-exclusion-principle.webp",
       "cardFace": "/card-faces/competitive-exclusion-principle.webp",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "diplocaulus",
+      "kind": "creature",
+      "name": "Diplocaulus",
+      "scientificName": "Diplocaulus magnicornis",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Permian",
+      "periodColor": "Slate Gray",
+      "gameplayTaxon": "Amphibian",
+      "taxa": ["Vertebrate","Tetrapod","Amphibian","Lepospondyl","Nectridean","Diplocaulid"],
+      "tags": ["Aquatic", "Small Game Hunter"],
+      "visualTags": [],
+      "flavorText": "Juvenile Diplocaulus had short projections at the rear of the skull that lengthened dramatically with maturity. Hydrodynamic models suggest the adult’s boomerang-shaped head generated lift and high underwater maneuverability, although its actual biological function remains uncertain.",
+      "cardFace": "/card-faces/diplocaulus.webp",
       "status": "Not playable · Work in progress"
     }
   ]

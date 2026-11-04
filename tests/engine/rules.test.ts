@@ -280,9 +280,9 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     SUPPORTS.some((card) => card.key === "wildfire"),
     true,
   );
-  assert.equal(GENERAL_POOL.length, 11);
+  assert.equal(GENERAL_POOL.length, 12);
   assert.ok(
-    ["competitive-exclusion-principle", "purussaurus", "epicyon"].every((key) =>
+    ["competitive-exclusion-principle", "purussaurus", "epicyon", "diplocaulus"].every((key) =>
       GENERAL_POOL.some((card) => card.key === key),
     ),
   );
@@ -403,7 +403,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 128);
+  assert.equal(inspectableCards.length, 129);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -468,6 +468,8 @@ test("every piece of artwork shown on screen carries a short credit", () => {
   // A CC BY-SA image is shown as artwork, but its card face ships as a placeholder until that license is settled.
   assert.match(artCreditLine("edestus", credits, "artwork") ?? "", /CC BY-SA/);
   assert.equal(artCreditLine("edestus", credits, "face"), null);
+  // Pelagornis uses a CC BY-SA drawing of its sister species as placeholder artwork.
+  assert.equal(artCreditLine("pelagornis", credits, "artwork"), "Art: El fosilmaníaco · CC BY-SA 3.0");
   // Before the manifest loads, a licensed credit waits rather than showing a wrong one.
   assert.equal(artCreditLine("wildfire", null, "artwork"), null);
   for (const credit of credits) {
@@ -506,7 +508,14 @@ test("a card named for its genus prints the genus as an initial", () => {
 test("all 22 playable Creatures carry final flavor text and corrected records", () => {
   assert.ok(CREATURES.every((card) => card.flavorText.length > 70));
   assert.equal(CREATURES.find((card) => card.key === "baryonyx")?.diet, "Carnivore");
-  assert.equal(CREATURES.find((card) => card.key === "diplocaulus")?.period, "Permian");
+  assert.deepEqual(CREATURES.find((card) => card.key === "pelagornis")?.tags, ["Aerial", "Semi-Aquatic", "Gigantic"]);
+  assert.equal(CREATURES.find((card) => card.key === "pelagornis")?.period, "Paleogene");
+  // Diplocaulus left Deck 1 for the General Pool.
+  assert.equal(
+    CREATURES.some((card) => card.key === "diplocaulus"),
+    false,
+  );
+  assert.equal(CARD_LIBRARY.get("diplocaulus")?.status, "Not playable · Work in progress");
   assert.deepEqual(CREATURES.find((card) => card.key === "yutyrannus")?.tags, ["Cranial Display", "Pack Hunter"]);
   assert.deepEqual(CREATURES.find((card) => card.key === "dilophosaurus")?.tags, ["Raptorial", "Cranial Display"]);
   assert.deepEqual(CREATURES.find((card) => card.key === "tyrannosaurus-rex")?.tags, [
@@ -613,7 +622,7 @@ test("Aquatic and Semi-Aquatic substitute exactly their specified override categ
   assert.equal(result.legal, true, "Aquatic supplies Taxon while Engulf independently supplies Tag");
 
   game = readyGame();
-  placeCreature(game, 0, 0, "diplocaulus");
+  placePoolCreature(game, 0, 0, "diplocaulus");
   const baryonyx = putInHand(game, 0, "baryonyx");
   assert.equal(baryonyx.definition.kind, "creature");
   result = checkOverride(game, 0, baryonyx.definition, 0);
@@ -719,20 +728,14 @@ test("Semi-Aquatic does not qualify for Autotomy", () => {
     ),
     false,
   );
-  assert.equal(
-    adaptationEligible(
-      autotomy,
-      CREATURES.find((card) => card.key === "diplocaulus")!,
-    ),
-    true,
-  );
+  assert.equal(adaptationEligible(autotomy, CARD_LIBRARY.get("diplocaulus") as CreatureCard), true);
 });
 
 test("Semi-Aquatic counts as Aquatic only for Event and Concept effects", () => {
   const game = readyGame();
   game.phase = "battle";
   const ordinary = placeCreature(game, 0, 0, "allosaurus");
-  const aquaticTarget = placeCreature(game, 1, 1, "diplocaulus");
+  const aquaticTarget = placePoolCreature(game, 1, 1, "diplocaulus");
   setEvent(game, 0, "superpredators");
   assert.ok(
     legalAttackTargets(game, ordinary.card.uid).includes(aquaticTarget.card.uid),
@@ -756,7 +759,7 @@ test("Diver recognizes printed Aquatic defenders but not Semi-Aquatic defenders"
   game = readyGame();
   game.phase = "battle";
   const diverAgain = placeCreature(game, 0, 0, "natovenator");
-  const aquaticDefender = placeCreature(game, 1, 0, "diplocaulus");
+  const aquaticDefender = placePoolCreature(game, 1, 0, "diplocaulus");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, diverAgain.card.uid, aquaticDefender.card.uid);
   assert.ok(game.pendingBattle?.attackerNotes.includes("Diver +1"));
@@ -1184,7 +1187,7 @@ test("former Piscivores are Carnivores and use Cryptic Camouflage's offensive br
   let game = readyGame();
   game.phase = "battle";
   const natovenator = placeCreature(game, 0, 0, "natovenator");
-  const diplocaulus = placeCreature(game, 1, 0, "diplocaulus");
+  const diplocaulus = placePoolCreature(game, 1, 0, "diplocaulus");
   assert.equal(natovenator.card.definition.diet, "Carnivore");
   setEvent(game, 0, "superpredators");
   assert.ok(legalAttackTargets(game, natovenator.card.uid).includes(diplocaulus.card.uid));
@@ -1265,7 +1268,7 @@ test("Autotomy draws only when its Creature is overridden", () => {
   game = readyGame();
   game.phase = "battle";
   const allosaurus = placeCreature(game, 0, 0, "allosaurus");
-  const diplocaulus = placeCreature(game, 1, 0, "diplocaulus");
+  const diplocaulus = placePoolCreature(game, 1, 0, "diplocaulus");
   attachAdaptation(game, 1, 0, "autotomy");
   setEvent(game, 0, "superpredators");
   const deckBeforeBattle = game.players[1].deck.length;
@@ -1464,7 +1467,7 @@ test("declining Semelparity's in-play replacement preserves the Battle Phase", (
 
 test("Obligate Migration moves either side and carries the attached Adaptation without an entry trigger", () => {
   let game = readyGame();
-  placeCreature(game, 1, 0, "diplocaulus");
+  placePoolCreature(game, 1, 0, "diplocaulus");
   attachAdaptation(game, 1, 0, "autotomy");
   const migration = putInHand(game, 0, "obligate-migration");
   game = playConcept(game, migration.uid);
@@ -1534,6 +1537,12 @@ test("Abiogenesis places a Level 0 from hand, preserves the normal Creature play
 });
 
 /** Puts a card from the whole library onto `playerId`'s side, for Creatures outside their deck. */
+/** Places a Creature that is in no deck, such as one retired to the General Pool, and returns it in play. */
+function placePoolCreature(game: GameState, playerId: PlayerId, lane: number, key: string) {
+  placeLibraryCreature(game, playerId, lane, key);
+  return game.players[playerId].lanes[lane].creature!;
+}
+
 function placeLibraryCreature(
   game: GameState,
   playerId: PlayerId,
@@ -1831,7 +1840,7 @@ test("Aquatic Connected Waterways repositions a Creature and attachment without 
   let game = readyGame();
   game.players[0].biome.key = "aquatic";
   game.players[0].biome.waterwaysConnected = true;
-  const creature = placeCreature(game, 0, 0, "diplocaulus");
+  const creature = placePoolCreature(game, 0, 0, "diplocaulus");
   const attachment = attachAdaptation(game, 0, 0, "autotomy");
 
   assert.deepEqual(legalConnectedWaterwaySources(game), [0]);
@@ -1875,7 +1884,7 @@ test("Drought can fill either side, selectively override Aquatic identities, sup
   const facing = placeCreature(game, 0, 2, "xiphactinus");
   placeCreature(game, 1, 0, "natovenator");
   placeCreature(game, 1, 1, "hoatzin");
-  const aquaticTarget = placeCreature(game, 1, 2, "diplocaulus");
+  const aquaticTarget = placePoolCreature(game, 1, 2, "diplocaulus");
   const drought = putInHand(game, 0, "drought");
 
   const targets = legalDroughtTargets(game, drought);
@@ -2992,4 +3001,28 @@ test("The Great Dying sends the whole hand when it is short of what's owed", () 
   const game = playEvent(start, dying.uid);
   assert.equal(game.players[0].hand.length, 0);
   assert.equal(game.pendingGreatDying?.remaining, 0);
+});
+
+test("Pelagornis carries the early fossils, Microraptor and Hoatzin into the Level 2 theropods", () => {
+  let game = readyGame();
+  for (const [lane, key] of ["nautilus", "horseshoe-crab", "hoatzin", "microraptor", "compsognathus"].entries()) {
+    placeCreature(game, 0, lane, key);
+  }
+  const pelagornis = putInHand(game, 0, "pelagornis");
+  const definition = pelagornis.definition as CreatureCard;
+  // Semi-Aquatic opens the printed-Aquatic fossils; Aerial (with Glider) supplies the Tag for the two fliers.
+  assert.deepEqual(
+    [0, 1, 2, 3, 4].map((lane) => checkOverride(game, 0, definition, lane).legal),
+    [true, true, true, true, false],
+  );
+
+  game = playCreature(game, 0, pelagornis.uid, 0);
+  const inPlay = game.players[0].lanes[0].creature!;
+  assert.equal(inPlay.card.definition.key, "pelagornis");
+  assert.equal(cardVictoryLevel(game, inPlay), 2, "Gigantic adds a Victory Level");
+
+  const next = (key: string) => checkOverride(game, 0, putInHand(game, 0, key).definition as CreatureCard, 0).legal;
+  assert.equal(next("baryonyx"), true);
+  assert.equal(next("gojirasaurus"), true);
+  assert.equal(next("allosaurus"), false);
 });

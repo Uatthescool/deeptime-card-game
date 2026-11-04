@@ -1388,6 +1388,26 @@
       },
       "modifications": "Cropped from center as needed; resized; converted to sRGB WebP. Also set into the Dire Wolf card face, with the card's frame, period border and lettering.",
       "derivativeLicense": null
+    },
+    {
+      "cardKey": "pelagornis",
+      "cardName": "Pelagornis",
+      "cardKind": "creature",
+      "scientificName": "Pelagornis sandersi",
+      "commonsFile": "File:Pelagornis chilensis EF.jpg",
+      "creator": "El fosilmaníaco",
+      "credit": "Hypothetical life restoration of Pelagornis chilensis",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pelagornis_chilensis_EF.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/51/Pelagornis_chilensis_EF.jpg",
+      "sourceSha1": "c9aa06381b3ac846beea25945eea6959b00791a5",
+      "sourceDimensions": {
+        "width": 1750,
+        "height": 1302
+      },
+      "modifications": "Resized to fit; padded at the sides with the drawing’s paper color; converted to sRGB WebP. It shows Pelagornis chilensis, a sister species, as placeholder art for Pelagornis sandersi.",
+      "derivativeLicense": "CC BY-SA 3.0"
     }
   ]
 }
