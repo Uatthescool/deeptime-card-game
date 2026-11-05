@@ -520,7 +520,7 @@ test("all 22 playable Creatures carry final flavor text and corrected records", 
   assert.equal(CREATURES.find((card) => card.key === "baryonyx")?.diet, "Carnivore");
   assert.deepEqual(CREATURES.find((card) => card.key === "pelagornis")?.tags, ["Aerial", "Semi-Aquatic", "Gigantic"]);
   assert.equal(CREATURES.find((card) => card.key === "pelagornis")?.period, "Paleogene");
-  assert.deepEqual(CREATURES.find((card) => card.key === "maip")?.tags, ["Apex Predator"]);
+  assert.deepEqual(CREATURES.find((card) => card.key === "maip")?.tags, ["Apex Predator", "Bruiser"]);
   assert.deepEqual(CREATURES.find((card) => card.key === "saurornitholestes")?.tags, ["Ambush", "Scavenger"]);
   // Territorial moved to Velociraptor, for the "Fighting Dinosaurs" fossil.
   assert.deepEqual(CREATURES.find((card) => card.key === "velociraptor")?.tags, [

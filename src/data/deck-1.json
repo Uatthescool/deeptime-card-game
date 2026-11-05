@@ -557,7 +557,7 @@
       "periodColor": "Lime Green",
       "gameplayTaxon": "Archosaur",
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Megaraptoran"],
-      "tags": ["Apex Predator"],
+      "tags": ["Apex Predator","Bruiser"],
       "visualTags": [],
       "flavorText": "Maip is the largest theropod yet found in Argentina’s Chorrillo Formation, estimated at 9 to 10 meters long. Its name comes from Aonikenk mythology, in which Maip is an evil being that kills with cold wind.",
       "cardFace": "/card-faces/maip.webp",
