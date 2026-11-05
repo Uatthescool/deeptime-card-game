@@ -14,6 +14,7 @@ import {
   otherPlayer,
   type PlayerId,
 } from "../../src/engine/index.ts";
+import { inPlay } from "../fixtures.ts";
 
 type Seat = Difficulty | "random";
 
@@ -50,11 +51,14 @@ function playGame(
   return state;
 }
 
+// Each test plays many full AI games, and Deck 1 games can run past 50 turns, so allow plenty of time.
+const AI_GAMES_TIMEOUT_MS = 900_000;
+
 const decksFor = (game: number): [DeckKey, DeckKey] => [DECK_KEYS[game % 3]!, DECK_KEYS[(game + 1) % 3]!];
 const biomesFor = (game: number): [BiomeKey | null, BiomeKey | null] => [BIOMES[game % 6]!, BIOMES[(game + 2) % 6]!];
 
 describe("computer opponent", () => {
-  test("AI games always finish, using only legal moves", { timeout: 300_000 }, () => {
+  test("AI games always finish, using only legal moves", { timeout: AI_GAMES_TIMEOUT_MS }, () => {
     for (let game = 0; game < 9; game += 1) {
       const seats: [Seat, Seat] =
         game % 3 === 0 ? ["normal", "normal"] : game % 3 === 1 ? ["easy", "normal"] : ["normal", "easy"];
@@ -62,7 +66,7 @@ describe("computer opponent", () => {
     }
   });
 
-  test("Normal clearly beats random play", { timeout: 300_000 }, () => {
+  test("Normal clearly beats random play", { timeout: AI_GAMES_TIMEOUT_MS }, () => {
     let wins = 0;
     const games = 12;
     for (let game = 0; game < games; game += 1) {
@@ -73,7 +77,7 @@ describe("computer opponent", () => {
     expect(wins / games).toBeGreaterThanOrEqual(0.75);
   });
 
-  test("Normal beats Easy more often than not", { timeout: 300_000 }, () => {
+  test("Normal beats Easy more often than not", { timeout: AI_GAMES_TIMEOUT_MS }, () => {
     let wins = 0;
     const games = 12;
     for (let game = 0; game < games; game += 1) {
@@ -108,7 +112,7 @@ function scrambleHidden(state: GameState, me: PlayerId, seed: number): GameState
 }
 
 describe("the AI plays fair", () => {
-  test("its decisions never depend on information it couldn't see", { timeout: 300_000 }, () => {
+  test("its decisions never depend on information it couldn't see", { timeout: AI_GAMES_TIMEOUT_MS }, () => {
     let decisions = 0;
     for (let game = 0; game < 6; game += 1) {
       let state = createGame("North", "South", biomesFor(game), decksFor(game), { seed: 7000 + game });
@@ -135,5 +139,37 @@ describe("the AI plays fair", () => {
       }
     }
     expect(decisions).toBeGreaterThan(150);
+  });
+});
+
+describe("Intraguild Predation", () => {
+  /** Deck 1's Allosaurus facing two Deck 2 or Deck 3 Creatures, with Intraguild Predation as its only card. */
+  function spot(opponentDeck: DeckKey, opposing: [string, string]): GameState {
+    const game = createGame("A", "B", ["arid", "aquatic"], ["deck-1", opponentDeck], { seed: 3 });
+    Object.assign(game, { activePlayer: 0, turnNumber: 5, phase: "development", handoff: null });
+    const take = (playerId: PlayerId, key: string) => {
+      const player = game.players[playerId];
+      for (const zone of [player.deck, player.hand]) {
+        const index = zone.findIndex((card) => card.definition.key === key);
+        if (index >= 0) return zone.splice(index, 1)[0]!;
+      }
+      throw new Error(`No ${key}`);
+    };
+    game.players[0].lanes[0].creature = inPlay(take(0, "allosaurus"));
+    game.players[1].lanes[0].creature = inPlay(take(1, opposing[0]));
+    game.players[1].lanes[2].creature = inPlay(take(1, opposing[1]));
+    const concept = take(0, "intraguild-predation");
+    game.players[0].deck.push(...game.players[0].hand);
+    game.players[0].hand = [concept];
+    return game;
+  }
+  const choice = (game: GameState) => chooseAction(game, 0, { difficulty: "normal", random: aiRandom(1) });
+
+  test("Normal plays it when it opens a Hunt on a Carnivore", () => {
+    expect(choice(spot("deck-3", ["hyneria", "endoceras"]))?.type).toBe("playConcept");
+  });
+
+  test("Normal holds it when every opposing Creature can already be Hunted", () => {
+    expect(choice(spot("deck-2", ["protoceratops", "kentrosaurus"]))?.type).not.toBe("playConcept");
   });
 });

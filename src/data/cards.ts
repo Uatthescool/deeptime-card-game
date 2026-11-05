@@ -216,7 +216,9 @@ export function cardFacePath(card: CardDefinition): string | undefined {
 export function printedScientificName(card: CreatureCard): string | null {
   if (!card.scientificName) return null;
   const [genus, ...species] = card.scientificName.split(" ");
-  return genus === card.name && species.length ? `${genus[0]}. ${species.join(" ")}` : card.scientificName;
+  // Named for its genus, alone or followed by a nickname (Maip “Shadow of Death”): print the genus as an initial.
+  const namedForGenus = card.name === genus || card.name.startsWith(`${genus} `);
+  return namedForGenus && species.length ? `${genus[0]}. ${species.join(" ")}` : card.scientificName;
 }
 
 export function expandedTagNames(card: CreatureCard): string[] {

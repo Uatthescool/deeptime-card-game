@@ -153,6 +153,26 @@ function expectedHuntValue(preview: GameState, me: PlayerId) {
 
 const PASSING = new Set<GameAction["type"]>(["advanceToBattle", "endTurn", "cancelHunt"]);
 
+/** How much better than not Hunting the best Hunt available after entering the Battle Phase is. */
+function bestHuntGain(state: GameState, me: PlayerId) {
+  const battle = applyAction(state, { type: "advanceToBattle" });
+  if (battle.phase !== "battle") return 0;
+  const stay = evaluate(battle, me);
+  const hunts = listLegalActions(battle).filter((action) => action.type === "previewHunt");
+  return hunts.reduce((best, hunt) => Math.max(best, expectedHuntValue(applyAction(battle, hunt), me) - stay), 0);
+}
+
+/**
+ * Intraguild Predation pays off in the Battle Phase, past the AI's Development lookahead, so its choice
+ * is also worth the Hunts it opens up: the best Hunt with the Creature marked, less the best without.
+ */
+function intraguildPredationGain(world: GameState, next: GameState, me: PlayerId) {
+  if (world.pendingConceptChoice?.kind !== "intraguild-predation") return 0;
+  const unmarked = structuredClone(next);
+  for (const lane of unmarked.players[me].lanes) if (lane.creature) lane.creature.intraguildPredationTurn = null;
+  return Math.max(0, bestHuntGain(next, me) - bestHuntGain(unmarked, me));
+}
+
 /** True when `me` must answer a follow-up choice (a Concept option, a Herd pick, and so on) before play goes on. */
 function owesChoice(state: GameState, me: PlayerId) {
   if (state.phase === "game-over" || state.handoff || state.pendingBattle || actingPlayer(state) !== me) return false;
@@ -179,7 +199,7 @@ function actionValue(
     const options = listLegalActions(next).filter((option) => option.type !== "concede");
     return Math.max(...options.map((option) => actionValue(next, option, me, lookahead, plan, depth + 1)));
   }
-  const here = evaluate(next, me);
+  const here = evaluate(next, me) + intraguildPredationGain(world, next, me);
   // Planning ahead: a Development move is also worth the best Development move it opens up.
   if (plan > 0 && next.phase === "development" && !next.handoff && actingPlayer(next) === me) {
     const followUps = listLegalActions(next).filter((option) => option.type !== "concede" && !PASSING.has(option.type));

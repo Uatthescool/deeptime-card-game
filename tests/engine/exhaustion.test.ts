@@ -90,7 +90,7 @@ describe("deck exhaustion", () => {
     expect(state.finalTurn).toBe(8);
     state = applyAction(state, { type: "acknowledgeHandoff" });
     // Grace's board jumps past the threshold before the round ends.
-    for (const [laneIndex, key] of ["torvosaurus", "tyrannosaurus-rex", "spinosaurus", "dimetrodon"].entries()) {
+    for (const [laneIndex, key] of ["torvosaurus", "tyrannosaurus-rex", "spinosaurus", "maip"].entries()) {
       const card = state.players[1].history.find((entry) => entry.definition.key === key)!;
       state.players[1].history = state.players[1].history.filter((entry) => entry !== card);
       state.players[1].lanes[laneIndex + 1]!.creature = inPlay(card);

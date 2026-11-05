@@ -6,6 +6,7 @@ import {
   creatureCanEnterNiche,
   creatureCanMoveByEffect,
   creatureIsUntouchable,
+  huntingDiet,
   effectiveHasTag,
   hasEnterableEmptyNiche,
   hasIslandDwarfism,
@@ -345,6 +346,16 @@ export function deepSeaGigantismLanes(state: GameState, playerId: PlayerId, card
   );
 }
 
+/** Intraguild Predation: the Niches holding a Carnivore or Omnivore of yours that can be chosen. */
+export function intraguildPredationLanes(state: GameState, playerId: PlayerId): number[] {
+  return state.players[playerId].lanes.flatMap((lane, index) => {
+    const creature = lane.creature?.card.definition;
+    if (!creature || creatureIsUntouchable(lane)) return [];
+    const diet = huntingDiet(creature);
+    return diet === "Carnivore" || diet === "Omnivore" ? [index] : [];
+  });
+}
+
 /**
  * Concepts with a mandatory choice may be played only when that choice can be
  * made. Returns why it can't, or null when the choice is available.
@@ -384,6 +395,10 @@ function missingRequiredChoice(state: GameState, key: string): Reason | null {
       )
         ? null
         : missing("Needs a Creature that can move and an empty Niche on the same side of the board.");
+    case "intraguild-predation":
+      return intraguildPredationLanes(state, state.activePlayer).length
+        ? null
+        : missing("Needs a Carnivore or Omnivore on your side of the board.");
     case "deep-sea-gigantism":
       return player.hand.some((card) => deepSeaGigantismLanes(state, state.activePlayer, card).length)
         ? null

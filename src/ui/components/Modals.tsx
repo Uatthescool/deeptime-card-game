@@ -320,6 +320,10 @@ const CONCEPT_PROMPTS: Record<string, { title: string; copy: string }> = {
     title: "Choose an Aquatic Gigantic Creature",
     copy: "Level 1 is free. Level 2 or 3 ends your turn without a Battle Phase, and Level 3 also skips your next Draw Phase.",
   },
+  "intraguild-predation": {
+    title: "Choose your hunter",
+    copy: "This turn it may Hunt opposing Creatures that share its Diet. The first time it destroys one this turn, you draw a card.",
+  },
   "deep-sea-gigantism-lane": {
     title: "Choose the Creature it replaces",
     copy: "The override ignores Level, the Aquatic gate and matching. It doesn’t use your normal Creature play.",

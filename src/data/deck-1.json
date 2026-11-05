@@ -13,10 +13,10 @@
       "level3": 3
     },
     "supportSplit": {
-      "continuousEvents": 3,
+      "continuousEvents": 2,
       "instantaneousEvents": 1,
       "adaptations": 3,
-      "concepts": 11
+      "concepts": 12
     }
   },
   "rulesChanges": [
@@ -233,6 +233,7 @@
     "Elusive": "This Creature cannot Hunt Level 1 or higher Creatures. The first time it is Hunted each turn, flip the Elusive coin: red Rex forces a tie; black reverse resolves normally.",
     "Small Game Hunter": "Gets +1 Battle Level while attacking a Level 0 Creature.",
     "Mob Feeder": "After another friendly Creature makes the first kill that can trigger this Tag during a turn, this Creature gets +1 Battle Level in its next initiated Hunt that turn.",
+    "Scavenger": "Whenever the opposing Creature in this Creature’s facing Niche leaves play, except by a Hunt this Creature initiated, draw 1 card. For overrides, this Creature also counts as having Mob Feeder.",
     "Resourceful": "Represents behavioral or ecological flexibility. While you control at least one Creature with Resourceful, your normal Concept allowance is two per turn instead of one. Multiple instances do not stack.",
     "Aerial": "When this Creature is Hunted, the attacker gets -1 Battle Level during that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only for bypassing this penalty and for compatibility; Glider does not grant this defensive effect.",
     "Transitional": "For an override involving this Creature, treat the two Time Periods as matching when the two Creatures share their Primary Taxon.",
@@ -386,7 +387,7 @@
       "periodColor": "Lime Green",
       "gameplayTaxon": "Archosaur",
       "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Dromaeosaurid"],
-      "tags": ["Ambush", "Saboteur", "Small Game Hunter"],
+      "tags": ["Territorial", "Saboteur", "Small Game Hunter"],
       "visualTags": ["Feathered", "Wings", "Raptorial Claws"],
       "flavorText": "Quill knobs along a Velociraptor forearm show that long wing feathers anchored to the ulna, although the animal could not fly. The famous Fighting Dinosaurs fossil preserves one locked in combat with Protoceratops—a small, feathered predator far removed from its oversized screen portrayals.",
       "cardFace": "/card-faces/velociraptor.webp",
@@ -444,20 +445,20 @@
       "status": "Locked"
     },
     {
-      "key": "cynognathus",
+      "key": "saurornitholestes",
       "kind": "creature",
-      "name": "Cynognathus",
-      "scientificName": "Cynognathus crateronotus",
+      "name": "Saurornitholestes",
+      "scientificName": "Saurornitholestes langstoni",
       "printedLevel": 1,
       "diet": "Carnivore",
-      "period": "Triassic",
-      "periodColor": "Amber Orange",
-      "gameplayTaxon": "Synapsid",
-      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Cynodont", "Cynognathid"],
-      "tags": ["Transitional", "Generalist"],
-      "visualTags": [],
-      "flavorText": "One of the largest predatory cynodonts, Cynognathus grew rapidly and could exceed 100 kilograms, combining a powerful skull and serrated, blade-like teeth with increasingly mammal-like anatomy.",
-      "cardFace": "/card-faces/cynognathus.webp",
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Coelurosaur","Paravian","Dromaeosaurid"],
+      "tags": ["Ambush", "Scavenger"],
+      "visualTags": ["Feathered"],
+      "flavorText": "A Saurornitholestes tooth found embedded in a wing bone of a giant pterosaur shows that it fed on animals far larger than itself, probably by scavenging.",
+      "cardFace": "/card-faces/saurornitholestes.webp",
       "status": "Locked"
     },
     {
@@ -546,20 +547,20 @@
       "status": "Locked"
     },
     {
-      "key": "dimetrodon",
+      "key": "maip",
       "kind": "creature",
-      "name": "Dimetrodon",
-      "scientificName": "Dimetrodon grandis",
+      "name": "Maip “Shadow of Death”",
+      "scientificName": "Maip macrothorax",
       "printedLevel": 2,
       "diet": "Carnivore",
-      "period": "Permian",
-      "periodColor": "Slate Gray",
-      "gameplayTaxon": "Synapsid",
-      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Sphenacodontian", "Sphenacodontid"],
-      "tags": ["Spinal Sail", "Small Game Hunter", "Apex Predator"],
+      "period": "Cretaceous",
+      "periodColor": "Lime Green",
+      "gameplayTaxon": "Archosaur",
+      "taxa": ["Vertebrate","Amniote","Archosaur","Dinosaur","Saurischian","Theropod","Tetanuran","Megaraptoran"],
+      "tags": ["Apex Predator"],
       "visualTags": [],
-      "flavorText": "Dimetrodon was a non-mammalian synapsid, making it more closely related to mammals than to dinosaurs; it lived tens of millions of years before the first dinosaurs appeared.",
-      "cardFace": "/card-faces/dimetrodon.webp",
+      "flavorText": "Maip is the largest theropod yet found in Argentina’s Chorrillo Formation, estimated at 9 to 10 meters long. Its name comes from Aonikenk mythology, in which Maip is an evil being that kills with cold wind.",
+      "cardFace": "/card-faces/maip.webp",
       "status": "Locked"
     },
     {
@@ -680,13 +681,12 @@
       "status": "Locked"
     },
     {
-      "key": "carnian-pluvial-episode",
-      "kind": "event",
-      "eventType": "continuous",
-      "name": "Carnian Pluvial Episode",
-      "rules": "Once during each of your Development Phases, you may send 1 Creature you control without Dinosaur in its Taxa to its owner's History Pile. If you do, search your deck for a Creature with Dinosaur in its Taxa and Printed Level 2 or lower, reveal it, add it to your hand, then shuffle your deck.",
-      "note": "It may be activated during the Development Phase in which it is played. Activating it does not use the normal Creature play or Event play. A Dinosaur is identified through its Taxa, so birds cannot be sent as the cost. It cannot be activated at the 10-card hand limit.",
-      "cardFace": "/card-faces/carnian-pluvial-episode.webp",
+      "key": "intraguild-predation",
+      "kind": "concept",
+      "name": "Intraguild Predation",
+      "rules": "Choose a Carnivore or Omnivore you control. This turn, it may Hunt opposing Creatures that share its Diet. The first time it destroys one this turn, draw 1 card.",
+      "note": "Diet here means the Diet it Hunts by: a Filter Feeder counts as an Herbivore, so it can't be chosen. A Frozen or Burrowed Creature can't be chosen.",
+      "cardFace": "/card-faces/intraguild-predation.webp",
       "status": "Locked"
     },
     {
@@ -894,6 +894,50 @@
       "visualTags": [],
       "flavorText": "Juvenile Diplocaulus had short projections at the rear of the skull that lengthened dramatically with maturity. Hydrodynamic models suggest the adult’s boomerang-shaped head generated lift and high underwater maneuverability, although its actual biological function remains uncertain.",
       "cardFace": "/card-faces/diplocaulus.webp",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "dimetrodon",
+      "kind": "creature",
+      "name": "Dimetrodon",
+      "scientificName": "Dimetrodon grandis",
+      "printedLevel": 2,
+      "diet": "Carnivore",
+      "period": "Permian",
+      "periodColor": "Slate Gray",
+      "gameplayTaxon": "Synapsid",
+      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Sphenacodontian", "Sphenacodontid"],
+      "tags": ["Spinal Sail", "Small Game Hunter", "Apex Predator"],
+      "visualTags": [],
+      "flavorText": "Dimetrodon was a non-mammalian synapsid, making it more closely related to mammals than to dinosaurs; it lived tens of millions of years before the first dinosaurs appeared.",
+      "cardFace": "/card-faces/dimetrodon.webp",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "cynognathus",
+      "kind": "creature",
+      "name": "Cynognathus",
+      "scientificName": "Cynognathus crateronotus",
+      "printedLevel": 1,
+      "diet": "Carnivore",
+      "period": "Triassic",
+      "periodColor": "Amber Orange",
+      "gameplayTaxon": "Synapsid",
+      "taxa": ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Cynodont", "Cynognathid"],
+      "tags": ["Transitional", "Generalist"],
+      "visualTags": [],
+      "flavorText": "One of the largest predatory cynodonts, Cynognathus grew rapidly and could exceed 100 kilograms, combining a powerful skull and serrated, blade-like teeth with increasingly mammal-like anatomy.",
+      "cardFace": "/card-faces/cynognathus.webp",
+      "status": "Not playable · Work in progress"
+    },
+    {
+      "key": "carnian-pluvial-episode",
+      "kind": "event",
+      "eventType": "continuous",
+      "name": "Carnian Pluvial Episode",
+      "rules": "Once during each of your Development Phases, you may send 1 Creature you control without Dinosaur in its Taxa to its owner's History Pile. If you do, search your deck for a Creature with Dinosaur in its Taxa and Printed Level 2 or lower, reveal it, add it to your hand, then shuffle your deck.",
+      "note": "It may be activated during the Development Phase in which it is played. Activating it does not use the normal Creature play or Event play. A Dinosaur is identified through its Taxa, so birds cannot be sent as the cost. It cannot be activated at the 10-card hand limit.",
+      "cardFace": "/card-faces/carnian-pluvial-episode.webp",
       "status": "Not playable · Work in progress"
     }
   ]

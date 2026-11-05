@@ -11,6 +11,7 @@ import {
 import {
   adaptationSlotEmpty,
   addLog,
+  huntingDiet,
   clone,
   drawOne,
   findCreature,
@@ -161,6 +162,18 @@ function hasLethalThagomizer(found: FoundCreature, ignoreDefenses: boolean) {
 function resolveKillTags(state: GameState, killer: FoundCreature, defeated: CreatureInstance) {
   const killerDefinition = killer.creature.card.definition;
   if (
+    killer.creature.intraguildPredationTurn === state.turnNumber &&
+    killer.creature.intraguildPredationDrewTurn !== state.turnNumber &&
+    huntingDiet(defeated.definition) === huntingDiet(killerDefinition)
+  ) {
+    killer.creature.intraguildPredationDrewTurn = state.turnNumber;
+    drawOne(state, killer.playerId, "Intraguild Predation");
+    addLog(
+      state,
+      `Intraguild Predation drew a card when ${killerDefinition.name} destroyed ${defeated.definition.name}.`,
+    );
+  }
+  if (
     killerDefinition.tags.includes("Durophagy") &&
     defeated.definition.tags.some((tag) => DEFENSIVE_TAGS[tag]?.hard)
   ) {
@@ -187,7 +200,8 @@ function resolveKillTags(state: GameState, killer: FoundCreature, defeated: Crea
 function destroyInBattle(state: GameState, loserUid: string, killerUid: string, message: string) {
   const loser = findCreature(state, loserUid);
   if (!loser) return null;
-  const defeated = sendCreatureToHistory(state, loser.playerId, loser.laneIndex, "battle");
+  const initiator = state.pendingBattle?.attackerUid ?? null;
+  const defeated = sendCreatureToHistory(state, loser.playerId, loser.laneIndex, "battle", initiator);
   addLog(state, message);
   const killer = findCreature(state, killerUid);
   if (killer && defeated?.definition.kind === "creature") {

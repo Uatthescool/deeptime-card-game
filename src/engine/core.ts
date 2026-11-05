@@ -1,4 +1,4 @@
-import { type CreatureCard, PERIODS } from "../data/cards.ts";
+import { type CreatureCard, PERIODS, tagEffectMultiplier } from "../data/cards.ts";
 import type {
   CardInstance,
   CreatureInPlay,
@@ -80,6 +80,8 @@ export function overrideTags(creature: CreatureCard) {
     tags.add("Shell");
     tags.add("Osteoderm");
   }
+  // Scavenger counts as Mob Feeder for overrides only; it gains none of Mob Feeder's Hunt bonus.
+  if (tags.has("Scavenger")) tags.add("Mob Feeder");
   if (tags.has("Sovereign")) {
     tags.add("Gigantic");
     if (creature.diet !== "Herbivore") tags.add("Territorial");
@@ -289,11 +291,16 @@ function moveAdaptationSlotToHistory(state: GameState, lane: LaneState) {
   return attachment;
 }
 
+/**
+ * Sends the Creature in a Niche to its owner's History Pile. `huntInitiatorUid` is the Creature that
+ * initiated the Hunt this happened in, if any; Scavenger ignores a departure its own Hunt caused.
+ */
 export function sendCreatureToHistory(
   state: GameState,
   playerId: PlayerId,
   laneIndex: number,
   reason: "battle" | "override" | "effect",
+  huntInitiatorUid: string | null = null,
 ) {
   const player = state.players[playerId];
   const lane = player.lanes[laneIndex]!;
@@ -313,7 +320,25 @@ export function sendCreatureToHistory(
     player.returnQueue.push(card.uid);
     addLog(state, `${card.definition.name} was marked for its once-per-game Living Fossil return.`);
   }
+  resolveScavenger(state, playerId, laneIndex, huntInitiatorUid);
   return card;
+}
+
+/** Scavenger: the opposing Creature facing one that left play draws, unless that came from its own Hunt. */
+function resolveScavenger(
+  state: GameState,
+  departedOwner: PlayerId,
+  laneIndex: number,
+  huntInitiatorUid: string | null,
+) {
+  const scavengerPlayer = otherPlayer(departedOwner);
+  const lane = state.players[scavengerPlayer].lanes[laneIndex];
+  const scavenger = lane?.creature;
+  if (!scavenger || !scavenger.card.definition.tags.includes("Scavenger") || nicheIsFrozen(lane)) return;
+  if (scavenger.card.uid === huntInitiatorUid) return;
+  const draws = tagEffectMultiplier(scavenger.card.definition, "Scavenger");
+  addLog(state, `${scavenger.card.definition.name}'s Scavenger drew ${draws} ${draws === 1 ? "card" : "cards"}.`);
+  for (let index = 0; index < draws; index += 1) drawOne(state, scavengerPlayer, "Scavenger");
 }
 
 export function makeCreatureInPlay(card: CreatureInstance, turnNumber: number, ownerNextTurn: number): CreatureInPlay {

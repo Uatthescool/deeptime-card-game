@@ -250,7 +250,7 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
   assert.equal(SUPPORTS.length, 18);
   assert.deepEqual(
     ["event", "adaptation", "concept"].map((kind) => SUPPORTS.filter((card) => card.kind === kind).length),
-    [4, 3, 11],
+    [3, 3, 12],
   );
   assert.equal(
     SUPPORTS.some((card) => card.key === "ghost-lineage"),
@@ -268,8 +268,13 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     CREATURES.some((card) => card.key === "inostrancevia"),
     false,
   );
+  // Carnian Pluvial Episode left Deck 1 for the General Pool; Intraguild Predation took its place.
   assert.equal(
     SUPPORTS.some((card) => card.key === "carnian-pluvial-episode"),
+    false,
+  );
+  assert.equal(
+    SUPPORTS.some((card) => card.key === "intraguild-predation"),
     true,
   );
   assert.equal(
@@ -280,10 +285,10 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     SUPPORTS.some((card) => card.key === "wildfire"),
     true,
   );
-  assert.equal(GENERAL_POOL.length, 12);
+  assert.equal(GENERAL_POOL.length, 15);
   assert.ok(
-    ["competitive-exclusion-principle", "purussaurus", "epicyon", "diplocaulus"].every((key) =>
-      GENERAL_POOL.some((card) => card.key === key),
+    ["competitive-exclusion-principle", "purussaurus", "epicyon", "diplocaulus", "dimetrodon", "cynognathus"].every(
+      (key) => GENERAL_POOL.some((card) => card.key === key),
     ),
   );
   // The pool only holds cards that aren't in a deck, Deck 4 included.
@@ -403,7 +408,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 129);
+  assert.equal(inspectableCards.length, 132);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -470,6 +475,8 @@ test("every piece of artwork shown on screen carries a short credit", () => {
   assert.equal(artCreditLine("edestus", credits, "face"), null);
   // Pelagornis uses a CC BY-SA drawing of its sister species as placeholder artwork.
   assert.equal(artCreditLine("pelagornis", credits, "artwork"), "Art: El fosilmaníaco · CC BY-SA 3.0");
+  // A CC BY painting can go on the finished face too.
+  assert.equal(artCreditLine("saurornitholestes", credits, "face"), "Art: Emily Willoughby · CC BY 3.0");
   // Before the manifest loads, a licensed credit waits rather than showing a wrong one.
   assert.equal(artCreditLine("wildfire", null, "artwork"), null);
   for (const credit of credits) {
@@ -503,6 +510,9 @@ test("a card named for its genus prints the genus as an initial", () => {
   assert.equal(printed("orca"), "Orcinus orca");
   assert.equal(printed("megalodon"), "Otodus megalodon");
   assert.equal(printed("horseshoe-crab"), null);
+  // A genus name followed by a nickname still prints the initial.
+  assert.equal(CARD_LIBRARY.get("maip")?.name, "Maip “Shadow of Death”");
+  assert.equal(printed("maip"), "M. macrothorax");
 });
 
 test("all 22 playable Creatures carry final flavor text and corrected records", () => {
@@ -510,7 +520,23 @@ test("all 22 playable Creatures carry final flavor text and corrected records", 
   assert.equal(CREATURES.find((card) => card.key === "baryonyx")?.diet, "Carnivore");
   assert.deepEqual(CREATURES.find((card) => card.key === "pelagornis")?.tags, ["Aerial", "Semi-Aquatic", "Gigantic"]);
   assert.equal(CREATURES.find((card) => card.key === "pelagornis")?.period, "Paleogene");
-  // Diplocaulus left Deck 1 for the General Pool.
+  assert.deepEqual(CREATURES.find((card) => card.key === "maip")?.tags, ["Apex Predator"]);
+  assert.deepEqual(CREATURES.find((card) => card.key === "saurornitholestes")?.tags, ["Ambush", "Scavenger"]);
+  // Territorial moved to Velociraptor, for the "Fighting Dinosaurs" fossil.
+  assert.deepEqual(CREATURES.find((card) => card.key === "velociraptor")?.tags, [
+    "Territorial",
+    "Saboteur",
+    "Small Game Hunter",
+  ]);
+  // Diplocaulus, Dimetrodon and Cynognathus left Deck 1 for the General Pool.
+  assert.equal(
+    CREATURES.some((card) => card.key === "cynognathus"),
+    false,
+  );
+  assert.equal(
+    CREATURES.some((card) => card.key === "dimetrodon"),
+    false,
+  );
   assert.equal(
     CREATURES.some((card) => card.key === "diplocaulus"),
     false,
@@ -558,7 +584,7 @@ test("every visible Creature Tag has an inspection definition", () => {
 
 test("Cynognathus reaches Triassic Carnivores but is not universal", () => {
   const game = readyGame();
-  placeCreature(game, 0, 0, "cynognathus");
+  placePoolCreature(game, 0, 0, "cynognathus");
   const gojirasaurus = putInHand(game, 0, "gojirasaurus");
   const baryonyx = putInHand(game, 0, "baryonyx");
   assert.equal(gojirasaurus.definition.kind, "creature");
@@ -767,7 +793,7 @@ test("Diver recognizes printed Aquatic defenders but not Semi-Aquatic defenders"
 
 test("Spinal Sail mitigates each Creature's Apex Predator crowding decrease by one", () => {
   const game = readyGame();
-  const dimetrodon = placeCreature(game, 0, 0, "dimetrodon");
+  const dimetrodon = placePoolCreature(game, 0, 0, "dimetrodon");
   assert.equal(cardVictoryLevel(game, dimetrodon), 4);
   placeCreature(game, 1, 0, "tyrannosaurus-rex");
   assert.equal(cardVictoryLevel(game, dimetrodon), 4);
@@ -865,7 +891,7 @@ test("a pending Convergent Evolution prevents Rapid Speciation from combining", 
 test("Convergent Evolution supplies one missing non-Tag category after a shared Tag and one other match", () => {
   let game = readyGame();
   placeCreature(game, 0, 0, "archaeopteryx");
-  const dimetrodon = putInHand(game, 0, "dimetrodon");
+  const dimetrodon = putGeneralCreatureInHand(game, 0, "dimetrodon");
   assert.equal(dimetrodon.definition.kind, "creature");
   assert.equal(checkOverride(game, 0, dimetrodon.definition, 0).legal, false);
   game.players[0].allowances.convergentEvolution = true;
@@ -987,7 +1013,11 @@ test("Cambrian Explosion replaces itself on entry only when its controller has a
 
 test("Carnian Pluvial Episode converts a controlled non-Dinosaur into a Level 2-or-lower Dinosaur tutor", () => {
   let game = readyGame();
-  setEvent(game, 0, "carnian-pluvial-episode");
+  game.players[0].event = {
+    uid: "0-library-carnian-pluvial-episode",
+    owner: 0,
+    definition: CARD_LIBRARY.get("carnian-pluvial-episode") as EventCard,
+  };
   const nautilus = placeCreature(game, 0, 0, "nautilus");
   const hoatzin = placeCreature(game, 0, 1, "hoatzin");
   const carnotaurus = takeCard(game, 0, "carnotaurus");
@@ -1134,10 +1164,10 @@ test("Aerial reduces ordinary attackers but Ambush and Glider bypass the penalty
 
   game = readyGame();
   game.phase = "battle";
-  const velociraptor = placeCreature(game, 0, 0, "velociraptor");
+  const ambusher = placeCreature(game, 0, 0, "saurornitholestes");
   const hoatzin2 = placeCreature(game, 1, 0, "hoatzin");
-  game = previewBattle(game, velociraptor.card.uid, hoatzin2.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 2);
+  game = previewBattle(game, ambusher.card.uid, hoatzin2.card.uid);
+  assert.equal(game.pendingBattle?.attackerLevel, 1);
   assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -1"), false);
 
   game = readyGame();
@@ -1227,13 +1257,13 @@ test("Cryptic Camouflage defensive coins force a tie and combine with existing E
 test("Cryptic Camouflage gives Ambush predators two offensive coin flips", () => {
   let game = readyGame();
   game.phase = "battle";
-  const velociraptor = placeCreature(game, 0, 0, "velociraptor");
+  const ambusher = placeCreature(game, 0, 0, "saurornitholestes");
   const hoatzin = placeCreature(game, 1, 0, "hoatzin");
   attachAdaptation(game, 0, 0, "cryptic-camouflage");
-  game = previewBattle(game, velociraptor.card.uid, hoatzin.card.uid);
+  game = previewBattle(game, ambusher.card.uid, hoatzin.card.uid);
   assert.equal(game.pendingBattle?.coinPlan.offensiveCount, 2);
-  assert.equal(game.pendingBattle?.attackerLevel, 2);
-  assert.equal(game.pendingBattle?.attackerLevelMax, 4);
+  assert.equal(game.pendingBattle?.attackerLevel, 1);
+  assert.equal(game.pendingBattle?.attackerLevelMax, 3);
   game = commitBattle(game, { offensive: [true, true] });
   assert.equal(game.players[1].lanes[0].creature, null);
   assert.ok(game.log.some((line) => line.includes("+2 Battle Level")));
@@ -1300,7 +1330,7 @@ test("Evolutionary Radiation can resolve both effects, preserve the normal Creat
   assert.equal(game.players[0].allowances.skipBattlePhase, true);
   assert.equal(game.pendingConceptChoice, null);
 
-  const normal = putInHand(game, 0, "cynognathus");
+  const normal = putGeneralCreatureInHand(game, 0, "cynognathus");
   game = playCreature(game, 0, normal.uid, 3);
   assert.equal(game.players[0].lanes.filter((lane) => lane.creature).length, 4);
   assert.equal(game.players[0].allowances.creaturePlayed, true);
@@ -1812,7 +1842,7 @@ test("Cold augments Gigantic itself, so Specialized doubles only the granted num
   const levelTwoHunter = placeCreature(game, 0, 0, "carnotaurus");
   assert.ok(legalAttackTargets(game, levelTwoHunter.card.uid).includes(protectedBlueWhale.card.uid));
   game.players[0].lanes[0].creature = null;
-  const levelOneHunter = placeCreature(game, 0, 0, "cynognathus");
+  const levelOneHunter = placePoolCreature(game, 0, 0, "cynognathus");
   assert.equal(legalAttackTargets(game, levelOneHunter.card.uid).includes(protectedBlueWhale.card.uid), false);
 });
 
@@ -1821,7 +1851,7 @@ test("Arid Tipping Point wins at the start of Turn 26 with 10+ Victory Levels an
   game.players[0].biome.key = "arid";
   placeCreature(game, 0, 0, "tyrannosaurus-rex");
   placeCreature(game, 0, 1, "spinosaurus");
-  placeCreature(game, 0, 2, "dimetrodon");
+  placePoolCreature(game, 0, 2, "dimetrodon");
   placeCreature(game, 0, 3, "allosaurus");
   assert.ok(victoryTotals(game)[0] >= 10);
   assert.ok(game.players[1].lanes.every((lane) => !lane.creature));
@@ -1919,7 +1949,7 @@ test("Drought can fill either side, selectively override Aquatic identities, sup
   assert.equal(cardVictoryLevel(game, facing), 2, "the directly opposing Niche loses one Victory Level");
   assert.equal(game.players[0].allowances.creaturePlayed, false, "Drought never consumes the normal Creature play");
 
-  const protectedSpinalSail = placeCreature(game, 1, 4, "dimetrodon");
+  const protectedSpinalSail = placePoolCreature(game, 1, 4, "dimetrodon");
   const droughtDefinition = DECK_3_SUPPORTS.find((card) => card.key === "drought");
   assert.ok(droughtDefinition);
   const secondDrought: CardInstance = { uid: "0-drought-spinal-sail-check", owner: 0, definition: droughtDefinition };
@@ -1932,7 +1962,7 @@ test("Drought can fill either side, selectively override Aquatic identities, sup
     "Spinal Sail mitigates Drought's Event-based Victory decrease by 1",
   );
 
-  const opposing = placeCreature(game, 1, 3, "cynognathus");
+  const opposing = placePoolCreature(game, 1, 3, "cynognathus");
   assert.equal(
     inspectBattleLevel(game, facing.card.uid, "attacker", opposing.card.uid),
     1,
@@ -2045,7 +2075,7 @@ test("Geological Boundary resolves Victory changes from global Apex Predator cro
   let game = readyGame(["deck-1", "deck-3"]);
   placeCreature(game, 0, 0, "tyrannosaurus-rex");
   placeCreature(game, 0, 1, "torvosaurus");
-  placeCreature(game, 0, 2, "dimetrodon");
+  placePoolCreature(game, 0, 2, "dimetrodon");
   placeCreature(game, 0, 3, "allosaurus");
   placeCreature(game, 1, 4, "megalodon");
   assert.deepEqual(victoryTotals(game), [11, 3]);
@@ -2072,7 +2102,7 @@ test("Drought expiration restores Victory and checks the win threshold before ha
   let game = readyGame(["deck-1", "deck-3"]);
   placeCreature(game, 0, 0, "tyrannosaurus-rex");
   placeCreature(game, 0, 1, "torvosaurus");
-  placeCreature(game, 0, 2, "dimetrodon");
+  placePoolCreature(game, 0, 2, "dimetrodon");
   placeCreature(game, 0, 3, "allosaurus");
 
   const droughtDefinition = DECK_3_SUPPORTS.find((card) => card.key === "drought");
@@ -2942,7 +2972,7 @@ function greatDyingBoard() {
   const triassic = placeCreature(game, 0, 1, "herrerasaurus");
   const victims = [
     placeCreature(game, 1, 0, "allosaurus"),
-    placeCreature(game, 1, 1, "dimetrodon"),
+    placePoolCreature(game, 1, 1, "dimetrodon"),
     placeCreature(game, 1, 2, "carnotaurus"),
   ];
   const burrowed = placeCreature(game, 1, 3, "horseshoe-crab");
@@ -3025,4 +3055,118 @@ test("Pelagornis carries the early fossils, Microraptor and Hoatzin into the Lev
   assert.equal(next("baryonyx"), true);
   assert.equal(next("gojirasaurus"), true);
   assert.equal(next("allosaurus"), false);
+});
+
+test("Scavenger draws when the facing opposing Creature leaves play, except to its own Hunt", () => {
+  // Its own Hunt: a kill it makes itself draws nothing. (Ambush also cancels Hoatzin's Aerial penalty.)
+  let game = readyGame();
+  game.phase = "battle";
+  const scavenger = placeCreature(game, 0, 1, "saurornitholestes");
+  const prey = placeCreature(game, 1, 1, "hoatzin");
+  let handSize = game.players[0].hand.length;
+  assert.ok(legalAttackTargets(game, scavenger.card.uid).includes(prey.card.uid));
+  game = previewBattle(game, scavenger.card.uid, prey.card.uid);
+  game = commitBattle(game);
+  assert.equal(game.players[1].lanes[1].creature, null);
+  assert.equal(game.players[0].hand.length, handSize);
+
+  // Another friendly Creature's kill draws a card.
+  game = readyGame();
+  game.phase = "battle";
+  placeCreature(game, 0, 1, "saurornitholestes");
+  const hunter = placeCreature(game, 0, 2, "allosaurus");
+  const carcass = placeCreature(game, 1, 1, "compsognathus");
+  setEvent(game, 0, "superpredators");
+  handSize = game.players[0].hand.length;
+  game = previewBattle(game, hunter.card.uid, carcass.card.uid);
+  game = commitBattle(game);
+  assert.equal(game.players[1].lanes[1].creature, null);
+  assert.equal(game.players[0].hand.length, handSize + 1);
+
+  // So does the opponent overriding the facing Creature: the outcompeted animal is scavenged too.
+  game = readyGame();
+  placeCreature(game, 0, 3, "saurornitholestes");
+  placeCreature(game, 1, 3, "compsognathus");
+  game.activePlayer = 1;
+  const successor = putInHand(game, 1, "velociraptor");
+  handSize = game.players[0].hand.length;
+  game = playCreature(game, 1, successor.uid, 3);
+  assert.equal(game.players[1].lanes[3].creature?.card.definition.key, "velociraptor");
+  assert.equal(game.players[0].hand.length, handSize + 1);
+});
+
+test("Scavenger counts as Mob Feeder for overrides, opening Compsognathus and Allosaurus", () => {
+  const game = readyGame();
+  placeCreature(game, 0, 0, "compsognathus");
+  const scavenger = putInHand(game, 0, "saurornitholestes").definition as CreatureCard;
+  assert.equal(checkOverride(game, 0, scavenger, 0).matches.tag, true);
+  assert.equal(checkOverride(game, 0, scavenger, 0).legal, true);
+  placeCreature(game, 0, 1, "saurornitholestes");
+  const allosaurus = putInHand(game, 0, "allosaurus").definition as CreatureCard;
+  assert.equal(checkOverride(game, 0, allosaurus, 1).legal, true);
+});
+
+test("Territorial lets Velociraptor Hunt the Carnivore facing it, which Saurornitholestes can't", () => {
+  const game = readyGame();
+  game.phase = "battle";
+  const velociraptor = placeCreature(game, 0, 0, "velociraptor");
+  const scavenger = placeCreature(game, 0, 1, "saurornitholestes");
+  const facingVelociraptor = placeCreature(game, 1, 0, "compsognathus");
+  const facingScavenger = placeCreature(game, 1, 1, "nautilus");
+  assert.ok(legalAttackTargets(game, velociraptor.card.uid).includes(facingVelociraptor.card.uid));
+  assert.equal(legalAttackTargets(game, scavenger.card.uid).includes(facingScavenger.card.uid), false);
+});
+
+test("Intraguild Predation lets one chosen Carnivore Hunt Carnivores this turn and draws on its first such kill", () => {
+  let game = readyGame();
+  const chosen = placeCreature(game, 0, 0, "allosaurus");
+  const other = placeCreature(game, 0, 1, "torvosaurus");
+  const rival = placeCreature(game, 1, 0, "compsognathus");
+  const rivalForOther = placeCreature(game, 1, 1, "microraptor");
+  const concept = putInHand(game, 0, "intraguild-predation");
+  game = playConcept(game, concept.uid);
+  assert.deepEqual(
+    getConceptChoiceOptions(game).map((option) => option.label),
+    ["Allosaurus", "Torvosaurus"],
+  );
+  game = chooseConceptOption(game, "0");
+  assert.equal(game.pendingConceptChoice, null);
+  game.phase = "battle";
+  // Only the chosen Creature ignores the Diet rule.
+  assert.ok(legalAttackTargets(game, chosen.card.uid).includes(rival.card.uid));
+  assert.equal(legalAttackTargets(game, other.card.uid).includes(rivalForOther.card.uid), false);
+
+  const handSize = game.players[0].hand.length;
+  game = previewBattle(game, chosen.card.uid, rival.card.uid);
+  game = commitBattle(game);
+  assert.equal(game.players[1].lanes[0].creature, null);
+  assert.equal(game.players[0].hand.length, handSize + 1, "the first kill of a Creature sharing its Diet draws");
+});
+
+test("Intraguild Predation draws nothing for a kill outside its Diet, and it lasts only this turn", () => {
+  let game = readyGame();
+  const chosen = placeCreature(game, 0, 0, "allosaurus");
+  const herbivore = placeCreature(game, 1, 0, "hoatzin");
+  const carnivore = placeCreature(game, 1, 1, "compsognathus");
+  const concept = putInHand(game, 0, "intraguild-predation");
+  game = chooseConceptOption(playConcept(game, concept.uid), "0");
+  game.phase = "battle";
+  const handSize = game.players[0].hand.length;
+  game = previewBattle(game, chosen.card.uid, herbivore.card.uid);
+  game = commitBattle(game);
+  assert.equal(game.players[1].lanes[0].creature, null);
+  assert.equal(game.players[0].hand.length, handSize, "a Herbivore doesn't share a Carnivore's Diet");
+
+  game.turnNumber += 2;
+  assert.equal(legalAttackTargets(game, chosen.card.uid).includes(carnivore.card.uid), false);
+});
+
+test("Intraguild Predation needs a Carnivore or Omnivore of yours on the board", () => {
+  const game = readyGame();
+  const concept = putInHand(game, 0, "intraguild-predation");
+  assert.equal(canPlayConcept(game, concept), false);
+  placeCreature(game, 0, 0, "hoatzin");
+  assert.equal(canPlayConcept(game, concept), false, "Hoatzin is an Herbivore");
+  placeCreature(game, 0, 1, "compsognathus");
+  assert.equal(canPlayConcept(game, concept), true);
 });

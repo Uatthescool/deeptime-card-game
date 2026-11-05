@@ -47,6 +47,8 @@ export const PENDING_ARTWORK_KEYS: ReadonlySet<string> = new Set([
   "hyaenodon",
   "ice-age",
   "inostrancevia",
+  "intraguild-predation",
+  "maip",
   "mastodon",
   "microraptor",
   "natovenator",

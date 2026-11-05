@@ -17,7 +17,13 @@ import {
   takeDeckCard,
 } from "./core.ts";
 import { queueEntryEffects } from "./entry-effects.ts";
-import { abiogenesisModes, canPlayConcept, deepSeaGigantismLanes, evolutionaryRadiationLevels } from "./queries.ts";
+import {
+  abiogenesisModes,
+  canPlayConcept,
+  deepSeaGigantismLanes,
+  evolutionaryRadiationLevels,
+  intraguildPredationLanes,
+} from "./queries.ts";
 import { randomInt, shuffle } from "./rng.ts";
 import { finishResolution } from "./turn.ts";
 import type {
@@ -132,6 +138,8 @@ export function playConcept(original: GameState, cardUid: string): GameState {
       return choose(state, moved, "abiogenesis-mode");
     case "deep-sea-gigantism":
       return choose(state, moved, "deep-sea-gigantism-card");
+    case "intraguild-predation":
+      return choose(state, moved, "intraguild-predation");
     default:
       return completeConcept(state, moved);
   }
@@ -295,6 +303,11 @@ export function getConceptChoiceOptions(state: GameState): ChoiceOption[] {
         };
       });
     }
+    case "intraguild-predation":
+      return intraguildPredationLanes(state, state.activePlayer).map((index) => {
+        const creature = player.lanes[index]!.creature!.card.definition;
+        return { id: String(index), label: creature.name, detail: `Your Niche ${index + 1} · ${creature.diet}` };
+      });
   }
 }
 
@@ -546,6 +559,18 @@ export function chooseConceptOption(original: GameState, optionId: string): Game
         addLog(state, `${player.name} will skip the Start-of-Turn Draw Phase of their next turn.`);
       }
       queueEntryEffects(state, active, laneIndex);
+      return completeConcept(state, pending.card);
+    }
+
+    case "intraguild-predation": {
+      const laneIndex = Number(optionId);
+      if (!intraguildPredationLanes(state, active).includes(laneIndex)) return state;
+      const chosen = player.lanes[laneIndex]!.creature!;
+      chosen.intraguildPredationTurn = state.turnNumber;
+      addLog(
+        state,
+        `Intraguild Predation: ${chosen.card.definition.name} may Hunt opposing Creatures that share its Diet this turn.`,
+      );
       return completeConcept(state, pending.card);
     }
   }

@@ -167,7 +167,8 @@ function targetBlockers(
     charge ||
     filterFeederPrey ||
     (effectiveHasTag(attackerDef, "Territorial") && attackerLane === targetLane) ||
-    (activeSuperpredators(state) && (attackerDiet === "Carnivore" || attackerDiet === "Omnivore"));
+    (activeSuperpredators(state) && (attackerDiet === "Carnivore" || attackerDiet === "Omnivore")) ||
+    (attacker.intraguildPredationTurn === state.turnNumber && attackerDiet === targetDiet);
   if (!dietWaived) {
     if (attackerDiet === "Herbivore") {
       blockers.push(

@@ -1408,6 +1408,26 @@
       },
       "modifications": "Resized to fit; padded at the sides with the drawing’s paper color; converted to sRGB WebP. It shows Pelagornis chilensis, a sister species, as placeholder art for Pelagornis sandersi.",
       "derivativeLicense": "CC BY-SA 3.0"
+    },
+    {
+      "cardKey": "saurornitholestes",
+      "cardName": "Saurornitholestes",
+      "cardKind": "creature",
+      "scientificName": "Saurornitholestes langstoni",
+      "commonsFile": "File:Saurornitholestes digging Burrows wahweap.jpg",
+      "creator": "Emily Willoughby",
+      "credit": "Saurornitholestes digging a multituberculate out of its burrow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Saurornitholestes_digging_Burrows_wahweap.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Saurornitholestes_digging_Burrows_wahweap.jpg",
+      "sourceSha1": "82177b3890cf772f0655cbebd3d1f8e65e916749",
+      "sourceDimensions": {
+        "width": 1071,
+        "height": 716
+      },
+      "modifications": "Cropped top and bottom (the bottom crop removes the artist’s signature); resized; converted to sRGB WebP. Also set into the Saurornitholestes card face, with the card’s frame, period border and lettering.",
+      "derivativeLicense": null
     }
   ]
 }

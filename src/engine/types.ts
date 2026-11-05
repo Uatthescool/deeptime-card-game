@@ -50,6 +50,10 @@ export type CreatureInPlay = {
   bastionDefendedTurn: number | null;
   bastionAttackedTurn: number | null;
   facultativeMovedTurn: number | null;
+  /** Intraguild Predation: the turn this Creature may Hunt opposing Creatures that share its Diet. */
+  intraguildPredationTurn?: number | null;
+  /** The turn Intraguild Predation's first qualifying kill drew its card. */
+  intraguildPredationDrewTurn?: number | null;
 };
 
 export type LaneEvent = {
@@ -200,7 +204,8 @@ export type ConceptChoiceKind =
   | "abiogenesis-placement-card"
   | "abiogenesis-placement-lane"
   | "deep-sea-gigantism-card"
-  | "deep-sea-gigantism-lane";
+  | "deep-sea-gigantism-lane"
+  | "intraguild-predation";
 
 export type PendingConceptChoice = {
   card: ConceptInstance;
