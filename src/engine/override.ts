@@ -39,6 +39,27 @@ const blocked = (reason: Reason): OverrideCheck => ({
   explanations: null,
 });
 
+/** Ancestor: the incoming Creature's taxa include every taxon of the Ancestor it would override. */
+export function ancestorMatch(current: CreatureCard, incoming: CreatureCard) {
+  return effectiveHasTag(current, "Ancestor") && current.taxa.every((taxon) => incoming.taxa.includes(taxon));
+}
+
+/**
+ * Ancestor's extra play: after the normal Creature play, a matching Creature may override an Ancestor that
+ * entered this turn. Once per turn.
+ */
+export function isAncestorExtraPlay(state: GameState, playerId: PlayerId, incoming: CreatureCard, laneIndex: number) {
+  const player = state.players[playerId];
+  const occupant = player.lanes[laneIndex]?.creature;
+  return Boolean(
+    player.allowances.creaturePlayed &&
+    !player.allowances.ancestorPlayUsed &&
+    occupant &&
+    occupant.enteredTurn === state.turnNumber &&
+    ancestorMatch(occupant.card.definition, incoming),
+  );
+}
+
 /** Which Diets an incoming Creature may replace. Diet matching is directional. */
 function dietMatches(incoming: Diet, current: Diet) {
   if (incoming === "Omnivore") return true;
@@ -108,7 +129,8 @@ export function checkOverride(
     incoming.taxa.includes("Saurischian") &&
     (effectiveHasTag(current, "Gigantic") || effectiveHasTag(incoming, "Gigantic")),
   );
-  const levelLegal = rapid ? difference === 2 : (difference >= 0 && difference <= 1) || airSacsJump;
+  const ancestorJump = difference === 2 && ancestorMatch(current, incoming);
+  const levelLegal = rapid ? difference === 2 : (difference >= 0 && difference <= 1) || airSacsJump || ancestorJump;
   const step = `Level ${current.printedLevel} → ${incoming.printedLevel}`;
   const levelText = rapid
     ? levelLegal
@@ -116,11 +138,13 @@ export function checkOverride(
       : `Rapid Speciation needs exactly two Levels up; this is ${step}`
     : airSacsJump
       ? `${step}: Air Sacs allows a two-Level jump`
-      : levelLegal
-        ? `${step} is a legal step`
-        : difference < 0
-          ? `${step}: a Creature can't be replaced by a lower Level`
-          : `${step} skips too far; an override may rise at most one Level`;
+      : ancestorJump
+        ? `${step}: Ancestor allows a two-Level jump`
+        : levelLegal
+          ? `${step} is a legal step`
+          : difference < 0
+            ? `${step}: a Creature can't be replaced by a lower Level`
+            : `${step} skips too far; an override may rise at most one Level`;
   if (!levelLegal) block("level", levelText + ".");
 
   let diet = dietMatches(incoming.diet, current.diet);
@@ -146,7 +170,8 @@ export function checkOverride(
   let taxon = baseTaxon || aquaticTaxonMatch;
 
   const livingFossil = current.tags.includes("Living Fossil") || incoming.tags.includes("Living Fossil");
-  const transitional = (current.tags.includes("Transitional") || incoming.tags.includes("Transitional")) && baseTaxon;
+  const transitional =
+    (effectiveHasTag(current, "Transitional") || effectiveHasTag(incoming, "Transitional")) && baseTaxon;
   let period = incoming.period === current.period || livingFossil || transitional;
 
   const sharedTag = [...incomingTags].find((value) => currentTags.has(value));

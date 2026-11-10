@@ -48,7 +48,7 @@ export type DefenseKind = "battle-level" | "retaliation" | "evasion" | "hunt-eli
 
 /**
  * Defensive Tags: a behind-the-scenes flag that no card face shows. Echolocation ignores all of them.
- * Stampede turns the Battle Level and Retaliation kinds into attacks; `hard` marks Durophagy's hard defenses.
+ * Stampede turns the Battle Power and Retaliation kinds into attacks; `hard` marks Durophagy's hard defenses.
  */
 export const DEFENSIVE_TAGS: Readonly<Record<string, { kind: DefenseKind; hard?: true }>> = {
   Shell: { kind: "battle-level", hard: true },
@@ -80,7 +80,7 @@ export const DECK_1: CardDefinition[] = [...CREATURES, ...SUPPORTS];
 /** @deprecated Use DECK_1. Kept for the rules-engine test suite's historical name. */
 export const TEST_DECK = DECK_1;
 
-const DECK_2_SHARED_KEYS = new Set(["hoatzin"]);
+const DECK_2_SHARED_KEYS = new Set<string>([]);
 export const DECK_2: CreatureCard[] = [
   ...CREATURES.filter((card) => DECK_2_SHARED_KEYS.has(card.key)),
   ...DECK_2_UNIQUE_CREATURES,
@@ -227,6 +227,7 @@ export function expandedTagNames(card: CreatureCard): string[] {
     names.push("Gigantic");
     if (card.diet !== "Herbivore") names.push("Territorial");
   }
+  if (card.tags.includes("Divergent")) names.push("Transitional", "Ancestor");
   return [...new Set(names)];
 }
 

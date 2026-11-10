@@ -1,5 +1,6 @@
 import { DEFENSIVE_TAGS, tagEffectMultiplier } from "../data/cards.ts";
 import {
+  BATTLE_POWER_PER_LEVEL,
   calculateBattleCoinPlan,
   calculateBattleNumbers,
   defendingAdaptationKey,
@@ -266,7 +267,7 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
   if (offensiveResults.length) {
     addLog(
       state,
-      `${attackerDef.name}'s Cryptic Camouflage ${offensiveResults.length === 1 ? "coin showed" : "coins showed"} ${coinFaces(offensiveResults)} — +${offensiveBonus} Battle Level.`,
+      `${attackerDef.name}'s Cryptic Camouflage ${offensiveResults.length === 1 ? "coin showed" : "coins showed"} ${coinFaces(offensiveResults)} — +${offensiveBonus * BATTLE_POWER_PER_LEVEL} Battle Power.`,
     );
   }
 
@@ -283,7 +284,7 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
   const defenderName = defenderDef.name;
   const attackerUid = attacker.creature.card.uid;
   const defenderUid = defender.creature.card.uid;
-  const tied = forcedTie || numbers.attackerLevel === numbers.defenderLevel;
+  const tied = forcedTie || numbers.attackerPower === numbers.defenderPower;
   addLog(state, `${attackerName} committed a Hunt against ${defenderName}.`);
 
   if (tied) {
@@ -291,7 +292,7 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
     const retaliationDestroysAttacker = defendsWithTag(defenderDef, "Retaliation", ignoreDefenses) || thagomizerKill;
     const stampedeRetaliationDestroysDefender =
       pending.origin === "stampede" && attackerDef.tags.includes("Retaliation");
-    addLog(state, `${attackerName} ${numbers.attackerLevel} vs. ${defenderName} ${numbers.defenderLevel}: tie.`);
+    addLog(state, `${attackerName} ${numbers.attackerPower} vs. ${defenderName} ${numbers.defenderPower}: tie.`);
     if (attackerDef.tags.includes("Saboteur")) {
       defender.creature.cannotAttackOnTurn = nextTurnForPlayer(state, defender.playerId);
       addLog(state, `Saboteur prevents ${defenderName} from Hunting during its controller's next Battle Phase.`);
@@ -324,14 +325,14 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
     }
     if (!retaliationDestroysAttacker && !stampedeRetaliationDestroysDefender)
       addLog(state, "Neither Creature was destroyed.");
-  } else if (numbers.attackerLevel < numbers.defenderLevel) {
+  } else if (numbers.attackerPower < numbers.defenderPower) {
     // Shell, Dermal Armor, and Bastion spare a losing attacker that was within the defensive bonus.
     const savedByDefense =
       !hasLethalThagomizer(defender, ignoreDefenses) &&
       numbers.defenderOwnReactiveBonus > 0 &&
-      numbers.attackerLevel >= numbers.defenderLevel - numbers.defenderOwnReactiveBonus;
+      numbers.attackerPower >= numbers.defenderPower - numbers.defenderOwnReactiveBonus;
     if (tryAutotomy(state, attacker)) {
-      addLog(state, `${attackerName} survived a ${numbers.attackerLevel} to ${numbers.defenderLevel} loss.`);
+      addLog(state, `${attackerName} survived a ${numbers.attackerPower} to ${numbers.defenderPower} loss.`);
     } else if (savedByDefense) {
       const defenseTag = defenderDef.tags.includes("Shell")
         ? "Shell"
@@ -340,33 +341,33 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
           : "Bastion";
       addLog(
         state,
-        `${attackerName} lost ${numbers.attackerLevel} to ${numbers.defenderLevel}, but the defender's ${defenseTag} clause spared it.`,
+        `${attackerName} lost ${numbers.attackerPower} to ${numbers.defenderPower}, but the defender's ${defenseTag} clause spared it.`,
       );
     } else {
       destroyInBattle(
         state,
         attackerUid,
         defenderUid,
-        `${defenderName} destroyed ${attackerName} (${numbers.defenderLevel} to ${numbers.attackerLevel}).`,
+        `${defenderName} destroyed ${attackerName} (${numbers.defenderPower} to ${numbers.attackerPower}).`,
       );
     }
   } else if (tryAutotomy(state, defender)) {
-    addLog(state, `${defenderName} survived a ${numbers.defenderLevel} to ${numbers.attackerLevel} loss.`);
+    addLog(state, `${defenderName} survived a ${numbers.defenderPower} to ${numbers.attackerPower} loss.`);
   } else if (
     pending.origin === "stampede" &&
     numbers.attackerOwnReactiveBonus > 0 &&
-    numbers.defenderLevel >= numbers.attackerLevel - numbers.attackerOwnReactiveBonus
+    numbers.defenderPower >= numbers.attackerPower - numbers.attackerOwnReactiveBonus
   ) {
     addLog(
       state,
-      `${defenderName} lost ${numbers.defenderLevel} to ${numbers.attackerLevel}, but ${attackerName}'s inverted defensive-Tag survival clause spared it.`,
+      `${defenderName} lost ${numbers.defenderPower} to ${numbers.attackerPower}, but ${attackerName}'s inverted defensive-Tag survival clause spared it.`,
     );
   } else {
     destroyInBattle(
       state,
       defenderUid,
       attackerUid,
-      `${attackerName} destroyed ${defenderName} (${numbers.attackerLevel} to ${numbers.defenderLevel}).`,
+      `${attackerName} destroyed ${defenderName} (${numbers.attackerPower} to ${numbers.defenderPower}).`,
     );
   }
 

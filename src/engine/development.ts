@@ -15,7 +15,7 @@ import {
   takeDeckCard,
 } from "./core.ts";
 import { queueEntryEffects } from "./entry-effects.ts";
-import { checkOverride } from "./override.ts";
+import { checkOverride, isAncestorExtraPlay } from "./override.ts";
 import {
   canActivateCarnianPluvialEpisode,
   canPlayEvent,
@@ -80,10 +80,12 @@ function playCreatureWithSource(
       ? lane.attachment
       : null;
   const wasRapid = source === "normal" && player.allowances.rapidSpeciation;
+  const wasAncestor = source === "normal" && isAncestorExtraPlay(state, playerId, definition, laneIndex);
   const wasPropulsion =
-    source === "normal" && player.allowances.creaturePlayed && definition.tags.includes("Propulsion");
+    source === "normal" && !wasAncestor && player.allowances.creaturePlayed && definition.tags.includes("Propulsion");
   const wasOpportunist =
     source === "normal" &&
+    !wasAncestor &&
     player.allowances.creaturePlayed &&
     definition.tags.includes("Opportunist") &&
     state.players[otherPlayer(playerId)].event?.definition.eventType === "continuous";
@@ -134,6 +136,10 @@ function playCreatureWithSource(
     );
   }
 
+  if (wasAncestor) {
+    player.allowances.ancestorPlayUsed = true;
+    addLog(state, `Ancestor let ${definition.name} override ${previous!.name} as an extra Creature play.`);
+  }
   if (wasRapid) {
     player.allowances.rapidSpeciation = false;
     addLog(state, "Rapid Speciation completed its exactly-two-Level override.");
@@ -511,10 +517,10 @@ export function chooseGeologicalBoundaryPeriod(original: GameState, period: Peri
   if (succeeding) {
     addLog(
       state,
-      `${succeeding} Creatures get +1 Battle Level until the start of ${state.players[owner].name}'s next turn.`,
+      `${succeeding} Creatures get +100 Battle Power until the start of ${state.players[owner].name}'s next turn.`,
     );
   } else {
-    addLog(state, "Quaternary has no succeeding Time Period and created no Battle Level modifier.");
+    addLog(state, "Quaternary has no succeeding Time Period and created no Battle Power modifier.");
   }
   addLog(state, `${state.players[owner].name}'s turn ends without a Battle Phase.`);
   if (resolveVictoryThreshold(state)) return state;

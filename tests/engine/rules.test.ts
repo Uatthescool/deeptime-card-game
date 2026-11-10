@@ -73,7 +73,7 @@ import {
   getCarnianPluvialOptions,
   geologicalBoundaryOptions,
   hasLegalHunts,
-  inspectBattleLevel,
+  inspectBattlePower,
   laneIsLocked,
   legalAdaptationTargets,
   legalAttackTargets,
@@ -104,6 +104,7 @@ import {
   type PlayerId,
 } from "../../src/engine/index.ts";
 import { flipCoin } from "../../src/engine/rng.ts";
+import { markSettledNiches } from "../../src/engine/core.ts";
 
 function readyGame(decks: [DeckKey, DeckKey] = ["deck-1", "deck-1"]): GameState {
   const game = createGame("Alpha", "Beta", [null, null], decks);
@@ -285,7 +286,7 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     SUPPORTS.some((card) => card.key === "wildfire"),
     true,
   );
-  assert.equal(GENERAL_POOL.length, 15);
+  assert.equal(GENERAL_POOL.length, 14);
   assert.ok(
     ["competitive-exclusion-principle", "purussaurus", "epicyon", "diplocaulus", "dimetrodon", "cynognathus"].every(
       (key) => GENERAL_POOL.some((card) => card.key === key),
@@ -343,10 +344,10 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
         DECK_2.filter((card) => card.period === period).length,
       ]),
     ),
-    { Triassic: 1, Jurassic: 7, Cretaceous: 13, Quaternary: 2 },
+    { Triassic: 2, Jurassic: 7, Cretaceous: 13, Quaternary: 1 },
   );
   assert.ok(
-    ["hoatzin", "mussaurus", "parasaurolophus", "triceratops", "dreadnoughtus"].every((key) =>
+    ["eoraptor", "mussaurus", "parasaurolophus", "triceratops", "dreadnoughtus"].every((key) =>
       DECK_2.some((card) => card.key === key),
     ),
   );
@@ -458,7 +459,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
   }
   assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "inostrancevia")!), undefined);
   assert.equal(artworkPath(DECK_2.find((card) => card.key === "stegosaurus")!), "/artwork/stegosaurus.webp");
-  assert.equal(artworkPath(GENERAL_POOL.find((card) => card.key === "eoraptor")!), "/artwork/eoraptor.webp");
+  assert.equal(artworkPath(DECK_2.find((card) => card.key === "eoraptor")!), "/artwork/eoraptor.webp");
 });
 
 test("every piece of artwork shown on screen carries a short credit", () => {
@@ -780,7 +781,7 @@ test("Diver recognizes printed Aquatic defenders but not Semi-Aquatic defenders"
   const defender = placeCreature(game, 1, 0, "baryonyx");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, diver.card.uid, defender.card.uid);
-  assert.equal(game.pendingBattle?.attackerNotes.includes("Diver +1") ?? false, false);
+  assert.equal(game.pendingBattle?.attackerNotes.includes("Diver +100") ?? false, false);
 
   game = readyGame();
   game.phase = "battle";
@@ -788,7 +789,7 @@ test("Diver recognizes printed Aquatic defenders but not Semi-Aquatic defenders"
   const aquaticDefender = placePoolCreature(game, 1, 0, "diplocaulus");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, diverAgain.card.uid, aquaticDefender.card.uid);
-  assert.ok(game.pendingBattle?.attackerNotes.includes("Diver +1"));
+  assert.ok(game.pendingBattle?.attackerNotes.includes("Diver +100"));
 });
 
 test("Spinal Sail mitigates each Creature's Apex Predator crowding decrease by one", () => {
@@ -1103,8 +1104,8 @@ test("Rivalry adds +1 while attacking or defending only in facing Niches", () =>
   const defender = placeCreature(game, 1, 0, "allosaurus");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, carnotaurus.card.uid, defender.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 3);
-  assert.ok(game.pendingBattle?.attackerNotes.includes("Rivalry +1"));
+  assert.equal(game.pendingBattle?.attackerPower, 300);
+  assert.ok(game.pendingBattle?.attackerNotes.includes("Rivalry +100"));
 
   game = readyGame();
   game.phase = "battle";
@@ -1112,8 +1113,8 @@ test("Rivalry adds +1 while attacking or defending only in facing Niches", () =>
   const rivalDefender = placeCreature(game, 1, 0, "carnotaurus");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, attacker.card.uid, rivalDefender.card.uid);
-  assert.equal(game.pendingBattle?.defenderLevel, 3);
-  assert.ok(game.pendingBattle?.defenderNotes.includes("Rivalry +1"));
+  assert.equal(game.pendingBattle?.defenderPower, 300);
+  assert.ok(game.pendingBattle?.defenderNotes.includes("Rivalry +100"));
 });
 
 test("ordinary Hunt preview can be canceled without spending the attacker", () => {
@@ -1159,24 +1160,24 @@ test("Aerial reduces ordinary attackers but Ambush and Glider bypass the penalty
   const allosaurus = placeCreature(game, 0, 0, "allosaurus");
   const hoatzin = placeCreature(game, 1, 0, "hoatzin");
   game = previewBattle(game, allosaurus.card.uid, hoatzin.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 1);
-  assert.ok(game.pendingBattle?.attackerNotes.includes("Aerial defense -1"));
+  assert.equal(game.pendingBattle?.attackerPower, 100);
+  assert.ok(game.pendingBattle?.attackerNotes.includes("Aerial defense -100"));
 
   game = readyGame();
   game.phase = "battle";
   const ambusher = placeCreature(game, 0, 0, "saurornitholestes");
   const hoatzin2 = placeCreature(game, 1, 0, "hoatzin");
   game = previewBattle(game, ambusher.card.uid, hoatzin2.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 1);
-  assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -1"), false);
+  assert.equal(game.pendingBattle?.attackerPower, 100);
+  assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -100"), false);
 
   game = readyGame();
   game.phase = "battle";
   const microraptor = placeCreature(game, 0, 0, "microraptor");
   const hoatzin3 = placeCreature(game, 1, 0, "hoatzin");
   game = previewBattle(game, microraptor.card.uid, hoatzin3.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 0);
-  assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -1"), false);
+  assert.equal(game.pendingBattle?.attackerPower, 0);
+  assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -100"), false);
 });
 
 test("Sovereign prevents opposing Tag and Adaptation reductions during a Hunt", () => {
@@ -1185,8 +1186,8 @@ test("Sovereign prevents opposing Tag and Adaptation reductions during a Hunt", 
   const tyrannosaurus = placeCreature(game, 0, 0, "tyrannosaurus-rex");
   const aerial = placeCreature(game, 1, 0, "hoatzin");
   game = previewBattle(game, tyrannosaurus.card.uid, aerial.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 3);
-  assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -1"), false);
+  assert.equal(game.pendingBattle?.attackerPower, 300);
+  assert.equal(game.pendingBattle?.attackerNotes.includes("Aerial defense -100"), false);
 
   game = readyGame();
   game.phase = "battle";
@@ -1198,7 +1199,7 @@ test("Sovereign prevents opposing Tag and Adaptation reductions during a Hunt", 
   };
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, crushing.card.uid, sovereignShell.card.uid);
-  assert.equal(game.pendingBattle?.defenderLevel, 4);
+  assert.equal(game.pendingBattle?.defenderPower, 400);
   assert.ok(game.pendingBattle?.defenderNotes.includes("Sovereign prevented Crushing Bite"));
 });
 
@@ -1209,8 +1210,8 @@ test("Specialized doubles Megalodon's immediately following Crushing Bite value"
   const nautilus = placeCreature(game, 1, 0, "nautilus");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, megalodon.card.uid, nautilus.card.uid);
-  assert.ok(game.pendingBattle?.attackerNotes.includes("Crushing Bite reduced reactive defense by up to 2"));
-  assert.equal(game.pendingBattle?.defenderLevel, 0);
+  assert.ok(game.pendingBattle?.attackerNotes.includes("Crushing Bite reduced reactive defense by up to 200"));
+  assert.equal(game.pendingBattle?.defenderPower, 0);
 });
 
 test("former Piscivores are Carnivores and use Cryptic Camouflage's offensive branch", () => {
@@ -1262,11 +1263,11 @@ test("Cryptic Camouflage gives Ambush predators two offensive coin flips", () =>
   attachAdaptation(game, 0, 0, "cryptic-camouflage");
   game = previewBattle(game, ambusher.card.uid, hoatzin.card.uid);
   assert.equal(game.pendingBattle?.coinPlan.offensiveCount, 2);
-  assert.equal(game.pendingBattle?.attackerLevel, 1);
-  assert.equal(game.pendingBattle?.attackerLevelMax, 3);
+  assert.equal(game.pendingBattle?.attackerPower, 100);
+  assert.equal(game.pendingBattle?.attackerPowerMax, 300);
   game = commitBattle(game, { offensive: [true, true] });
   assert.equal(game.players[1].lanes[0].creature, null);
-  assert.ok(game.log.some((line) => line.includes("+2 Battle Level")));
+  assert.ok(game.log.some((line) => line.includes("+200 Battle Power")));
 });
 
 test("Raptorial Claws contributes +1 while attacking and defending", () => {
@@ -1280,8 +1281,8 @@ test("Raptorial Claws contributes +1 while attacking and defending", () => {
   game.players[1].lanes[0].attachment = clawsD as CardInstance & { definition: AdaptationCard };
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, attacker.card.uid, defender.card.uid);
-  assert.ok(game.pendingBattle?.attackerNotes.includes("Raptorial Claws +1"));
-  assert.ok(game.pendingBattle?.defenderNotes.includes("Raptorial Claws +1"));
+  assert.ok(game.pendingBattle?.attackerNotes.includes("Raptorial Claws +100"));
+  assert.ok(game.pendingBattle?.defenderNotes.includes("Raptorial Claws +100"));
 });
 
 test("Autotomy draws only when its Creature is overridden", () => {
@@ -1777,9 +1778,9 @@ test("Temperate Seasonal Cycle provides four mandatory rerolls at most once per 
     attackerLane: 0,
     defenderPlayer: 1,
     defenderLane: 0,
-    attackerLevel: 1,
-    attackerLevelMax: 2,
-    defenderLevel: 1,
+    attackerPower: 1,
+    attackerPowerMax: 200,
+    defenderPower: 1,
     attackerNotes: [],
     defenderNotes: [],
     coinPlan: { offensiveCount: 1, offensiveReason: "test", defensiveCount: 0, defensiveReason: null },
@@ -1803,15 +1804,15 @@ test("Cold Thermal Inertia treats Sovereign as Gigantic and respects both counte
   game.players[1].biome.key = "cold";
   const defender = placeCreature(game, 1, 0, "tyrannosaurus-rex");
   const ordinaryHunter = placeCreature(game, 0, 0, "carnotaurus");
-  assert.equal(inspectBattleLevel(game, defender.card.uid, "defender", ordinaryHunter.card.uid), 4);
+  assert.equal(inspectBattlePower(game, defender.card.uid, "defender", ordinaryHunter.card.uid), 400);
 
   game.players[0].lanes[0].creature = null;
   const bruiser = placeCreature(game, 0, 0, "allosaurus");
-  assert.equal(inspectBattleLevel(game, defender.card.uid, "defender", bruiser.card.uid), 3);
+  assert.equal(inspectBattlePower(game, defender.card.uid, "defender", bruiser.card.uid), 300);
 
   game.players[0].lanes[0].creature = null;
   const giganticHunter = placeCreature(game, 0, 0, "tyrannosaurus-rex");
-  assert.equal(inspectBattleLevel(game, defender.card.uid, "defender", giganticHunter.card.uid), 3);
+  assert.equal(inspectBattlePower(game, defender.card.uid, "defender", giganticHunter.card.uid), 300);
 });
 
 test("Cold augments Gigantic itself, so Specialized doubles only the granted numerical modifier", () => {
@@ -1819,22 +1820,22 @@ test("Cold augments Gigantic itself, so Specialized doubles only the granted num
   game.players[1].biome.key = "cold";
   const ordinaryGigantic = placeDeckThreeCreature(game, 1, 0, "leedsichthys");
   const ordinaryHunter = placeCreature(game, 0, 0, "carnotaurus");
-  assert.equal(inspectBattleLevel(game, ordinaryGigantic.card.uid, "defender", ordinaryHunter.card.uid), 4);
+  assert.equal(inspectBattlePower(game, ordinaryGigantic.card.uid, "defender", ordinaryHunter.card.uid), 400);
 
   game = readyGame();
   game.players[1].biome.key = "cold";
   const blueWhale = placeDeckThreeCreature(game, 1, 0, "blue-whale");
   const blueHunter = placeCreature(game, 0, 0, "carnotaurus");
-  assert.equal(inspectBattleLevel(game, blueWhale.card.uid, "defender", blueHunter.card.uid), 6);
+  assert.equal(inspectBattlePower(game, blueWhale.card.uid, "defender", blueHunter.card.uid), 600);
   assert.equal(cardVictoryLevel(game, blueWhale), 6);
 
   game.players[0].lanes[0].creature = null;
   const bruiser = placeCreature(game, 0, 0, "allosaurus");
-  assert.equal(inspectBattleLevel(game, blueWhale.card.uid, "defender", bruiser.card.uid), 4);
+  assert.equal(inspectBattlePower(game, blueWhale.card.uid, "defender", bruiser.card.uid), 400);
 
   game.players[0].lanes[0].creature = null;
   const giganticHunter = placeCreature(game, 0, 0, "tyrannosaurus-rex");
-  assert.equal(inspectBattleLevel(game, blueWhale.card.uid, "defender", giganticHunter.card.uid), 4);
+  assert.equal(inspectBattlePower(game, blueWhale.card.uid, "defender", giganticHunter.card.uid), 400);
 
   game = readyGame();
   game.phase = "battle";
@@ -1964,9 +1965,9 @@ test("Drought can fill either side, selectively override Aquatic identities, sup
 
   const opposing = placePoolCreature(game, 1, 3, "cynognathus");
   assert.equal(
-    inspectBattleLevel(game, facing.card.uid, "attacker", opposing.card.uid),
-    1,
-    "the directly opposing Niche loses one Battle Level",
+    inspectBattlePower(game, facing.card.uid, "attacker", opposing.card.uid),
+    100,
+    "the directly opposing Niche loses one Battle Power",
   );
 
   game = endTurn(game);
@@ -1997,8 +1998,8 @@ test("Island Dwarfism attaches on either side and enforces its isolation, moveme
   );
   assert.equal(cardVictoryLevel(game, gigantic), 6, "Gigantic doubles Island Dwarfism's Victory modifier to +2");
   assert.equal(
-    inspectBattleLevel(game, gigantic.card.uid, "defender", ordinary.card.uid),
-    1,
+    inspectBattlePower(game, gigantic.card.uid, "defender", ordinary.card.uid),
+    100,
     "Gigantic doubles Island Dwarfism's Battle penalty to -2",
   );
 
@@ -2061,14 +2062,14 @@ test("Geological Boundary is instantaneous, clears its Period and Continuous Eve
     game.periodAuras.map((aura) => aura.period),
     ["Cretaceous"],
   );
-  assert.equal(inspectBattleLevel(game, xiphactinus.card.uid, "attacker", tyrannosaurus.card.uid), 3);
-  assert.equal(inspectBattleLevel(game, tyrannosaurus.card.uid, "defender", xiphactinus.card.uid), 4);
+  assert.equal(inspectBattlePower(game, xiphactinus.card.uid, "attacker", tyrannosaurus.card.uid), 300);
+  assert.equal(inspectBattlePower(game, tyrannosaurus.card.uid, "defender", xiphactinus.card.uid), 400);
 
   game = acknowledgeHandoff(game);
   game = endTurn(game);
   game = acknowledgeHandoff(game);
   assert.deepEqual(game.periodAuras, []);
-  assert.equal(inspectBattleLevel(game, xiphactinus.card.uid, "attacker", tyrannosaurus.card.uid), 2);
+  assert.equal(inspectBattlePower(game, xiphactinus.card.uid, "attacker", tyrannosaurus.card.uid), 200);
 });
 
 test("Geological Boundary resolves Victory changes from global Apex Predator crowding before handoff", () => {
@@ -2184,7 +2185,7 @@ test("Visual applies only to the first committed Hunt involving its bearer", () 
   setEvent(game, 0, "superpredators");
 
   game = previewBattle(game, dollocaris.card.uid, nautilus.card.uid);
-  assert.ok(game.pendingBattle?.attackerNotes.includes("Visual +1"));
+  assert.ok(game.pendingBattle?.attackerNotes.includes("Visual +100"));
   game = cancelBattlePreview(game);
   assert.equal(game.players[0].lanes[0].creature?.visualUsed, false, "canceling a preview does not spend Visual");
   game = previewBattle(game, dollocaris.card.uid, nautilus.card.uid);
@@ -2197,7 +2198,7 @@ test("Visual applies only to the first committed Hunt involving its bearer", () 
   game.activePlayer = 0;
   game.phase = "battle";
   game = previewBattle(game, dollocaris.card.uid, nautilus.card.uid);
-  assert.equal(game.pendingBattle?.attackerNotes.includes("Visual +1"), false);
+  assert.equal(game.pendingBattle?.attackerNotes.includes("Visual +100"), false);
 });
 
 test("Dermal Armor bridges hard defenses and Durophagy rewards qualifying kills, including Specialized draws", () => {
@@ -2207,7 +2208,7 @@ test("Dermal Armor bridges hard defenses and Durophagy rewards qualifying kills,
   const dunkleosteus = placeCreature(game, 1, 0, "dunkleosteus");
   setEvent(game, 0, "superpredators");
   game = previewBattle(game, allosaurus.card.uid, dunkleosteus.card.uid);
-  assert.ok(game.pendingBattle?.defenderNotes.includes("Dermal Armor +1"));
+  assert.ok(game.pendingBattle?.defenderNotes.includes("Dermal Armor +100"));
   game = commitBattle(game);
   assert.ok(
     game.players[0].lanes[0].creature,
@@ -2366,40 +2367,40 @@ test("Deck 2 combat Tags apply their locked Battle modifiers", () => {
   const iguanodon = placeCreature(game, 0, 0, "iguanodon");
   const opposing = placeCreature(game, 1, 0, "yinlong");
   assert.equal(
-    inspectBattleLevel(game, iguanodon.card.uid, "attacker", opposing.card.uid),
-    3,
-    "Armament attacks at +1",
+    inspectBattlePower(game, iguanodon.card.uid, "attacker", opposing.card.uid),
+    300,
+    "Armament attacks at +100",
   );
 
   const defendingIguanodon = placeCreature(game, 1, 1, "iguanodon");
   assert.equal(
-    inspectBattleLevel(game, defendingIguanodon.card.uid, "defender", iguanodon.card.uid),
-    3,
-    "Armament defends at +1",
+    inspectBattlePower(game, defendingIguanodon.card.uid, "defender", iguanodon.card.uid),
+    300,
+    "Armament defends at +100",
   );
 
   game = readyGame(["deck-2", "deck-2"]);
   const pachycephalosaurus = placeCreature(game, 0, 0, "pachycephalosaurus");
   const facing = placeCreature(game, 1, 0, "yinlong");
   assert.equal(
-    inspectBattleLevel(game, pachycephalosaurus.card.uid, "attacker", facing.card.uid),
-    3,
+    inspectBattlePower(game, pachycephalosaurus.card.uid, "attacker", facing.card.uid),
+    300,
     "Specialized doubles Rivalry to +2",
   );
   game.players[1].lanes[1].creature = game.players[1].lanes[0].creature;
   game.players[1].lanes[0].creature = null;
   assert.equal(
-    inspectBattleLevel(game, pachycephalosaurus.card.uid, "attacker", facing.card.uid),
-    1,
+    inspectBattlePower(game, pachycephalosaurus.card.uid, "attacker", facing.card.uid),
+    100,
     "Rivalry still requires facing Niches",
   );
 
   game = readyGame(["deck-2", "deck-2"]);
   const saltasaurus = placeCreature(game, 1, 0, "saltasaurus");
-  const hunter = placeCreature(game, 0, 0, "hoatzin");
+  const hunter = placeCreature(game, 0, 0, "eoraptor");
   assert.equal(
-    inspectBattleLevel(game, saltasaurus.card.uid, "defender", hunter.card.uid),
-    4,
+    inspectBattlePower(game, saltasaurus.card.uid, "defender", hunter.card.uid),
+    400,
     "Osteoderm provides its existing +2 defense",
   );
 });
@@ -2484,9 +2485,11 @@ test("Bastion applies both branches on the correct first Hunt and inverts during
   let game = readyGame(["deck-2", "deck-2"]);
   const triceratops = placeCreature(game, 0, 1, "triceratops");
   const protoceratops = placeCreature(game, 0, 0, "protoceratops");
-  const hunter = placeCreature(game, 1, 0, "hoatzin");
-  assert.equal(inspectBattleLevel(game, protoceratops.card.uid, "defender", hunter.card.uid), 1);
-  assert.equal(inspectBattleLevel(game, triceratops.card.uid, "defender", hunter.card.uid), 3);
+  // Without its own Bastion, so only the adjacent high-Level branch applies.
+  protoceratops.card.definition = { ...protoceratops.card.definition, tags: ["Herd", "Retaliation"] };
+  const hunter = placeCreature(game, 1, 0, "eoraptor");
+  assert.equal(inspectBattlePower(game, protoceratops.card.uid, "defender", hunter.card.uid), 100);
+  assert.equal(inspectBattlePower(game, triceratops.card.uid, "defender", hunter.card.uid), 300);
 
   game = readyGame(["deck-1", "deck-2"]);
   game.phase = "battle";
@@ -2496,13 +2499,13 @@ test("Bastion applies both branches on the correct first Hunt and inverts during
   lowBastion.card.definition = { ...lowBastion.card.definition, tags: ["Bastion"] };
 
   game = previewBattle(game, firstHunter.card.uid, lowBastion.card.uid);
-  assert.equal(game.pendingBattle?.defenderLevel, 2);
+  assert.equal(game.pendingBattle?.defenderPower, 200);
   game = commitBattle(game);
   assert.ok(game.players[0].lanes[0].creature, "Bastion's survival clause spares the first hunter");
   assert.ok(game.players[1].lanes[0].creature);
 
   game = previewBattle(game, secondHunter.card.uid, lowBastion.card.uid);
-  assert.equal(game.pendingBattle?.defenderLevel, 0, "the low-Level Bastion bonus is spent after the first Hunt");
+  assert.equal(game.pendingBattle?.defenderPower, 0, "the low-Level Bastion bonus is spent after the first Hunt");
   game = commitBattle(game);
   assert.equal(game.players[1].lanes[0].creature, null);
 
@@ -2512,7 +2515,7 @@ test("Bastion applies both branches on the correct first Hunt and inverts during
   placeCreature(game, 1, 0, "herrerasaurus");
   const stampede = putInHand(game, 0, "stampede");
   game = playEvent(game, stampede.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 2);
+  assert.equal(game.pendingBattle?.attackerPower, 200);
   game = commitBattle(game);
   assert.ok(game.players[0].lanes[0].creature);
   assert.ok(
@@ -2639,7 +2642,7 @@ test("Thagomizer enforces eligibility, defense, lethal ties, and the Stegosaur V
   const attacker = placeDeckThreeCreature(game, 0, 0, "cladoselache", { printedLevel: 4 });
   assert.equal(cardVictoryLevel(game, stegosaurus), 3);
   game = previewBattle(game, attacker.card.uid, stegosaurus.card.uid);
-  assert.equal(game.pendingBattle?.defenderLevel, 4);
+  assert.equal(game.pendingBattle?.defenderPower, 400);
   game = commitBattle(game);
   assert.equal(
     game.players[0].lanes[0].creature,
@@ -2676,6 +2679,8 @@ test("Genetic Mutations chooses exactly one Adaptation currently remaining in th
 test("Stampede traverses both boards counter-clockwise, ignores Diet, permits new Herbivores, and inverts Tags but not Adaptations", () => {
   let game = readyGame(["deck-2", "deck-2"]);
   const protoceratops = placeCreature(game, 0, 0, "protoceratops");
+  // Retaliation alone, so the inverted tie is the only Tag effect in this Hunt.
+  protoceratops.card.definition = { ...protoceratops.card.definition, tags: ["Herd", "Retaliation"] };
   const yinlong = placeCreature(game, 1, 0, "yinlong");
   const stegosaurus = placeCreature(game, 1, 4, "stegosaurus");
   attachAdaptation(game, 1, 4, "thagomizer");
@@ -2698,7 +2703,7 @@ test("Stampede traverses both boards counter-clockwise, ignores Diet, permits ne
     "the opposing rightmost Herbivore is next counter-clockwise",
   );
   assert.equal(game.pendingBattle?.defenderUid, carnivore.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 3, "Armament applies, but defensive Thagomizer is not inverted");
+  assert.equal(game.pendingBattle?.attackerPower, 300, "Armament applies, but defensive Thagomizer is not inverted");
   assert.equal(
     game.pendingBattle?.attackerNotes.some((note) => note.includes("Thagomizer")),
     false,
@@ -2793,7 +2798,7 @@ test("Echolocation attaches only to Aerial or Aquatic Synapsid Carnivores that a
   assert.equal(game.players[0].lanes[0].attachment?.definition.key, "echolocation");
 });
 
-test("Echolocation ignores defensive Battle Level Tags, Retaliation and defensive Adaptations", () => {
+test("Echolocation ignores defensive Battle Power Tags, Retaliation and defensive Adaptations", () => {
   let game = readyGame(["deck-2", "deck-2"]);
   game.phase = "battle";
   game.players[1].biome.key = "temperate";
@@ -2802,22 +2807,22 @@ test("Echolocation ignores defensive Battle Level Tags, Retaliation and defensiv
   const glyptodon = placeLibraryCreature(game, 1, 1, "glyptodon");
   const stegosaurus = placeCreature(game, 1, 2, "stegosaurus");
   attachAdaptation(game, 1, 2, "thagomizer");
-  const defending = (uid: string) => inspectBattleLevel(game, uid, "defender", livyatan.uid);
-  assert.equal(defending(glyptodon.uid), 3, "Osteoderm adds 2");
-  assert.equal(defending(stegosaurus.card.uid), 4, "Thagomizer adds 1");
+  const defending = (uid: string) => inspectBattlePower(game, uid, "defender", livyatan.uid);
+  assert.equal(defending(glyptodon.uid), 300, "Osteoderm adds 200");
+  assert.equal(defending(stegosaurus.card.uid), 400, "Thagomizer adds 100");
   game.players[1].biome.key = "cold";
-  assert.equal(defending(mammoth.uid), 4, "Gigantic's Cold Biome bonus adds 1");
+  assert.equal(defending(mammoth.uid), 400, "Gigantic's Cold Biome bonus adds 100");
 
   attachLibraryAdaptation(game, 0, 0, "echolocation");
-  assert.equal(defending(glyptodon.uid), 1);
-  assert.equal(defending(stegosaurus.card.uid), 3);
-  assert.equal(defending(mammoth.uid), 3);
+  assert.equal(defending(glyptodon.uid), 100);
+  assert.equal(defending(stegosaurus.card.uid), 300);
+  assert.equal(defending(mammoth.uid), 300);
 
   // A tie with Woolly Mammoth no longer triggers Retaliation.
   game.players[1].biome.key = "temperate";
   game = previewBattle(game, livyatan.uid, mammoth.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 3);
-  assert.equal(game.pendingBattle?.defenderLevel, 3);
+  assert.equal(game.pendingBattle?.attackerPower, 300);
+  assert.equal(game.pendingBattle?.defenderPower, 300);
   game = commitBattle(game);
   assert.equal(game.players[0].lanes[0].creature?.card.uid, livyatan.uid);
   assert.equal(game.players[1].lanes[0].creature?.card.uid, mammoth.uid);
@@ -2831,13 +2836,13 @@ test("Echolocation ignores Aerial, Elusive and Cryptic Camouflage evasion", () =
   const hoatzin = placeCreature(game, 1, 0, "hoatzin");
   attachAdaptation(game, 1, 0, "cryptic-camouflage");
   game = previewBattle(game, orca.uid, hoatzin.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 1, "Aerial defense takes 1");
+  assert.equal(game.pendingBattle?.attackerPower, 100, "Aerial defense takes 1");
   assert.equal(battleNeedsElusiveFlip(game), true);
   game = cancelBattlePreview(game);
 
   attachLibraryAdaptation(game, 0, 0, "echolocation");
   game = previewBattle(game, orca.uid, hoatzin.card.uid);
-  assert.equal(game.pendingBattle?.attackerLevel, 2);
+  assert.equal(game.pendingBattle?.attackerPower, 200);
   assert.equal(battleNeedsElusiveFlip(game), false);
   game = commitBattle(game);
   assert.equal(game.players[1].lanes[0].creature, null);
@@ -3169,4 +3174,94 @@ test("Intraguild Predation needs a Carnivore or Omnivore of yours on the board",
   assert.equal(canPlayConcept(game, concept), false, "Hoatzin is an Herbivore");
   placeCreature(game, 0, 1, "compsognathus");
   assert.equal(canPlayConcept(game, concept), true);
+});
+
+test("Niche-unlock trial rule: Level 1 Creatures need an open Niche, and opening hands hold a Level 0", () => {
+  for (const deck of ["deck-1", "deck-2", "deck-3"] as const) {
+    const opening = createGame("Alpha", "Beta", [null, null], [deck, deck], { seed: 11, rules: { nicheUnlock: true } });
+    for (const player of opening.players) {
+      assert.ok(player.hand.some((card) => card.definition.kind === "creature" && card.definition.printedLevel === 0));
+      assert.equal(player.hand.length + player.deck.length, 40);
+    }
+  }
+
+  const game = readyGame();
+  game.rules = { nicheUnlock: true };
+  const velociraptor = putInHand(game, 0, "velociraptor");
+  const nautilus = putInHand(game, 0, "nautilus");
+  assert.deepEqual(legalCreatureLanes(game, 0, velociraptor), [], "an empty board opens nothing to Level 1");
+  assert.deepEqual(legalCreatureLanes(game, 0, nautilus), [0, 1, 2, 3, 4], "Level 0 may start anywhere");
+
+  placeLibraryCreature(game, 1, 3, "hoatzin");
+  assert.deepEqual(legalCreatureLanes(game, 0, velociraptor), [3], "the opposing Niche opens");
+  placeLibraryCreature(game, 0, 0, "compsognathus");
+  assert.deepEqual(
+    legalCreatureLanes(game, 0, velociraptor),
+    [0, 1, 3],
+    "a neighboring Niche opens, beside an override",
+  );
+
+  markSettledNiches(game);
+  game.players[0].lanes[0].creature = null;
+  assert.deepEqual(legalCreatureLanes(game, 0, velociraptor), [0, 3], "a Niche that held life stays open");
+});
+
+test("Divergent: Yinlong is Transitional and Ancestor, so Marginocephalians override it up to two Levels, at once as an extra play", () => {
+  let game = readyGame(["deck-2", "deck-2"]);
+  const yinlong = putInHand(game, 0, "yinlong");
+  const definition = yinlong.definition as CreatureCard;
+  assert.ok(effectiveHasTag(definition, "Transitional") && effectiveHasTag(definition, "Ancestor"));
+  assert.equal(definition.taxa.at(-1), "Marginocephalian");
+  for (const key of ["protoceratops", "pachycephalosaurus", "styracosaurus", "pachyrhinosaurus", "triceratops"]) {
+    const relative = DECK_2.find((card) => card.key === key)!;
+    assert.ok(
+      definition.taxa.every((taxon) => relative.taxa.includes(taxon)),
+      `${relative.name} carries every Yinlong taxon`,
+    );
+  }
+
+  game = playCreature(game, 0, yinlong.uid, 0);
+  assert.equal(game.players[0].lanes[0].creature?.card.definition.key, "yinlong");
+  const pachycephalosaurus = putInHand(game, 0, "pachycephalosaurus");
+  const pachyrhinosaurus = putInHand(game, 0, "pachyrhinosaurus");
+  const triceratops = putInHand(game, 0, "triceratops");
+  const plateosaurus = putInHand(game, 0, "plateosaurus");
+  assert.deepEqual(legalCreatureLanes(game, 0, pachycephalosaurus), [0], "the extra play may only override Yinlong");
+  assert.deepEqual(legalCreatureLanes(game, 0, pachyrhinosaurus), [0], "Ancestor allows two Levels up");
+  assert.deepEqual(legalCreatureLanes(game, 0, triceratops), [], "three Levels is too far");
+  assert.deepEqual(legalCreatureLanes(game, 0, plateosaurus), [], "a non-Marginocephalian gets no extra play");
+
+  game = playCreature(game, 0, pachyrhinosaurus.uid, 0);
+  assert.equal(game.players[0].lanes[0].creature?.card.definition.key, "pachyrhinosaurus");
+  assert.equal(game.players[0].allowances.ancestorPlayUsed, true);
+  assert.equal(game.phase, "development", "Ancestor's extra play does not end the Development Phase");
+  assert.deepEqual(legalCreatureLanes(game, 0, pachycephalosaurus), [], "only one extra play");
+
+  // A Yinlong from an earlier turn keeps the two-Level jump but gives no extra play.
+  const later = readyGame(["deck-2", "deck-2"]);
+  placeCreature(later, 0, 2, "yinlong");
+  const rhino = putInHand(later, 0, "pachyrhinosaurus");
+  const iguanodon = putInHand(later, 0, "iguanodon");
+  assert.deepEqual(legalCreatureLanes(later, 0, rhino), [2]);
+  assert.equal(checkOverride(later, 0, iguanodon.definition as CreatureCard, 2).levelLegal, false);
+  later.players[0].allowances.creaturePlayed = true;
+  assert.deepEqual(legalCreatureLanes(later, 0, rhino), []);
+});
+
+test("Eoraptor's Ancestor opens a same-turn Sauropodomorph line that stops at Level 2", () => {
+  let game = readyGame(["deck-2", "deck-2"]);
+  const eoraptor = putInHand(game, 0, "eoraptor");
+  game = playCreature(game, 0, eoraptor.uid, 0);
+  const saltasaurus = putInHand(game, 0, "saltasaurus");
+  const mussaurus = putInHand(game, 0, "mussaurus");
+  const brachiosaurus = putInHand(game, 0, "brachiosaurus");
+  const styracosaurus = putInHand(game, 0, "styracosaurus");
+  assert.deepEqual(legalCreatureLanes(game, 0, saltasaurus), [0], "a Level 2 sauropod jumps two Levels at once");
+  assert.deepEqual(legalCreatureLanes(game, 0, mussaurus), [0]);
+  assert.deepEqual(legalCreatureLanes(game, 0, brachiosaurus), [], "three Levels is too far");
+  assert.deepEqual(legalCreatureLanes(game, 0, styracosaurus), [], "a non-Sauropodomorph gets no extra play");
+});
+
+test("Protoceratops has Herd, Retaliation, and Bastion", () => {
+  assert.deepEqual(DECK_2.find((card) => card.key === "protoceratops")?.tags, ["Herd", "Retaliation", "Bastion"]);
 });

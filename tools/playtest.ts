@@ -50,6 +50,7 @@ import {
   type CardInstance,
   type GameState,
   type PlayerId,
+  BATTLE_POWER_PER_LEVEL,
 } from "../src/engine/index.ts";
 import type { CreatureCard, DeckKey } from "../src/data/cards.ts";
 
@@ -282,9 +283,9 @@ function battleDecisionScore(state: GameState, _playerId: PlayerId, style: Style
   let naturalTieProbability = 0;
   for (let successes = 0; successes <= plan.offensiveCount; successes += 1) {
     const probability = binomialProbability(plan.offensiveCount, successes) * (1 - forcedTieProbability);
-    const attackLevel = pending.attackerLevel + successes;
-    if (attackLevel > pending.defenderLevel) winProbability += probability;
-    else if (attackLevel < pending.defenderLevel) lossProbability += probability;
+    const attackLevel = pending.attackerPower + successes * BATTLE_POWER_PER_LEVEL;
+    if (attackLevel > pending.defenderPower) winProbability += probability;
+    else if (attackLevel < pending.defenderPower) lossProbability += probability;
     else naturalTieProbability += probability;
   }
   const totalTieProbability = naturalTieProbability + forcedTieProbability;
@@ -695,9 +696,9 @@ function chooseHunt(state: GameState, style: Style, policyRng: Rng) {
   return chosen && chosen.score >= threshold ? chosen : null;
 }
 
-function thresholdOutcome(attackerLevel: number, defenderLevel: number, forcedTie: boolean) {
-  if (forcedTie || attackerLevel === defenderLevel) return "tie";
-  return attackerLevel > defenderLevel ? "defender defeated" : "attacker defeated";
+function thresholdOutcome(attackerPower: number, defenderPower: number, forcedTie: boolean) {
+  if (forcedTie || attackerPower === defenderPower) return "tie";
+  return attackerPower > defenderPower ? "defender defeated" : "attacker defeated";
 }
 
 function resolveBattle(state: GameState, telemetry: Telemetry, engineRng: Rng) {
@@ -713,8 +714,8 @@ function resolveBattle(state: GameState, telemetry: Telemetry, engineRng: Rng) {
   const defenderDefinition = defender.creature.card.definition;
   const offensiveBonus = results.offensive?.filter(Boolean).length ?? 0;
   const forcedTie = results.defensive?.some(Boolean) ?? false;
-  const actualAttackerLevel = pending.attackerLevel + offensiveBonus;
-  const currentThreshold = thresholdOutcome(actualAttackerLevel, pending.defenderLevel, forcedTie);
+  const actualAttackerPower = pending.attackerPower + offensiveBonus * BATTLE_POWER_PER_LEVEL;
+  const currentThreshold = thresholdOutcome(actualAttackerPower, pending.defenderPower, forcedTie);
 
   const qualifiesAsGiganticDefense = effectiveHasTag(defenderDefinition, "Gigantic");
   if (qualifiesAsGiganticDefense) {
@@ -727,13 +728,13 @@ function resolveBattle(state: GameState, telemetry: Telemetry, engineRng: Rng) {
       attackerTags: [...attackerDefinition.tags],
       currentThreshold,
       giganticOnlyExceptionThreshold: thresholdOutcome(
-        actualAttackerLevel,
-        pending.defenderLevel + (attackerGigantic ? 0 : 1),
+        actualAttackerPower,
+        pending.defenderPower + (attackerGigantic ? 0 : BATTLE_POWER_PER_LEVEL),
         forcedTie,
       ),
       giganticOrBruiserExceptionThreshold: thresholdOutcome(
-        actualAttackerLevel,
-        pending.defenderLevel + (attackerGigantic || attackerBruiser ? 0 : 1),
+        actualAttackerPower,
+        pending.defenderPower + (attackerGigantic || attackerBruiser ? 0 : BATTLE_POWER_PER_LEVEL),
         forcedTie,
       ),
       actualResult: "pending",

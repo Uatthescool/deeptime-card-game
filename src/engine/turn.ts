@@ -26,6 +26,7 @@ import {
   type BiomeState,
   type CardInstance,
   type ComputerSeat,
+  type GameRules,
   type GameState,
   type PlayerId,
   type PlayerState,
@@ -71,11 +72,47 @@ function drawOpeningHand(rng: RngHolder, player: PlayerState) {
   }
 }
 
+/** Niche-unlock trial rule: how strongly each kind of card is drawn into the four slots beside the guaranteed Level 0. */
+const OPENING_WEIGHTS = { levels: [0.5, 4, 2.5, 1, 0.5], support: 1 };
+
+const openingWeight = (card: CardInstance) =>
+  card.definition.kind === "creature"
+    ? (OPENING_WEIGHTS.levels[card.definition.printedLevel] ?? 0.5)
+    : OPENING_WEIGHTS.support;
+
+/** Niche-unlock trial rule: one Level 0 for certain, then four weighted draws; the rest of the deck stays shuffled. */
+function drawWeightedOpeningHand(rng: RngHolder, player: PlayerState) {
+  const pool = shuffle(rng, [...player.deck, ...player.hand]);
+  const levelZeros = pool.filter((card) => card.definition.kind === "creature" && card.definition.printedLevel === 0);
+  if (!levelZeros.length) {
+    player.deck = pool;
+    player.hand = [];
+    drawOpeningHand(rng, player);
+    return;
+  }
+  const hand = [levelZeros[randomInt(rng, levelZeros.length)]!];
+  let rest = pool.filter((card) => card !== hand[0]);
+  while (hand.length < OPENING_HAND_SIZE && rest.length) {
+    const total = rest.reduce((sum, card) => sum + openingWeight(card), 0);
+    let pick = (randomInt(rng, 1_000_000) / 1_000_000) * total;
+    const index = Math.max(
+      0,
+      rest.findIndex((card) => (pick -= openingWeight(card)) < 0),
+    );
+    hand.push(rest[index]!);
+    rest = rest.filter((_, position) => position !== index);
+  }
+  player.hand = hand;
+  player.deck = rest;
+}
+
 export type CreateGameOptions = {
   /** Fixes the game's randomness. Omit for a fresh random game. */
   seed?: number;
   /** A seat for the computer opponent. */
   computer?: ComputerSeat | null;
+  /** Trial rules for balance testing. */
+  rules?: GameRules;
 };
 
 export function createGame(
@@ -109,8 +146,9 @@ export function createGame(
     biome: createBiomeState(biomes[id]),
   });
   const players: [PlayerState, PlayerState] = [makePlayer(0, playerOne), makePlayer(1, playerTwo)];
-  drawOpeningHand(rng, players[0]);
-  drawOpeningHand(rng, players[1]);
+  const drawHand = options.rules?.nicheUnlock ? drawWeightedOpeningHand : drawOpeningHand;
+  drawHand(rng, players[0]);
+  drawHand(rng, players[1]);
 
   return {
     version: GAME_STATE_VERSION,
@@ -150,6 +188,7 @@ export function createGame(
     ],
     seedLabel: seedLabel(seed),
     computer: options.computer ?? null,
+    ...(options.rules ? { rules: options.rules } : {}),
     drawEvents: [],
     nextDrawEventId: 1,
   };

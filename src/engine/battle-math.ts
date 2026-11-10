@@ -29,7 +29,10 @@ import type {
   Verdict,
 } from "./types.ts";
 
-/** Pure battle calculations: Hunt legality, Battle Levels, and Battle Coin plans. */
+/** Pure battle calculations: Hunt legality, Battle Power, and Battle Coin plans. */
+
+/** Battle Power per Printed Level: Battle Power = Printed Level × 100 + modifiers. */
+export const BATTLE_POWER_PER_LEVEL = 100;
 
 function activeSuperpredators(state: GameState) {
   return state.players.some((player) => player.event?.definition.key === "superpredators");
@@ -279,11 +282,11 @@ export function hasLegalHunts(state: GameState, playerId: PlayerId = state.activ
 }
 
 export type BattleNumbers = {
-  attackerLevel: number;
-  defenderLevel: number;
-  /** Portion of the attacker's level that comes from a survival-clause defensive Tag (Stampede only). */
+  attackerPower: number;
+  defenderPower: number;
+  /** Portion of the attacker's Battle Power that comes from a survival-clause defensive Tag (Stampede only). */
   attackerOwnReactiveBonus: number;
-  /** Portion of the defender's level that comes from a survival-clause defensive Tag. */
+  /** Portion of the defender's Battle Power that comes from a survival-clause defensive Tag. */
   defenderOwnReactiveBonus: number;
   attackerNotes: string[];
   defenderNotes: string[];
@@ -304,15 +307,15 @@ export function calculateBattleNumbers(
   attackerFound: FoundCreature,
   defenderFound: FoundCreature,
   targetAlreadyAttacked: boolean,
-  offensiveCrypticBonus = 0,
+  offensiveCoinSuccesses = 0,
   origin: BattlePreview["origin"] = "battle-phase",
 ): BattleNumbers {
   const attacker = attackerFound.creature;
   const defender = defenderFound.creature;
   const attackerDef = attacker.card.definition;
   const defenderDef = defender.card.definition;
-  let attackerLevel: number = attackerDef.printedLevel;
-  let defenderLevel: number = defenderDef.printedLevel;
+  let attackerPower = attackerDef.printedLevel * BATTLE_POWER_PER_LEVEL;
+  let defenderPower = defenderDef.printedLevel * BATTLE_POWER_PER_LEVEL;
   let attackerOwnReactiveBonus = 0;
   let defenderOwnReactiveBonus = 0;
   const attackerNotes: string[] = [];
@@ -325,73 +328,75 @@ export function calculateBattleNumbers(
     attackerDef.tags.includes("Solitary") &&
     hasNoAdjacentFriendly(state, attackerFound.playerId, attackerFound.laneIndex)
   ) {
-    attackerLevel += 1;
-    attackerNotes.push("Solitary +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Solitary +100");
   }
   if (
     defenderDef.tags.includes("Solitary") &&
     hasNoAdjacentFriendly(state, defenderFound.playerId, defenderFound.laneIndex)
   ) {
-    defenderLevel += 1;
-    defenderNotes.push("Solitary +1");
+    defenderPower += BATTLE_POWER_PER_LEVEL;
+    defenderNotes.push("Solitary +100");
   }
   if (attackerDef.tags.includes("Bruiser") && defenderDef.printedLevel >= 2) {
-    attackerLevel += 1;
-    attackerNotes.push("Bruiser +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Bruiser +100");
   }
   if (attackerDef.tags.includes("Small Game Hunter") && defenderDef.printedLevel === 0) {
-    attackerLevel += 1;
-    attackerNotes.push("Small Game Hunter +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Small Game Hunter +100");
   }
   if (attackerDef.tags.includes("Pack Hunter") && targetAlreadyAttacked) {
-    attackerLevel += 1;
-    attackerNotes.push("Pack Hunter +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Pack Hunter +100");
   }
   if (attackerDef.tags.includes("Diver") && hasPrintedAquatic(defenderDef)) {
-    const diverBonus = tagEffectMultiplier(attackerDef, "Diver");
-    attackerLevel += diverBonus;
+    const diverBonus = tagEffectMultiplier(attackerDef, "Diver") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += diverBonus;
     attackerNotes.push(`Diver +${diverBonus}`);
   }
   if (attacker.mobFeederBonusTurn === state.turnNumber) {
-    attackerLevel += 1;
-    attackerNotes.push("Mob Feeder +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Mob Feeder +100");
   }
   if (attackerDef.tags.includes("Rivalry") && sameLane) {
-    const bonus = tagEffectMultiplier(attackerDef, "Rivalry");
-    attackerLevel += bonus;
+    const bonus = tagEffectMultiplier(attackerDef, "Rivalry") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
     attackerNotes.push(`Rivalry +${bonus}`);
   }
   if (defenderDef.tags.includes("Rivalry") && sameLane) {
-    const bonus = tagEffectMultiplier(defenderDef, "Rivalry");
-    defenderLevel += bonus;
+    const bonus = tagEffectMultiplier(defenderDef, "Rivalry") * BATTLE_POWER_PER_LEVEL;
+    defenderPower += bonus;
     defenderNotes.push(`Rivalry +${bonus}`);
   }
   if (attackerDef.tags.includes("Armament")) {
-    const bonus = tagEffectMultiplier(attackerDef, "Armament");
-    attackerLevel += bonus;
+    const bonus = tagEffectMultiplier(attackerDef, "Armament") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
     attackerNotes.push(`Armament +${bonus}`);
   }
   if (defenderDef.tags.includes("Armament")) {
-    const bonus = tagEffectMultiplier(defenderDef, "Armament");
-    defenderLevel += bonus;
+    const bonus = tagEffectMultiplier(defenderDef, "Armament") * BATTLE_POWER_PER_LEVEL;
+    defenderPower += bonus;
     defenderNotes.push(`Armament +${bonus}`);
   }
   if (attackerDef.tags.includes("Visual") && !attacker.visualUsed) {
-    attackerLevel += 1;
-    attackerNotes.push("Visual +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Visual +100");
   }
   if (defenderDef.tags.includes("Visual") && !defender.visualUsed) {
-    defenderLevel += 1;
-    defenderNotes.push("Visual +1");
+    defenderPower += BATTLE_POWER_PER_LEVEL;
+    defenderNotes.push("Visual +100");
   }
-  const attackerPeriodBonus = state.periodAuras.filter((aura) => aura.period === attackerDef.period).length;
-  const defenderPeriodBonus = state.periodAuras.filter((aura) => aura.period === defenderDef.period).length;
+  const attackerPeriodBonus =
+    state.periodAuras.filter((aura) => aura.period === attackerDef.period).length * BATTLE_POWER_PER_LEVEL;
+  const defenderPeriodBonus =
+    state.periodAuras.filter((aura) => aura.period === defenderDef.period).length * BATTLE_POWER_PER_LEVEL;
   if (attackerPeriodBonus) {
-    attackerLevel += attackerPeriodBonus;
+    attackerPower += attackerPeriodBonus;
     attackerNotes.push(`Geological Boundary +${attackerPeriodBonus}`);
   }
   if (defenderPeriodBonus) {
-    defenderLevel += defenderPeriodBonus;
+    defenderPower += defenderPeriodBonus;
     defenderNotes.push(`Geological Boundary +${defenderPeriodBonus}`);
   }
   if (
@@ -400,8 +405,8 @@ export function calculateBattleNumbers(
     !effectiveHasTag(attackerDef, "Gigantic") &&
     !attackerDef.tags.includes("Bruiser")
   ) {
-    const thermalInertia = tagEffectMultiplier(defenderDef, "Gigantic");
-    defenderLevel += thermalInertia;
+    const thermalInertia = tagEffectMultiplier(defenderDef, "Gigantic") * BATTLE_POWER_PER_LEVEL;
+    defenderPower += thermalInertia;
     defenderNotes.push(`Thermal Inertia +${thermalInertia}`);
   }
   if (
@@ -411,17 +416,17 @@ export function calculateBattleNumbers(
     !effectiveHasTag(defenderDef, "Gigantic") &&
     !defenderDef.tags.includes("Bruiser")
   ) {
-    const thermalInertia = tagEffectMultiplier(attackerDef, "Gigantic");
-    attackerLevel += thermalInertia;
+    const thermalInertia = tagEffectMultiplier(attackerDef, "Gigantic") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += thermalInertia;
     attackerNotes.push(`Stampede Thermal Inertia +${thermalInertia}`);
   }
   if (attackerFound.lane.attachment?.definition.key === "raptorial-claws") {
-    attackerLevel += 1;
-    attackerNotes.push("Raptorial Claws +1");
+    attackerPower += BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Raptorial Claws +100");
   }
   if (defenderFound.lane.attachment?.definition.key === "raptorial-claws") {
-    defenderLevel += 1;
-    defenderNotes.push("Raptorial Claws +1");
+    defenderPower += BATTLE_POWER_PER_LEVEL;
+    defenderNotes.push("Raptorial Claws +100");
   }
 
   if (
@@ -430,68 +435,69 @@ export function calculateBattleNumbers(
     !attackerDef.tags.includes("Ambush") &&
     !attackerDef.tags.includes("Sovereign")
   ) {
-    attackerLevel -= 1;
-    attackerNotes.push("Aerial defense -1");
+    attackerPower -= BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Aerial defense -100");
   }
 
-  if (offensiveCrypticBonus > 0) {
-    attackerLevel += offensiveCrypticBonus;
-    attackerNotes.push(`Cryptic Camouflage +${offensiveCrypticBonus}`);
+  if (offensiveCoinSuccesses > 0) {
+    const crypticBonus = offensiveCoinSuccesses * BATTLE_POWER_PER_LEVEL;
+    attackerPower += crypticBonus;
+    attackerNotes.push(`Cryptic Camouflage +${crypticBonus}`);
   }
 
   // Reactive defense Tags. Crushing Bite reduces only this pool.
   let defenderTagDefenseBonus = 0;
   if (defenderHas("Shell") || defenderHas("Dermal Armor")) {
-    defenderOwnReactiveBonus += 1;
-    defenderTagDefenseBonus += 1;
-    defenderNotes.push(`${defenderHas("Shell") ? "Shell" : "Dermal Armor"} +1`);
+    defenderOwnReactiveBonus += BATTLE_POWER_PER_LEVEL;
+    defenderTagDefenseBonus += BATTLE_POWER_PER_LEVEL;
+    defenderNotes.push(`${defenderHas("Shell") ? "Shell" : "Dermal Armor"} +100`);
   }
   if (defenderHas("Osteoderm")) {
-    const bonus = 2 * tagEffectMultiplier(defenderDef, "Osteoderm");
+    const bonus = 2 * tagEffectMultiplier(defenderDef, "Osteoderm") * BATTLE_POWER_PER_LEVEL;
     defenderTagDefenseBonus += bonus;
     defenderNotes.push(`Osteoderm +${bonus}`);
   }
   if (defenderHas("Bastion") && defenderDef.printedLevel <= 1 && defender.bastionDefendedTurn !== state.turnNumber) {
-    const bonus = 2 * tagEffectMultiplier(defenderDef, "Bastion");
+    const bonus = 2 * tagEffectMultiplier(defenderDef, "Bastion") * BATTLE_POWER_PER_LEVEL;
     defenderOwnReactiveBonus += bonus;
     defenderTagDefenseBonus += bonus;
     defenderNotes.push(`Bastion +${bonus}`);
   }
   const defenderBastions =
     defenderDef.printedLevel <= 1 && !defenseIgnored(ignoreDefenses, "Bastion")
-      ? adjacentHighBastionCount(state, defenderFound.playerId, defenderFound.laneIndex)
+      ? adjacentHighBastionCount(state, defenderFound.playerId, defenderFound.laneIndex) * BATTLE_POWER_PER_LEVEL
       : 0;
   if (defenderBastions) {
     defenderTagDefenseBonus += defenderBastions;
     defenderNotes.push(`Adjacent Bastion +${defenderBastions}`);
   }
   if (defendingAdaptationKey(defenderFound.lane, ignoreDefenses) === "thagomizer") {
-    defenderLevel += 1;
-    defenderNotes.push("Thagomizer +1");
+    defenderPower += BATTLE_POWER_PER_LEVEL;
+    defenderNotes.push("Thagomizer +100");
   }
   if (attackerDef.tags.includes("Crushing Bite") && defenderTagDefenseBonus > 0) {
     if (defenderDef.tags.includes("Sovereign")) {
       defenderNotes.push("Sovereign prevented Crushing Bite");
     } else {
-      const reduction = tagEffectMultiplier(attackerDef, "Crushing Bite");
+      const reduction = tagEffectMultiplier(attackerDef, "Crushing Bite") * BATTLE_POWER_PER_LEVEL;
       const applied = Math.min(defenderTagDefenseBonus, reduction);
       defenderTagDefenseBonus -= applied;
       defenderOwnReactiveBonus = Math.max(0, defenderOwnReactiveBonus - applied);
       attackerNotes.push(`Crushing Bite reduced reactive defense by up to ${reduction}`);
     }
   }
-  defenderLevel += defenderTagDefenseBonus;
+  defenderPower += defenderTagDefenseBonus;
 
   // Stampede inverts defensive Tags: a stampeding Herbivore attacks with them.
   if (origin === "stampede") {
     if (attackerDef.tags.includes("Shell") || attackerDef.tags.includes("Dermal Armor")) {
-      attackerOwnReactiveBonus += 1;
-      attackerLevel += 1;
-      attackerNotes.push(`Stampede ${attackerDef.tags.includes("Shell") ? "Shell" : "Dermal Armor"} +1`);
+      attackerOwnReactiveBonus += BATTLE_POWER_PER_LEVEL;
+      attackerPower += BATTLE_POWER_PER_LEVEL;
+      attackerNotes.push(`Stampede ${attackerDef.tags.includes("Shell") ? "Shell" : "Dermal Armor"} +100`);
     }
     if (attackerDef.tags.includes("Osteoderm")) {
-      const bonus = 2 * tagEffectMultiplier(attackerDef, "Osteoderm");
-      attackerLevel += bonus;
+      const bonus = 2 * tagEffectMultiplier(attackerDef, "Osteoderm") * BATTLE_POWER_PER_LEVEL;
+      attackerPower += bonus;
       attackerNotes.push(`Stampede Osteoderm +${bonus}`);
     }
     if (
@@ -499,43 +505,43 @@ export function calculateBattleNumbers(
       attackerDef.printedLevel <= 1 &&
       attacker.bastionAttackedTurn !== state.turnNumber
     ) {
-      const bonus = 2 * tagEffectMultiplier(attackerDef, "Bastion");
+      const bonus = 2 * tagEffectMultiplier(attackerDef, "Bastion") * BATTLE_POWER_PER_LEVEL;
       attackerOwnReactiveBonus += bonus;
-      attackerLevel += bonus;
+      attackerPower += bonus;
       attackerNotes.push(`Stampede Bastion +${bonus}`);
     }
     const attackerBastions =
       attackerDef.printedLevel <= 1
-        ? adjacentHighBastionCount(state, attackerFound.playerId, attackerFound.laneIndex)
+        ? adjacentHighBastionCount(state, attackerFound.playerId, attackerFound.laneIndex) * BATTLE_POWER_PER_LEVEL
         : 0;
     if (attackerBastions) {
-      attackerLevel += attackerBastions;
+      attackerPower += attackerBastions;
       attackerNotes.push(`Stampede adjacent Bastion +${attackerBastions}`);
     }
   }
 
   if (attackerFound.lane.attachment?.definition.key === "island-dwarfism") {
-    const penalty = effectiveHasTag(attackerDef, "Gigantic") ? 2 : 1;
-    attackerLevel -= penalty;
+    const penalty = (effectiveHasTag(attackerDef, "Gigantic") ? 2 : 1) * BATTLE_POWER_PER_LEVEL;
+    attackerPower -= penalty;
     attackerNotes.push(`Island Dwarfism -${penalty}`);
   }
   if (defenderFound.lane.attachment?.definition.key === "island-dwarfism") {
-    const penalty = effectiveHasTag(defenderDef, "Gigantic") ? 2 : 1;
-    defenderLevel -= penalty;
+    const penalty = (effectiveHasTag(defenderDef, "Gigantic") ? 2 : 1) * BATTLE_POWER_PER_LEVEL;
+    defenderPower -= penalty;
     defenderNotes.push(`Island Dwarfism -${penalty}`);
   }
   if (state.players[otherPlayer(attackerFound.playerId)].lanes[attackerFound.laneIndex]!.drought) {
-    attackerLevel -= 1;
-    attackerNotes.push("Drought -1");
+    attackerPower -= BATTLE_POWER_PER_LEVEL;
+    attackerNotes.push("Drought -100");
   }
   if (state.players[otherPlayer(defenderFound.playerId)].lanes[defenderFound.laneIndex]!.drought) {
-    defenderLevel -= 1;
-    defenderNotes.push("Drought -1");
+    defenderPower -= BATTLE_POWER_PER_LEVEL;
+    defenderNotes.push("Drought -100");
   }
 
   return {
-    attackerLevel: Math.max(0, attackerLevel),
-    defenderLevel: Math.max(0, defenderLevel),
+    attackerPower: Math.max(0, attackerPower),
+    defenderPower: Math.max(0, defenderPower),
     attackerOwnReactiveBonus,
     defenderOwnReactiveBonus,
     attackerNotes,
@@ -607,7 +613,7 @@ export function createBattlePreview(
   const coinPlan = calculateBattleCoinPlan(state, attacker, defender);
   if (coinPlan.offensiveCount) {
     numbers.attackerNotes.push(
-      `Cryptic Camouflage: +0 to +${coinPlan.offensiveCount} (${coinPlan.offensiveCount} ${coinPlan.offensiveCount === 1 ? "coin" : "coins"})`,
+      `Cryptic Camouflage: +0 to +${coinPlan.offensiveCount * BATTLE_POWER_PER_LEVEL} (${coinPlan.offensiveCount} ${coinPlan.offensiveCount === 1 ? "coin" : "coins"})`,
     );
   }
   state.pendingBattle = {
@@ -618,18 +624,18 @@ export function createBattlePreview(
     defenderPlayer: defender.playerId,
     defenderLane: defender.laneIndex,
     origin,
-    attackerLevelMax: numbers.attackerLevel + coinPlan.offensiveCount,
+    attackerPowerMax: numbers.attackerPower + coinPlan.offensiveCount * BATTLE_POWER_PER_LEVEL,
     coinPlan,
     coins: null,
-    attackerLevel: numbers.attackerLevel,
-    defenderLevel: numbers.defenderLevel,
+    attackerPower: numbers.attackerPower,
+    defenderPower: numbers.defenderPower,
     attackerNotes: numbers.attackerNotes,
     defenderNotes: numbers.defenderNotes,
   };
 }
 
-/** Projected Battle Level of a Creature in a hypothetical Hunt against `opposingUid`. */
-export function inspectBattleLevel(
+/** Projected Battle Power of a Creature in a hypothetical Hunt against `opposingUid`. */
+export function inspectBattlePower(
   state: GameState,
   creatureUid: string,
   role: "attacker" | "defender",
@@ -640,8 +646,8 @@ export function inspectBattleLevel(
   if (!creature || !opposing) return null;
   if (role === "attacker") {
     return calculateBattleNumbers(state, creature, opposing, opposing.creature.attackedTurn === state.turnNumber)
-      .attackerLevel;
+      .attackerPower;
   }
   return calculateBattleNumbers(state, opposing, creature, creature.creature.attackedTurn === state.turnNumber)
-    .defenderLevel;
+    .defenderPower;
 }

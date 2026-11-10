@@ -47,6 +47,8 @@ const MAX_STEPS = 6000;
 
 /** Each deck plays in its own Biome, as in the game, unless `--random-biomes` asks for the old mixed runs. */
 const lockedBiomes = !process.argv.includes("--random-biomes");
+/** `--niche-unlock` plays the Niche-unlock trial rule (see GameRules). */
+const nicheUnlock = process.argv.includes("--niche-unlock");
 /** Ordered deck pairings to cycle through; a locked run skips mirrors, which always split evenly. */
 const PAIRINGS = DECK_KEYS.flatMap((north) =>
   DECK_KEYS.filter((south) => !lockedBiomes || south !== north).map((south): [DeckKey, DeckKey] => [north, south]),
@@ -89,7 +91,7 @@ function configure(index: number) {
 export function playOne(index: number): GameRecord {
   const started = performance.now();
   const { seed, decks, biomes } = configure(index);
-  let state = createGame("North", "South", biomes, decks, { seed });
+  let state = createGame("North", "South", biomes, decks, { seed, ...(nicheUnlock ? { rules: { nicheUnlock } } : {}) });
   const first = state.activePlayer;
   const randoms = [aiRandom(seed * 31 + 1), aiRandom(seed * 31 + 2)] as const;
   const tracker = createTracker();
@@ -379,7 +381,7 @@ if (args.includes("--summarize")) {
       (_, shard) =>
         new Promise<void>((resolve, reject) => {
           const child = spawn(
-            `npx vite-node tools/balance.ts -- --shard ${shard} --of ${workers} --games ${games}${lockedBiomes ? "" : " --random-biomes"}`,
+            `npx vite-node tools/balance.ts -- --shard ${shard} --of ${workers} --games ${games}${lockedBiomes ? "" : " --random-biomes"}${nicheUnlock ? " --niche-unlock" : ""}`,
             {
               shell: true,
               stdio: "inherit",

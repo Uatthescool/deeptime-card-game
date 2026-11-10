@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-import { canRerollBattleCoin, type CoinGroup, type GameState, type PlayerId } from "../../engine/index.ts";
+import {
+  BATTLE_POWER_PER_LEVEL,
+  canRerollBattleCoin,
+  type CoinGroup,
+  type GameState,
+  type PlayerId,
+} from "../../engine/index.ts";
 import { Dialog } from "./Dialog.tsx";
 import type { Dispatch } from "./Modals.tsx";
 
@@ -63,7 +69,7 @@ export function BattleModal({ game, dispatch, controller }: BattleModalProps) {
           owner: battle.attackerPlayer,
           label: battle.coinPlan.offensiveReason,
           results: coins.offensive ?? [],
-          outcome: `${(coins.offensive ?? []).filter(Boolean).length} Battle Level gained`,
+          outcome: `+${(coins.offensive ?? []).filter(Boolean).length * BATTLE_POWER_PER_LEVEL} Battle Power gained`,
         },
         {
           id: "defensive" as const,
@@ -79,16 +85,16 @@ export function BattleModal({ game, dispatch, controller }: BattleModalProps) {
     flipping === "all" || (flipping !== null && flipping.group === group && flipping.index === index);
 
   const levelRange =
-    battle.attackerLevelMax > battle.attackerLevel
-      ? `${battle.attackerLevel}–${battle.attackerLevelMax}`
-      : battle.attackerLevel;
+    battle.attackerPowerMax > battle.attackerPower
+      ? `${battle.attackerPower}–${battle.attackerPowerMax}`
+      : battle.attackerPower;
 
   return (
     <Dialog label="Hunt preview" className="battle-overlay">
       <div className="battle-modal">
         <div className="eyebrow">{isStampede ? "Stampede Hunt" : "Hunt preview"}</div>
         <h2>
-          {watching ? `${game.players[battle.attackerPlayer].name} is Hunting.` : "Review projected Battle Levels."}
+          {watching ? `${game.players[battle.attackerPlayer].name} is Hunting.` : "Review projected Battle Power."}
         </h2>
         <p>
           {watching
@@ -114,7 +120,7 @@ export function BattleModal({ game, dispatch, controller }: BattleModalProps) {
           <div>
             <small>Defender</small>
             <strong>{defender.card.definition.name}</strong>
-            <b>{battle.defenderLevel}</b>
+            <b>{battle.defenderPower}</b>
             <ul>
               {battle.defenderNotes.length ? (
                 battle.defenderNotes.map((note) => <li key={note}>{note}</li>)

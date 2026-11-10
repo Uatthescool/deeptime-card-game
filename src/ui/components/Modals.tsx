@@ -143,8 +143,8 @@ export function GeologicalBoundaryModal({ game, dispatch }: { game: GameState; d
         <div className="eyebrow">Geological Boundary · Instantaneous Event</div>
         <h2>Declare a Time Period.</h2>
         <p>
-          All Creatures from that Period will enter History. The immediately succeeding Period receives +1 Battle Level
-          until the start of your next turn.
+          All Creatures from that Period will enter History. The immediately succeeding Period receives +100 Battle
+          Power until the start of your next turn.
         </p>
         <div className="period-choice-grid">
           {geologicalBoundaryOptions(game).map((period) => (

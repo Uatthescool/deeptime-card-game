@@ -39,10 +39,10 @@ export const BIOMES: BiomeDefinition[] = [
     abilityName: "Thermal Inertia",
     subBiomes: ["Taiga and boreal forests", "Arctic tundra", "Alpine tundra", "Polar environments"],
     rules:
-      "The Gigantic Tag gains the following effect for Creatures you control: \u201cWhile this Creature is defending, it gets +1 Battle Level unless the hunting Creature has Gigantic or Bruiser.\u201d",
+      "The Gigantic Tag gains the following effect for Creatures you control: \u201cWhile this Creature is defending, it gets +100 Battle Power unless the hunting Creature has Gigantic or Bruiser.\u201d",
     flavor:
       "As body size increases, surface area does not keep pace with volume. Gigantic animals therefore exchange heat more slowly with their surroundings, giving them greater thermal inertia in the cold.",
-    shortRules: "Gigantic gains a conditional +1 defensive Battle Level effect.",
+    shortRules: "Gigantic gains a conditional +100 defensive Battle Power effect.",
   },
   {
     key: "arid",

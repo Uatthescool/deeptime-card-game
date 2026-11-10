@@ -8,6 +8,7 @@ const LOCK_CODES = new Set(["wildfire", "drought", "island-dwarfism-adjacent"]);
 const EMPTY_NICHE_LABELS: Record<string, string> = {
   "empty-needs-low-level": "Level 0–1 only",
   "already-filled-empty": "Already filled one",
+  "niche-not-open": "Not open yet",
   "rapid-needs-occupied": "Needs a Creature",
   "aquatic-needs-occupied": "Needs a Creature",
   "creature-already-played": "Creature play used",

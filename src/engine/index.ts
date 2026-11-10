@@ -36,7 +36,8 @@ export {
   battleCoinPlan,
   battleNeedsElusiveFlip,
   hasLegalHunts,
-  inspectBattleLevel,
+  BATTLE_POWER_PER_LEVEL,
+  inspectBattlePower,
   legalAttackTargets,
 } from "./battle-math.ts";
 export {

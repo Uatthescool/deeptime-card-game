@@ -78,9 +78,10 @@ export function RulesDrawer({ onClose }: { onClose: () => void }) {
       <section>
         <h3>Hunt</h3>
         <p>
-          Selecting a target opens a projected Battle Level preview, including any Battle Coin range. Canceling consumes
-          nothing. Lower Battle Level is destroyed after Commit Hunt; a tie normally destroys neither Creature unless an
-          effect says otherwise.
+          A Creature’s Battle Power is its Printed Level × 100 plus modifiers. Selecting a target opens a projected
+          Battle Power preview, including any Battle Coin range. Canceling consumes nothing. The Creature with lower
+          Battle Power is destroyed after Commit Hunt; a tie normally destroys neither Creature unless an effect says
+          otherwise.
         </p>
       </section>
       <section>

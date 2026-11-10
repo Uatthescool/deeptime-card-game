@@ -10,7 +10,7 @@ import type {
 import type { BiomeKey } from "../data/biomes.ts";
 
 /** Bump when GameState changes shape so saved games from older builds are discarded. */
-export const GAME_STATE_VERSION = 1;
+export const GAME_STATE_VERSION = 2;
 
 export type PlayerId = 0 | 1;
 export type Phase = "handoff" | "start" | "development" | "battle" | "game-over";
@@ -69,6 +69,8 @@ export type LaneState = {
   frozenUntilTurn?: number | null;
   wildfire?: LaneEvent | null;
   drought?: LaneEvent | null;
+  /** Niche-unlock trial rule: a Creature has lived here, so the Niche stays open to Level 1 Creatures. */
+  settled?: boolean;
 };
 
 export type TurnAllowances = {
@@ -85,6 +87,8 @@ export type TurnAllowances = {
   skipBattlePhase: boolean;
   overriddenLanes: number[];
   aquaticOverrideLockedLane: number | null;
+  /** Ancestor's extra same-turn override has been used this turn. */
+  ancestorPlayUsed?: boolean;
 };
 
 export type BiomeState = {
@@ -149,9 +153,9 @@ export type BattlePreview = {
   attackerLane: number;
   defenderPlayer: PlayerId;
   defenderLane: number;
-  attackerLevel: number;
-  attackerLevelMax: number;
-  defenderLevel: number;
+  attackerPower: number;
+  attackerPowerMax: number;
+  defenderPower: number;
   attackerNotes: string[];
   defenderNotes: string[];
   coinPlan: BattleCoinPlan;
@@ -251,6 +255,16 @@ export type Difficulty = "easy" | "normal";
 /** The seat the computer plays, and how well. */
 export type ComputerSeat = { seat: PlayerId; difficulty: Difficulty };
 
+/** Trial rules for balance testing. Absent in normal games. */
+export type GameRules = {
+  /**
+   * Level 1 Creatures may be played into an empty Niche only when a neighboring friendly Niche or the
+   * directly opposing Niche is occupied, or a Creature has lived in that Niche before. Opening hands
+   * always hold a Level 0 and lean toward low Levels.
+   */
+  nicheUnlock?: boolean;
+};
+
 export type GameState = {
   version: typeof GAME_STATE_VERSION;
   /** The seed this game was created from; identifies the game for replays and bug reports. */
@@ -288,6 +302,7 @@ export type GameState = {
   seedLabel: string;
   /** The computer opponent, if one plays this game; absent or null when two people share the device. */
   computer?: ComputerSeat | null;
+  rules?: GameRules;
   drawEvents: DrawEvent[];
   nextDrawEventId: number;
 };

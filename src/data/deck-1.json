@@ -74,7 +74,7 @@
     },
     {
       "title": "Optional Hunt commitment",
-      "rule": "Choosing an attacker and target opens a projected Battle Level preview. Canceling consumes nothing; a Hunt affects game state only after the player selects Commit Hunt."
+      "rule": "Choosing an attacker and target opens a projected Battle Power preview. Canceling consumes nothing; a Hunt affects game state only after the player selects Commit Hunt."
     },
     {
       "title": "Elusive coin",
@@ -110,11 +110,11 @@
     },
     {
       "title": "Cryptic Camouflage",
-      "rule": "Ghost Lineage is removed and replaced one-for-one by Cryptic Camouflage. The Level 2-or-lower Adaptation creates a defensive evasion wager for Herbivores, or an attacking Battle Level wager for Carnivores and Omnivores; Ambush doubles the attacking coin count."
+      "rule": "Ghost Lineage is removed and replaced one-for-one by Cryptic Camouflage. The Level 2-or-lower Adaptation creates a defensive evasion wager for Herbivores, or an attacking Battle Power wager for Carnivores and Omnivores; Ambush doubles the attacking coin count."
     },
     {
       "title": "Aerial battle effect",
-      "rule": "When an Aerial Creature is Hunted, the attacker gets -1 Battle Level for that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only to bypass this penalty and for compatibility; it does not grant the defensive effect."
+      "rule": "When an Aerial Creature is Hunted, the attacker gets -100 Battle Power for that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only to bypass this penalty and for compatibility; it does not grant the defensive effect."
     },
     {
       "title": "Evolutionary Radiation sequence",
@@ -146,7 +146,7 @@
     },
     {
       "title": "Spinal Sail Victory protection",
-      "rule": "Event and Tag effects each apply 1 less Victory Level decrease to a Creature with Spinal Sail. This does not affect Battle Level; in particular, it mitigates that Creature’s Apex Predator crowding decrease by 1."
+      "rule": "Event and Tag effects each apply 1 less Victory Level decrease to a Creature with Spinal Sail. This does not affect Battle Power; in particular, it mitigates that Creature’s Apex Predator crowding decrease by 1."
     },
     {
       "title": "Aquatic override identity",
@@ -174,7 +174,7 @@
     },
     {
       "title": "Sovereign Battle protection",
-      "rule": "Sovereign makes its bearer count as Gigantic and prevents opposing Tags or Adaptations from lowering its Battle Level during a Hunt. A Carnivore or Omnivore bearer also gains Territorial. A Herbivore bearer instead prevents opposing Tags or Adaptations from lowering its Victory Level. Events, Concepts, and Biomes are not prevented."
+      "rule": "Sovereign makes its bearer count as Gigantic and prevents opposing Tags or Adaptations from lowering its Battle Power during a Hunt. A Carnivore or Omnivore bearer also gains Territorial. A Herbivore bearer instead prevents opposing Tags or Adaptations from lowering its Victory Level. Events, Concepts, and Biomes are not prevented."
     },
     {
       "title": "Apex boss differentiation",
@@ -190,7 +190,7 @@
     },
     {
       "title": "Cold Gigantic augmentation",
-      "rule": "Thermal Inertia causes the Gigantic Tag itself to gain its conditional +1 defending Battle Level effect for Creatures controlled by the Cold player. Specialized therefore doubles that modifier when immediately followed by printed Gigantic, but it does not change the hunting-Creature counters."
+      "rule": "Thermal Inertia causes the Gigantic Tag itself to gain its conditional +100 defending Battle Power effect for Creatures controlled by the Cold player. Specialized therefore doubles that modifier when immediately followed by printed Gigantic, but it does not change the hunting-Creature counters."
     },
     {
       "title": "Exceptional Level 4 capstone",
@@ -223,7 +223,7 @@
   },
   "tagRules": {
     "Living Fossil": "For overrides, this Creature’s Time Period matches every Time Period. Once per game, if it leaves play for a reason other than battle, return it from History to its owner’s hand at the start of that player’s next turn.",
-    "Shell": "This Creature gets +1 Battle Level while defending. If that bonus alone would otherwise cause the attacking Creature to be destroyed, the attacker is not destroyed.",
+    "Shell": "This Creature gets +100 Battle Power while defending. If that bonus alone would otherwise cause the attacking Creature to be destroyed, the attacker is not destroyed.",
     "Aquatic": "This Creature can override, or be overridden by, only a Creature that counts as Aquatic. When the occupied Creature has Aquatic, the two Creatures' Primary Taxa count as matching; if those Taxa already match, Aquatic supplies the Tag category instead.",
     "Propulsion": "After the normal Creature play, this Creature may be played into a second empty Niche as the extra Creature play; doing so ends the Development Phase.",
     "Opportunist": "After your normal Creature play, if your opponent controls a Continuous Event, you may play this Creature from your hand as your extra Creature play. It may fill an empty Niche; if it is Level 1 or Level 2, it may instead perform a legal override. Normal placement, Level progression, matching, and override restrictions apply. Then end your Development Phase.",
@@ -231,44 +231,46 @@
     "Generalist": "When this Creature is the current occupant in an override and two of Diet, Time Period, and Primary Taxon already match, Generalist supplies the Tag match.",
     "Glider": "Counts as Aerial for compatibility without gaining an inherent Aerial effect.",
     "Elusive": "This Creature cannot Hunt Level 1 or higher Creatures. The first time it is Hunted each turn, flip the Elusive coin: red Rex forces a tie; black reverse resolves normally.",
-    "Small Game Hunter": "Gets +1 Battle Level while attacking a Level 0 Creature.",
-    "Mob Feeder": "After another friendly Creature makes the first kill that can trigger this Tag during a turn, this Creature gets +1 Battle Level in its next initiated Hunt that turn.",
+    "Small Game Hunter": "Gets +100 Battle Power while attacking a Level 0 Creature.",
+    "Mob Feeder": "After another friendly Creature makes the first kill that can trigger this Tag during a turn, this Creature gets +100 Battle Power in its next initiated Hunt that turn.",
     "Scavenger": "Whenever the opposing Creature in this Creature’s facing Niche leaves play, except by a Hunt this Creature initiated, draw 1 card. For overrides, this Creature also counts as having Mob Feeder.",
     "Resourceful": "Represents behavioral or ecological flexibility. While you control at least one Creature with Resourceful, your normal Concept allowance is two per turn instead of one. Multiple instances do not stack.",
-    "Aerial": "When this Creature is Hunted, the attacker gets -1 Battle Level during that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only for bypassing this penalty and for compatibility; Glider does not grant this defensive effect.",
+    "Aerial": "When this Creature is Hunted, the attacker gets -100 Battle Power during that Hunt unless it has Aerial or Ambush. Glider counts as Aerial only for bypassing this penalty and for compatibility; Glider does not grant this defensive effect.",
     "Transitional": "For an override involving this Creature, treat the two Time Periods as matching when the two Creatures share their Primary Taxon.",
     "Ambush": "May Hunt during the turn it enters play.",
     "Saboteur": "When this Creature initiates a Hunt that ends in a tie, the opposing Creature cannot Hunt during its controller’s next Battle Phase.",
     "Raptorial": "When this Creature initiates a Hunt that ends in a tie, the opposing Creature cannot be overridden during its controller’s next turn.",
     "Semi-Aquatic": "An unrestricted bridge Tag. It counts as Aquatic by name for Events and Concepts and for satisfying a printed Aquatic occupant's override gate, but not for Adaptations or Aquatic's own effect. When the occupied Creature has Semi-Aquatic, Aquatic or Semi-Aquatic supplies the Tag category.",
-    "Diver": "Gets +1 Battle Level while attacking a Creature with the Aquatic Tag.",
-    "Bruiser": "Gets +1 Battle Level while attacking a Level 2 or Level 3 Creature.",
+    "Diver": "Gets +100 Battle Power while attacking a Creature with the Aquatic Tag.",
+    "Bruiser": "Gets +100 Battle Power while attacking a Level 2 or Level 3 Creature.",
     "Cranial Display": "When this Creature enters play, choose an opposing Creature of equal or lower Level. The chosen Creature cannot Hunt this Creature through its controller’s next turn. Entry remains legal when no eligible target exists.",
-    "Pack Hunter": "Gets +1 Battle Level while attacking a Creature that has already been Hunted this turn.",
+    "Pack Hunter": "Gets +100 Battle Power while attacking a Creature that has already been Hunted this turn.",
     "Spinal Sail": "Event and Tag effects each apply 1 less Victory Level decrease to this Creature.",
     "Apex Predator": "Contributes +2 Victory Levels, reduced by 1 for each other Apex Predator on the board, to a minimum bonus of 0.",
     "Charge": "This Creature may Hunt during the Battle Phase of the turn it enters play. It may only Hunt the opposing Creature in its facing Niche, regardless of Diet.",
-    "Rivalry": "During a Hunt between this Creature and the opposing Creature in its facing Niche, this Creature gets +1 Battle Level, whether attacking or defending. This bonus does not contribute Victory Level.",
-    "Solitary": "Gets +1 Battle Level while it has no adjacent friendly Creatures.",
-    "Sovereign": "This Creature also counts as Gigantic. Its Battle Level cannot be lowered by opposing Tags or Adaptations during a Hunt. If it is a Carnivore or Omnivore, it also gains Territorial. If it is a Herbivore, its Victory Level cannot be lowered by opposing Tags or Adaptations.",
+    "Rivalry": "During a Hunt between this Creature and the opposing Creature in its facing Niche, this Creature gets +100 Battle Power, whether attacking or defending. This bonus does not contribute Victory Level.",
+    "Solitary": "Gets +100 Battle Power while it has no adjacent friendly Creatures.",
+    "Sovereign": "This Creature also counts as Gigantic. Its Battle Power cannot be lowered by opposing Tags or Adaptations during a Hunt. If it is a Carnivore or Omnivore, it also gains Territorial. If it is a Herbivore, its Victory Level cannot be lowered by opposing Tags or Adaptations.",
+    "Divergent": "This Creature also counts as Transitional and Ancestor.",
+    "Ancestor": "A Creature whose taxa include every one of this Creature’s taxa may override it while rising up to two Levels. On the turn this Creature enters play, that Creature may override it as an extra Creature play.",
     "Gigantic": "Cannot be Hunted by Level 1 or lower Creatures and contributes +1 Victory Level.",
     "Territorial": "May Hunt the opposing Creature in its facing Niche regardless of ordinary Diet restrictions.",
-    "Crushing Bite": "Reduces the defender’s qualifying attacked-only defensive Battle Level bonus by 1.",
+    "Crushing Bite": "Reduces the defender’s qualifying attacked-only defensive Battle Power bonus by 100.",
     "Specialized": "Double each numerical modifier or quantity generated by the immediately following printed Tag. Specialized does not alter that Tag’s conditions, thresholds, restrictions, or permissions.",
-    "Armament": "This Creature gets +1 Battle Level while attacking or defending. This bonus does not contribute Victory Level.",
-    "Osteoderm": "This Creature gets +2 Battle Level while defending.",
+    "Armament": "This Creature gets +100 Battle Power while attacking or defending. This bonus does not contribute Victory Level.",
+    "Osteoderm": "This Creature gets +200 Battle Power while defending.",
     "Herd": "Once per turn, when a Creature with Herd enters play under your control, you may search your deck for another Herd Creature whose Printed Level is no more than 1 higher, reveal it, add it to your hand, then shuffle. Herd does not count as a shared Tag for overrides.",
     "Nesting": "When this Creature enters a Niche, after resolving its other Tag effects, you may play a Level 0 Creature from your hand into an empty adjacent friendly Niche and resolve its entry effects. If you do, end your turn without entering your Battle Phase after those effects resolve.",
-    "Bastion": "If this Creature is Level 2 or higher, adjacent friendly Level 0–1 Creatures get +1 Battle Level while defending. If it is Level 0–1, the first time it is Hunted each turn it gets +2 Battle Level for that Hunt; the hunter is not destroyed solely because of this bonus.",
+    "Bastion": "If this Creature is Level 2 or higher, adjacent friendly Level 0–1 Creatures get +100 Battle Power while defending. If it is Level 0–1, the first time it is Hunted each turn it gets +200 Battle Power for that Hunt; the hunter is not destroyed solely because of this bonus.",
     "Deimatic": "This Creature cannot be targeted for a Hunt for 1 opposing turn after it enters a Niche.",
     "Graviportal": "This Creature cannot be moved to another Niche or returned to its owner's hand by an effect. It can still enter History through a Hunt or eligible effect.",
     "Overreach": "When this Creature enters a Niche, draw 1 additional card during the Start-of-Turn Draw Phase of your next turn. Overreach can trigger only once per turn across all bearers you control.",
     "Resonance": "Placeholder Tag, effect undecided.",
     "Retaliation": "When this Creature is defending and the Hunt ends in a tie, destroy the attacking Creature.",
-    "Visual": "The first time this Creature is involved in a Hunt after entering play, it gets +1 Battle Level for that Hunt.",
+    "Visual": "The first time this Creature is involved in a Hunt after entering play, it gets +100 Battle Power for that Hunt.",
     "Engulf": "When this Creature destroys a Creature with a lower or equal Printed Level in a Hunt, if its Adaptation Slot is empty, you may place the destroyed Creature face-up in that Adaptation Slot instead of sending it to History. While a Creature is engulfed this way, this Creature contributes +1 Victory Level but cannot attack. When this Creature leaves play, send the engulfed Creature to its owner’s History Pile.",
     "Filter Feeder": "When this Creature enters play, look at the top 2 cards of your deck, then return them to the top in any order. In Hunting checks this Creature counts as a Herbivore: Carnivores and Omnivores may Hunt it, and it can Hunt only with Charge or Territorial.",
-    "Dermal Armor": "This Creature gets +1 Battle Level while defending. If that bonus alone would otherwise cause the attacking Creature to be destroyed, the attacker is not destroyed. For override checks, Dermal Armor may match either Shell or Osteoderm.",
+    "Dermal Armor": "This Creature gets +100 Battle Power while defending. If that bonus alone would otherwise cause the attacking Creature to be destroyed, the attacker is not destroyed. For override checks, Dermal Armor may match either Shell or Osteoderm.",
     "Durophagy": "When this Creature destroys a Creature in a Hunt, if that Creature has Shell, Osteoderm, Dermal Armor, or another designated hard-defense Tag, draw 1 card.",
     "Shearing Bite": "Placeholder Tag, effect undecided.",
     "Retention": "Placeholder Tag, effect undecided."
@@ -704,7 +706,7 @@
       "kind": "adaptation",
       "name": "Raptorial Claws",
       "eligibility": "raptorial-claws",
-      "rules": "Attach to an eligible Creature with the hidden Raptorial Claws Visual Tag. It gets +1 Battle Level while Hunting.",
+      "rules": "Attach to an eligible Creature with the hidden Raptorial Claws Visual Tag. It gets +100 Battle Power while Hunting.",
       "note": "Eligibility is hidden card data and is independent of the visible Raptorial Tag.",
       "cardFace": "/card-faces/raptorial-claws.webp",
       "status": "Locked"
@@ -714,8 +716,8 @@
       "kind": "adaptation",
       "name": "Cryptic Camouflage",
       "eligibility": "level-2-or-lower",
-      "rules": "Attach only to a Level 2 or lower Creature. If the attached Creature is a Herbivore, it cannot initiate a Hunt. The first time it is Hunted each turn, flip the Battle Coin: one or more red Rex results force the Hunt to end in a tie; black reverse results resolve it normally. If it already has Elusive, flip two coins total. This does not grant Elusive for overriding or Tag matching. If the attached Creature is a Carnivore or Omnivore, whenever it initiates a Hunt, flip the Battle Coin and give it +1 Battle Level for each red Rex result during that Hunt. If it also has Ambush, flip two coins total.",
-      "note": "Defensive double flipping succeeds if either coin shows red Rex. Offensive Ambush results range from +0 to +2 Battle Level. Coin modifiers affect Battle Level only.",
+      "rules": "Attach only to a Level 2 or lower Creature. If the attached Creature is a Herbivore, it cannot initiate a Hunt. The first time it is Hunted each turn, flip the Battle Coin: one or more red Rex results force the Hunt to end in a tie; black reverse results resolve it normally. If it already has Elusive, flip two coins total. This does not grant Elusive for overriding or Tag matching. If the attached Creature is a Carnivore or Omnivore, whenever it initiates a Hunt, flip the Battle Coin and give it +100 Battle Power for each red Rex result during that Hunt. If it also has Ambush, flip two coins total.",
+      "note": "Defensive double flipping succeeds if either coin shows red Rex. Offensive Ambush results range from +0 to +200 Battle Power. Coin modifiers affect Battle Power only.",
       "cardFace": "/card-faces/cryptic-camouflage.webp",
       "status": "Locked"
     },

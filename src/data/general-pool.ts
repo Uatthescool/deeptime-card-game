@@ -74,7 +74,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     period: "Cretaceous",
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
-    taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Pachycephalosaurid"],
+    taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Marginocephalian", "Pachycephalosaurid"],
     tags: ["Cranial Display", "Rivalry"],
     visualTags: ["Cranial Dome", "Bipedal"],
     flavorText:
@@ -89,7 +89,16 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     period: "Cretaceous",
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
-    taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ceratopsian", "Protoceratopsid"],
+    taxa: [
+      "Vertebrate",
+      "Amniote",
+      "Archosaur",
+      "Dinosaur",
+      "Ornithischian",
+      "Marginocephalian",
+      "Ceratopsian",
+      "Protoceratopsid",
+    ],
     tags: ["Cranial Display", "Retaliation"],
     visualTags: ["Frill", "Beaked", "Quadrupedal"],
     flavorText:
@@ -104,7 +113,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     period: "Jurassic",
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
-    taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ceratopsian"],
+    taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Marginocephalian"],
     tags: ["Transitional", "Cranial Display"],
     visualTags: ["Beaked", "Bipedal"],
     flavorText:
@@ -197,6 +206,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
       "Archosaur",
       "Dinosaur",
       "Ornithischian",
+      "Marginocephalian",
       "Ceratopsian",
       "Ceratopsid",
       "Chasmosaurine",

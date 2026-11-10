@@ -3,12 +3,13 @@ import {
   laneIsFrozen,
   laneIsLocked,
   nicheIsLocked,
+  nicheIsOpenToLevelOne,
   otherPlayer,
   playerHolds,
   resolutionBlocked,
   isGameOver,
 } from "./core.ts";
-import { checkOverride } from "./override.ts";
+import { checkOverride, isAncestorExtraPlay } from "./override.ts";
 import type { CardInstance, GameState, OverrideCheck, PlacementVerdict, PlayerId, Reason } from "./types.ts";
 
 /**
@@ -80,7 +81,8 @@ export function explainCreatureLane(
     creature.tags.includes("Opportunist") &&
     state.players[otherPlayer(playerId)].event?.definition.eventType === "continuous";
   const extraPlay = allowances.creaturePlayed;
-  if (extraPlay && !creature.tags.includes("Propulsion") && !opportunistActive) {
+  const ancestorExtra = isAncestorExtraPlay(state, playerId, creature, laneIndex);
+  if (extraPlay && !creature.tags.includes("Propulsion") && !opportunistActive && !ancestorExtra) {
     return verdict([reason("creature-already-played", "You've already played a Creature this turn.")]);
   }
 
@@ -96,6 +98,13 @@ export function explainCreatureLane(
           `Empty Niches take only Level 0 or 1 Creatures; ${creature.name} is Level ${creature.printedLevel}.`,
         ),
       );
+    } else if (creature.printedLevel === 1 && !nicheIsOpenToLevelOne(state, playerId, laneIndex)) {
+      reasons.push(
+        reason(
+          "niche-not-open",
+          "A Level 1 Creature needs a Creature next to this Niche or across from it, or one that lived here before.",
+        ),
+      );
     }
     // The normal play may fill only one empty Niche per turn; Propulsion and Opportunist extra plays may fill another.
     if (!extraPlay && allowances.filledEmpty) {
@@ -107,7 +116,7 @@ export function explainCreatureLane(
   const override = checkOverride(state, playerId, creature, laneIndex);
   const reasons: Reason[] = [];
   if (allowances.aquaticOverrideLockedLane === laneIndex) reasons.push(AQUATIC_LANE_USED);
-  if (extraPlay) {
+  if (extraPlay && !ancestorExtra) {
     if (!opportunistActive) {
       reasons.push(reason("propulsion-empty-only", "Propulsion's extra play can only fill an empty Niche."));
     } else if (creature.printedLevel !== 1 && creature.printedLevel !== 2) {

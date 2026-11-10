@@ -10,7 +10,7 @@ import {
 } from "./battle.ts";
 import { legalAttackTargets } from "./battle-math.ts";
 import { chooseConceptOption, getConceptChoiceOptions, playConcept } from "./concepts.ts";
-import { isGameOver, otherPlayer } from "./core.ts";
+import { isGameOver, markSettledNiches, otherPlayer } from "./core.ts";
 import {
   activateCarnianPluvialEpisode,
   chooseCarnianPluvialOption,
@@ -103,6 +103,12 @@ export type GameAction =
 export type GameActionType = GameAction["type"];
 
 export function applyAction(state: GameState, action: GameAction): GameState {
+  const next = reduce(state, action);
+  if (next !== state) markSettledNiches(next);
+  return next;
+}
+
+function reduce(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "acknowledgeHandoff":
       return acknowledgeHandoff(state);

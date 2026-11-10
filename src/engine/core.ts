@@ -40,6 +40,7 @@ export const emptyAllowances = (): TurnAllowances => ({
   skipBattlePhase: false,
   overriddenLanes: [],
   aquaticOverrideLockedLane: null,
+  ancestorPlayUsed: false,
 });
 
 export const emptyLane = (): LaneState => ({
@@ -59,9 +60,10 @@ export function addLog(state: GameState, message: string) {
 // Tags
 // ---------------------------------------------------------------------------
 
-/** Printed Tags plus those granted by Sovereign. */
+/** Printed Tags plus those granted by Sovereign and Divergent. */
 export function effectiveHasTag(creature: CreatureCard, tag: string) {
   if (creature.tags.includes(tag)) return true;
+  if ((tag === "Transitional" || tag === "Ancestor") && creature.tags.includes("Divergent")) return true;
   if (!creature.tags.includes("Sovereign")) return false;
   if (tag === "Gigantic") return true;
   return tag === "Territorial" && creature.diet !== "Herbivore";
@@ -85,6 +87,10 @@ export function overrideTags(creature: CreatureCard) {
   if (tags.has("Sovereign")) {
     tags.add("Gigantic");
     if (creature.diet !== "Herbivore") tags.add("Territorial");
+  }
+  if (tags.has("Divergent")) {
+    tags.add("Transitional");
+    tags.add("Ancestor");
   }
   // Aquatic supplies exactly one override category: Taxon when the printed
   // Primary Taxa differ, or Tag when those Primary Taxa already match.
@@ -141,6 +147,27 @@ export function islandDwarfismBlocksEntry(state: GameState, playerId: PlayerId, 
 
 export function creatureCanEnterNiche(state: GameState, playerId: PlayerId, laneIndex: number) {
   return !nicheIsLocked(state, playerId, laneIndex) && !islandDwarfismBlocksEntry(state, playerId, laneIndex);
+}
+
+/**
+ * Niche-unlock trial rule: whether an empty Niche is open to a Level 1 Creature. Without the rule every
+ * empty Niche is open.
+ */
+export function nicheIsOpenToLevelOne(state: GameState, playerId: PlayerId, laneIndex: number) {
+  if (!state.rules?.nicheUnlock) return true;
+  const lanes = state.players[playerId].lanes;
+  return Boolean(
+    lanes[laneIndex]?.settled ||
+    lanes[laneIndex - 1]?.creature ||
+    lanes[laneIndex + 1]?.creature ||
+    state.players[otherPlayer(playerId)].lanes[laneIndex]?.creature,
+  );
+}
+
+/** Niche-unlock trial rule: marks every occupied Niche as one a Creature has lived in. */
+export function markSettledNiches(state: GameState) {
+  if (!state.rules?.nicheUnlock) return;
+  for (const player of state.players) for (const lane of player.lanes) if (lane.creature) lane.settled = true;
 }
 
 export function hasEnterableEmptyNiche(state: GameState, playerId: PlayerId) {

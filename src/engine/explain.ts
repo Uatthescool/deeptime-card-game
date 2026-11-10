@@ -156,6 +156,11 @@ function summarizeCreature(state: GameState, card: CardInstance): Reason[] {
   if (codes.has("empty-needs-low-level")) {
     reasons.push(reason("empty-needs-low-level", "Empty Niches take only Level 0 or 1 Creatures."));
   }
+  if (codes.has("niche-not-open")) {
+    reasons.push(
+      reason("niche-not-open", "Level 1 Creatures need an open Niche: one beside or across from a Creature."),
+    );
+  }
   if (codes.has("already-filled-empty")) {
     reasons.push(reason("already-filled-empty", "You've already filled an empty Niche this turn."));
   }
