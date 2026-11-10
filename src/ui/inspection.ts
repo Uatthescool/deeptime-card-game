@@ -1,4 +1,4 @@
-import type { PointerEvent } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 
 import type { CardDefinition } from "../data/cards.ts";
 
@@ -24,6 +24,12 @@ export function inspectionHandlers(target: InspectionTarget, onPreview: PreviewH
     onBlur: () => onPreview(null),
     onPointerDown: (event: PointerEvent) => {
       if (event.pointerType !== "mouse") onPin?.(target, true);
+    },
+    // Right-click opens the card in the Inspector, for cards whose click plays them.
+    onContextMenu: (event: MouseEvent) => {
+      if (!onPin) return;
+      event.preventDefault();
+      onPin(target, true);
     },
   };
 }

@@ -36,7 +36,8 @@ type BoardCreatureProps = {
   victory: number;
   selected: boolean;
   highlighted: boolean;
-  onClick: () => void;
+  /** Returns true when the click took a game action; otherwise the click opens the card in the Inspector. */
+  onClick: () => boolean;
   turnNumber: number;
   attachment?: string;
   onPin: PinHandler;
@@ -68,8 +69,8 @@ function BoardCreature({
       data-tutorial-target="creature"
       className={`board-creature period-${card.period.toLowerCase()} ${selected ? "selected" : ""} ${highlighted ? "legal-target" : ""}`}
       onClick={() => {
-        onPin(target);
-        onClick();
+        const acted = onClick();
+        onPin(target, !acted);
       }}
       aria-label={`${card.name} in Niche ${lane}${highlighted ? ", available" : ""}`}
       aria-pressed={selected}
@@ -101,7 +102,8 @@ type NicheLaneProps = {
   opponentRow: boolean;
   selectedAttackerUid: string | null;
   highlighted: boolean;
-  onLaneClick: () => void;
+  /** Returns true when the click took a game action. */
+  onLaneClick: () => boolean;
   onPin: PinHandler;
   onPreview: PreviewHandler;
   /** Legality label shown while a card or hunter is selected. */
@@ -142,7 +144,7 @@ export function NicheLane({
     content = (
       <button
         className="wildfire-marker"
-        onClick={() => onPin(target)}
+        onClick={() => onPin(target, true)}
         {...inspectionHandlers(target, onPreview, onPin)}
       >
         <span>Instantaneous Event</span>
@@ -156,14 +158,14 @@ export function NicheLane({
       context: [
         `${player.name}'s Niche ${niche}`,
         "Only this Niche is locked.",
-        "The directly opposing Niche receives -1 Battle Level and -1 Victory Level.",
+        "The directly opposing Niche receives -100 Battle Power and -1 Victory Level.",
         `Expires after Turn ${lane.drought.expiresOnTurn}`,
       ],
     };
     content = (
       <button
         className="drought-marker"
-        onClick={() => onPin(target)}
+        onClick={() => onPin(target, true)}
         {...inspectionHandlers(target, onPreview, onPin)}
       >
         <span>Instantaneous Event</span>
@@ -251,7 +253,7 @@ export function NicheLane({
         <button
           className={slotClass}
           data-tutorial-target="adaptation-slot"
-          onClick={() => onPin(slotTarget)}
+          onClick={() => onPin(slotTarget, true)}
           {...inspectionHandlers(slotTarget, onPreview, onPin)}
         >
           {slotLabel}
@@ -281,7 +283,7 @@ export function EventZone({ game, playerId, onPin, onPreview }: EventZoneProps) 
   return (
     <button
       className="event-slot occupied"
-      onClick={() => onPin(target)}
+      onClick={() => onPin(target, true)}
       {...inspectionHandlers(target, onPreview, onPin)}
     >
       <span>{event.definition.name}</span>

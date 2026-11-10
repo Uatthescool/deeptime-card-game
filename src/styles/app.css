@@ -3924,38 +3924,40 @@ button:disabled {
   outline-offset: 2px;
 }
 
+/* The board and hand fill the screen at every width; the Inspector is a drawer opened from the header. */
+.game-layout {
+  grid-template-columns: 1fr;
+}
+.inspector-drawer-toggle {
+  display: inline-flex;
+}
+.side-rail {
+  position: fixed;
+  z-index: 71;
+  top: 54px;
+  right: 0;
+  bottom: 0;
+  width: min(460px, 92vw);
+  height: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: -1.5rem 0 3rem rgba(17, 27, 22, 0.28);
+  transform: translateX(102%);
+  transition: transform 0.2s ease;
+}
+.side-rail.open {
+  transform: translateX(0);
+}
+.sidewall-scrim {
+  position: fixed;
+  z-index: 70;
+  inset: 54px 0 0;
+  display: block;
+  border: 0;
+  background: rgba(18, 29, 23, 0.4);
+  backdrop-filter: blur(2px);
+}
+
 @media (max-width: 1100px) {
-  .game-layout {
-    grid-template-columns: 1fr;
-  }
-  .inspector-drawer-toggle {
-    display: inline-flex;
-  }
-  .side-rail {
-    position: fixed;
-    z-index: 71;
-    top: 54px;
-    right: 0;
-    bottom: 0;
-    width: min(460px, 92vw);
-    height: auto;
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: -1.5rem 0 3rem rgba(17, 27, 22, 0.28);
-    transform: translateX(102%);
-    transition: transform 0.2s ease;
-  }
-  .side-rail.open {
-    transform: translateX(0);
-  }
-  .sidewall-scrim {
-    position: fixed;
-    z-index: 70;
-    inset: 54px 0 0;
-    display: block;
-    border: 0;
-    background: rgba(18, 29, 23, 0.4);
-    backdrop-filter: blur(2px);
-  }
   .action-bar {
     grid-template-columns: minmax(145px, 0.58fr) minmax(170px, 1fr) minmax(165px, 0.72fr) auto;
   }
@@ -4209,7 +4211,7 @@ button:disabled {
   }
 }
 
-@media (min-width: 821px) and (max-width: 1100px) and (max-height: 760px) {
+@media (min-width: 821px) and (max-height: 760px) {
   .side-rail {
     top: 46px;
   }
@@ -5236,7 +5238,7 @@ header + .legality-reasons {
   color: #5a4a2a;
 }
 
-/* Wide screens: the panel tops the inspector rail. Narrow screens: a sheet over the board. */
+/* The legality panel is a sheet over the board, since the inspector is a closed drawer by default. */
 .side-rail {
   display: flex;
   flex-direction: column;
@@ -5246,34 +5248,23 @@ header + .legality-reasons {
   height: auto;
 }
 .legality-panel.in-rail {
-  flex: 0 0 auto;
-  margin: 0.6rem 0.6rem 0;
-  max-height: 45%;
-  overflow-y: auto;
-}
-.legality-panel.as-sheet {
   display: none;
 }
-@media (max-width: 1100px) {
-  .legality-panel.in-rail {
-    display: none;
-  }
-  .legality-panel.as-sheet {
-    display: block;
-    position: absolute;
-    z-index: 20;
-    left: 0.6rem;
-    right: 0.6rem;
-    max-height: 38%;
-    overflow-y: auto;
-    box-shadow: 0 10px 30px rgba(20, 28, 22, 0.35);
-  }
-  .legality-panel.as-sheet.over-opponent {
-    top: 0.6rem;
-  }
-  .legality-panel.as-sheet.over-own {
-    bottom: calc(318px + 0.9rem);
-  }
+.legality-panel.as-sheet {
+  display: block;
+  position: absolute;
+  z-index: 20;
+  left: 0.6rem;
+  right: 0.6rem;
+  max-height: 38%;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(20, 28, 22, 0.35);
+}
+.legality-panel.as-sheet.over-opponent {
+  top: 0.6rem;
+}
+.legality-panel.as-sheet.over-own {
+  bottom: calc(318px + 0.9rem);
 }
 @media (max-width: 820px) {
   .legality-panel.as-sheet.over-own {

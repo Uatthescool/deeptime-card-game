@@ -242,14 +242,15 @@ export function GameScreen({
 
   const attackTargets = selectedAttackerUid ? legalAttackTargets(game, selectedAttackerUid) : [];
 
-  const handleLaneClick = (playerId: PlayerId, laneIndex: number) => {
-    if (computerTurn) return;
+  /** Takes the game action a click on this Niche means, if any; returns whether it took one. */
+  const handleLaneClick = (playerId: PlayerId, laneIndex: number): boolean => {
+    if (computerTurn) return false;
     const lane = game.players[playerId].lanes[laneIndex]!;
     const own = playerId === viewPlayer;
     if (own && boardAction?.kind === "facultative-source" && legalFacultativeSources(game).includes(laneIndex)) {
       setBoardAction({ kind: "facultative-destination", sourceLane: laneIndex });
       setSelectedCardUid(null);
-      return;
+      return true;
     }
     if (
       own &&
@@ -258,12 +259,12 @@ export function GameScreen({
     ) {
       dispatch({ type: "moveFacultative", sourceLane: boardAction.sourceLane, destinationLane: laneIndex });
       setBoardAction(null);
-      return;
+      return true;
     }
     if (own && boardAction?.kind === "waterway-source" && legalConnectedWaterwaySources(game).includes(laneIndex)) {
       setBoardAction({ kind: "waterway-destination", sourceLane: laneIndex });
       setSelectedCardUid(null);
-      return;
+      return true;
     }
     if (
       own &&
@@ -272,13 +273,13 @@ export function GameScreen({
     ) {
       dispatch({ type: "repositionWaterway", sourceLane: boardAction.sourceLane, destinationLane: laneIndex });
       setBoardAction(null);
-      return;
+      return true;
     }
     if (own && boardAction?.kind === "aquatic-override" && selectedCard && creatureLanes.includes(laneIndex)) {
       dispatch({ type: "playAquaticOverride", cardUid: selectedCard.uid, laneIndex });
       setBoardAction(null);
       clearSelection();
-      return;
+      return true;
     }
     if (
       game.pendingCranialDisplay &&
@@ -286,7 +287,7 @@ export function GameScreen({
       game.pendingCranialDisplay.eligibleTargetUids.includes(lane.creature.card.uid)
     ) {
       dispatch({ type: "chooseCranialDisplayTarget", targetUid: lane.creature.card.uid });
-      return;
+      return true;
     }
     if (selectedCard && isLegalSelectedPosition(playerId, laneIndex)) {
       const { kind, key } = selectedCard.definition;
@@ -296,22 +297,26 @@ export function GameScreen({
       else if (key === "wildfire") dispatch({ type: "playWildfire", cardUid, laneIndex });
       else if (key === "drought") dispatch({ type: "playDrought", cardUid, targetPlayer: playerId, laneIndex });
       clearSelection();
-      return;
+      return true;
     }
     if (game.phase === "battle" && lane.creature) {
       if (own) {
         const uid = lane.creature.card.uid;
         setSelectedAttackerUid(selectedAttackerUid === uid ? null : uid);
         setSelectedCardUid(null);
-        return;
+        return true;
       }
       if (selectedAttackerUid && attackTargets.includes(lane.creature.card.uid)) {
         dispatch({ type: "previewHunt", attackerUid: selectedAttackerUid, defenderUid: lane.creature.card.uid });
-        return;
+        return true;
       }
     }
     // Not a legal move here: explain why instead (the only way to ask on touch screens).
-    if (canExplainLane(playerId, laneIndex)) setExplainLane({ playerId, laneIndex });
+    if (canExplainLane(playerId, laneIndex)) {
+      setExplainLane({ playerId, laneIndex });
+      return true;
+    }
+    return false;
   };
 
   const laneHighlighted = (playerId: PlayerId, laneIndex: number) => {
@@ -572,7 +577,7 @@ export function GameScreen({
             <div className="centerline" data-tutorial-target="centerline">
               <span>
                 {game.periodAuras.length
-                  ? game.periodAuras.map((aura) => `Geological Boundary · ${aura.period} +1 Battle Level`).join(" · ")
+                  ? game.periodAuras.map((aura) => `Geological Boundary · ${aura.period} +100 Battle Power`).join(" · ")
                   : "Directly opposing Niches"}
               </span>
             </div>
@@ -754,7 +759,7 @@ export function GameScreen({
                       ? "Private hand sealed for handoff"
                       : selectedCard
                         ? selectedCard.definition.name
-                        : "Choose a card to play; hover to inspect"}
+                        : "Choose a card to play; right-click to inspect"}
                   </h2>
                 </div>
                 <div className="hand-turn-status">
