@@ -86,6 +86,7 @@
   justify-content: flex-end;
   gap: calc(var(--u) * 0.6);
   padding: calc(var(--u) * 0.8);
+  padding-right: max(calc(var(--u) * 0.8), env(safe-area-inset-right));
 }
 .tbl-chip {
   border: 1px solid rgba(244, 237, 224, 0.28);
@@ -416,19 +417,15 @@ button.tbl-pile {
   border: max(1px, calc(var(--u) * 0.25)) solid #1b1712;
   border-radius: calc(var(--u) * 0.9);
   background: linear-gradient(180deg, #fbf6ea, #ece2cc);
+  /* Sized from the name's length so it fits the bar: about 11u of room at 0.6em a letter, at most 1.55u. */
   font:
-    700 max(8px, calc(var(--u) * 1.55)) / 1 Georgia,
+    700 max(5px, min(calc(var(--u) * 1.55), calc(var(--u) * 11 / (var(--name-length) * 0.6)))) / 1 Georgia,
     "Times New Roman",
     serif;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.tbl-card-name.long {
-  font-size: max(7px, calc(var(--u) * 1.25));
-}
-.tbl-card-name.longer {
-  font-size: max(7px, calc(var(--u) * 1.05));
 }
 .tbl-card-diet {
   position: absolute;
@@ -896,17 +893,13 @@ button.tbl-pile {
   opacity: 1;
 }
 
-/* On larger screens the dock is invisible and each panel takes its own corner. */
-.tbl-info-dock {
-  display: contents;
-}
 /* The small panel sits just above the fullscreen button in the bottom-right corner. */
 .tbl-info.small {
   margin-bottom: calc(var(--u) * 6);
 }
 .tbl-fullscreen {
   position: absolute;
-  right: calc(var(--u) * 1.2);
+  right: calc(var(--u) * 1.2 + env(safe-area-inset-right));
   bottom: calc(var(--u) * 1.2);
   z-index: 30;
 }
@@ -916,48 +909,54 @@ button.tbl-pile {
 }
 
 /*
- * Phones (held sideways): the Biome panel moves left, joined to the top of the large panel as one, leaving the
- * right corner to the fullscreen button. Your Event slot moves to the top of its space to make room.
+ * Phones (held sideways): the large panel fills the left area up to the board with tight text, so it stays short;
+ * the small panel sits at the bottom right, just left of an icon-only fullscreen button. Your Event slot moves
+ * to the top of its space to leave the large panel room.
  */
 @media (max-height: 540px) {
-  .tbl-info-dock {
-    grid-column: outer-l / center;
-    grid-row: own-b / end;
-    z-index: 25;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
-    padding: calc(var(--u) * 1.2);
-    pointer-events: none;
+  .tbl-info {
+    padding: calc(var(--u) * 0.6) calc(var(--u) * 1);
+    font-size: max(8px, calc(var(--u) * 1.4));
+    line-height: 1.2;
   }
-  .tbl-info-dock > .tbl-info {
-    align-self: flex-start;
-    width: min(100%, calc(var(--u) * 40));
-    margin: 0;
-    pointer-events: auto;
+  .tbl-info.large {
+    width: auto;
+    justify-self: stretch;
+    margin: calc(var(--u) * 1);
+    margin-left: max(calc(var(--u) * 1), env(safe-area-inset-left));
   }
-  .tbl-info-dock > .tbl-info.small {
-    order: -1;
+  .tbl-score span {
     display: flex;
     align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0 calc(var(--u) * 1);
-    border-bottom: 0;
-    border-radius: calc(var(--u) * 1.4) calc(var(--u) * 1.4) 0 0;
-    padding: calc(var(--u) * 0.6) calc(var(--u) * 1.2) 0;
+    gap: calc(var(--u) * 0.6);
   }
-  .tbl-info-dock > .tbl-info.small strong {
-    font-size: max(10px, calc(var(--u) * 1.6));
+  .tbl-score b {
+    font-size: max(12px, calc(var(--u) * 2.6));
   }
-  .tbl-info-dock > .tbl-info.large {
-    border-top: 0;
-    border-radius: 0 0 calc(var(--u) * 1.4) calc(var(--u) * 1.4);
-    padding-top: calc(var(--u) * 0.5);
+  .tbl-actions {
+    gap: calc(var(--u) * 0.5);
+    margin-top: calc(var(--u) * 0.5);
   }
-  .tbl-info-dock > .tbl-info.small .tbl-biome-rule {
-    left: 0;
-    right: auto;
+  .tbl-actions .primary-button,
+  .tbl-actions .quiet-button {
+    padding: calc(var(--u) * 0.4) calc(var(--u) * 1);
+    font-size: max(8px, calc(var(--u) * 1.35));
+  }
+  .tbl-info.small {
+    width: auto;
+    max-width: calc(100% - var(--u) * 2 - 34px);
+    margin: calc(var(--u) * 1);
+    margin-right: calc(var(--u) * 1.8 + 30px + env(safe-area-inset-right));
+  }
+  .tbl-info.small strong {
+    font-size: max(10px, calc(var(--u) * 1.8));
+  }
+  .tbl-fullscreen .tbl-fullscreen-label {
+    display: none;
+  }
+  .tbl-fullscreen {
+    min-width: 30px;
+    padding: calc(var(--u) * 0.6);
   }
   .tbl-area-own-event {
     align-items: start;

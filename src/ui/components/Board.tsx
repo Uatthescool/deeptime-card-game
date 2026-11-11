@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { artworkPath, type CardDefinition, type CreatureCard } from "../../data/cards.ts";
 import { FACE_CROPS } from "../../data/face-crops.ts";
 import {
@@ -87,7 +89,7 @@ function BoardCard({
       aria-pressed={selected}
       {...inspectionHandlers(target, onPreview, onPin)}
     >
-      <span className={`tbl-card-name ${card.name.length > 15 ? "longer" : card.name.length > 10 ? "long" : ""}`}>
+      <span className="tbl-card-name" style={{ "--name-length": card.name.length } as CSSProperties}>
         {card.name}
       </span>
       <span className="tbl-card-diet" aria-label={card.diet}>

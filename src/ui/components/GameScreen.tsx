@@ -616,146 +616,140 @@ export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: G
             />
           )}
         </section>
-
-        {/* The info panels: one bottom left, one bottom right; on phones both stack at the left. */}
-        <div className="tbl-info-dock">
-          <section
-            className="tbl-info large"
-            aria-label={computerTurn ? "Computer's turn" : "Turn"}
-            aria-live={computerTurn ? "polite" : undefined}
-            data-tutorial-target="turn-summary"
-          >
-            <div className="tbl-score" data-tutorial-target="victory">
-              <span>
-                <small>{computer ? "You" : viewer.name}</small>
-                <b>
-                  {totals[viewPlayer]}
-                  <i>/{VICTORY_THRESHOLD}</i>
-                </b>
-              </span>
-              <span className="opponent">
-                <small>{computer ? `Computer · ${DIFFICULTY_NAMES[computer.difficulty]}` : opponentState.name}</small>
-                <b>
-                  {totals[opponent]}
-                  <i>/{VICTORY_THRESHOLD}</i>
-                </b>
-              </span>
-            </div>
-            <p className="tbl-phase">
-              Turn {game.turnNumber} · {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
-              {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
-                <em className="final-round">
-                  {game.turnNumber >= game.finalTurn ? " · Final turn" : " · Final round"}
-                </em>
+        <section
+          className="tbl-info large"
+          aria-label={computerTurn ? "Computer's turn" : "Turn"}
+          aria-live={computerTurn ? "polite" : undefined}
+          data-tutorial-target="turn-summary"
+        >
+          <div className="tbl-score" data-tutorial-target="victory">
+            <span>
+              <small>{computer ? "You" : viewer.name}</small>
+              <b>
+                {totals[viewPlayer]}
+                <i>/{VICTORY_THRESHOLD}</i>
+              </b>
+            </span>
+            <span className="opponent">
+              <small>{computer ? `Computer · ${DIFFICULTY_NAMES[computer.difficulty]}` : opponentState.name}</small>
+              <b>
+                {totals[opponent]}
+                <i>/{VICTORY_THRESHOLD}</i>
+              </b>
+            </span>
+          </div>
+          <p className="tbl-phase">
+            Turn {game.turnNumber} · {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
+            {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
+              <em className="final-round">{game.turnNumber >= game.finalTurn ? " · Final turn" : " · Final round"}</em>
+            )}
+          </p>
+          {forfeitWarning && (
+            <p className="forfeit-warning" role="alert">
+              Full hand: play a card or Mulligan, or ending this turn forfeits.
+            </p>
+          )}
+          <p className="tbl-prompt" aria-live="polite">
+            {prompt}
+          </p>
+          {!computerTurn && (
+            <div className="tbl-actions">
+              {game.phase === "development" && (
+                <button
+                  className="primary-button"
+                  disabled={allowances.rapidSpeciation || boardAction !== null}
+                  onClick={() => {
+                    dispatch({ type: "advanceToBattle" });
+                    setSelectedCardUid(null);
+                  }}
+                >
+                  {allowances.skipBattlePhase
+                    ? forfeitWarning
+                      ? "Forfeit · Battle skipped"
+                      : "End Turn · Battle skipped"
+                    : legalHuntsAvailable
+                      ? "Enter Battle Phase"
+                      : forfeitWarning
+                        ? "End Turn and forfeit"
+                        : "End Turn"}
+                </button>
               )}
-            </p>
-            {forfeitWarning && (
-              <p className="forfeit-warning" role="alert">
-                Full hand: play a card or Mulligan, or ending this turn forfeits.
-              </p>
-            )}
-            <p className="tbl-prompt" aria-live="polite">
-              {prompt}
-            </p>
-            {!computerTurn && (
-              <div className="tbl-actions">
-                {game.phase === "development" && (
-                  <button
-                    className="primary-button"
-                    disabled={allowances.rapidSpeciation || boardAction !== null}
-                    onClick={() => {
-                      dispatch({ type: "advanceToBattle" });
-                      setSelectedCardUid(null);
-                    }}
-                  >
-                    {allowances.skipBattlePhase
-                      ? forfeitWarning
-                        ? "Forfeit · Battle skipped"
-                        : "End Turn · Battle skipped"
-                      : legalHuntsAvailable
-                        ? "Enter Battle Phase"
-                        : forfeitWarning
-                          ? "End Turn and forfeit"
-                          : "End Turn"}
-                  </button>
-                )}
-                {(game.phase === "battle" || (game.phase === "development" && legalHuntsAvailable)) && (
-                  <button
-                    className="quiet-button"
-                    disabled={boardAction !== null}
-                    onClick={() => {
-                      dispatch({ type: "endTurn" });
-                      clearSelection();
-                    }}
-                  >
-                    {forfeitWarning ? "End turn and forfeit" : "End turn"}
-                  </button>
-                )}
-                {selectedCard?.definition.kind === "event" && !NICHE_EVENT_KEYS.has(selectedCard.definition.key) && (
-                  <button
-                    className="primary-button"
-                    disabled={boardAction !== null || !canPlayEvent(game, selectedCard)}
-                    onClick={() => {
-                      dispatch({ type: "playEvent", cardUid: selectedCard.uid });
-                      clearSelection();
-                    }}
-                  >
-                    Play Event
-                  </button>
-                )}
-                {selectedCard?.definition.kind === "concept" && (
-                  <button
-                    className="primary-button"
-                    disabled={boardAction !== null || !canPlayConcept(game, selectedCard)}
-                    onClick={() => {
-                      dispatch({ type: "playConcept", cardUid: selectedCard.uid });
-                      clearSelection();
-                    }}
-                  >
-                    Play Concept
-                  </button>
-                )}
-                {(selectedCardUid || selectedAttackerUid) && (
-                  <button className="quiet-button" onClick={clearSelection}>
-                    Cancel
-                  </button>
-                )}
-                {viewer.event?.definition.key === "carnian-pluvial-episode" && (
-                  <button
-                    className="quiet-button"
-                    disabled={!canActivateCarnianPluvialEpisode(game)}
-                    onClick={() => dispatch({ type: "activateCarnianPluvial" })}
-                  >
-                    {allowances.carnianPluvialUsed ? "Carnian used" : "Use Carnian Pluvial"}
-                  </button>
-                )}
-                {game.phase === "development" && facultativeSources.length > 0 && (
-                  <button
-                    className="quiet-button"
-                    disabled={aquaticActive}
-                    onClick={() => startBoardAction(facultativeActive ? null : { kind: "facultative-source" })}
-                  >
-                    {facultativeActive ? "Cancel movement" : "Facultative move"}
-                  </button>
-                )}
-                {canPerformFullHandMulligan(game) && (
-                  <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
-                    Mulligan
-                  </button>
-                )}
-              </div>
-            )}
-          </section>
+              {(game.phase === "battle" || (game.phase === "development" && legalHuntsAvailable)) && (
+                <button
+                  className="quiet-button"
+                  disabled={boardAction !== null}
+                  onClick={() => {
+                    dispatch({ type: "endTurn" });
+                    clearSelection();
+                  }}
+                >
+                  {forfeitWarning ? "End turn and forfeit" : "End turn"}
+                </button>
+              )}
+              {selectedCard?.definition.kind === "event" && !NICHE_EVENT_KEYS.has(selectedCard.definition.key) && (
+                <button
+                  className="primary-button"
+                  disabled={boardAction !== null || !canPlayEvent(game, selectedCard)}
+                  onClick={() => {
+                    dispatch({ type: "playEvent", cardUid: selectedCard.uid });
+                    clearSelection();
+                  }}
+                >
+                  Play Event
+                </button>
+              )}
+              {selectedCard?.definition.kind === "concept" && (
+                <button
+                  className="primary-button"
+                  disabled={boardAction !== null || !canPlayConcept(game, selectedCard)}
+                  onClick={() => {
+                    dispatch({ type: "playConcept", cardUid: selectedCard.uid });
+                    clearSelection();
+                  }}
+                >
+                  Play Concept
+                </button>
+              )}
+              {(selectedCardUid || selectedAttackerUid) && (
+                <button className="quiet-button" onClick={clearSelection}>
+                  Cancel
+                </button>
+              )}
+              {viewer.event?.definition.key === "carnian-pluvial-episode" && (
+                <button
+                  className="quiet-button"
+                  disabled={!canActivateCarnianPluvialEpisode(game)}
+                  onClick={() => dispatch({ type: "activateCarnianPluvial" })}
+                >
+                  {allowances.carnianPluvialUsed ? "Carnian used" : "Use Carnian Pluvial"}
+                </button>
+              )}
+              {game.phase === "development" && facultativeSources.length > 0 && (
+                <button
+                  className="quiet-button"
+                  disabled={aquaticActive}
+                  onClick={() => startBoardAction(facultativeActive ? null : { kind: "facultative-source" })}
+                >
+                  {facultativeActive ? "Cancel movement" : "Facultative move"}
+                </button>
+              )}
+              {canPerformFullHandMulligan(game) && (
+                <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
+                  Mulligan
+                </button>
+              )}
+            </div>
+          )}
+        </section>
 
-          <BiomeInfo
-            game={game}
-            playerId={viewPlayer}
-            active={aquaticActive}
-            onReposition={() => startBoardAction({ kind: "waterway-source" })}
-            onOverride={() => startBoardAction({ kind: "aquatic-override" })}
-            onCancel={() => startBoardAction(null)}
-          />
-        </div>
+        <BiomeInfo
+          game={game}
+          playerId={viewPlayer}
+          active={aquaticActive}
+          onReposition={() => startBoardAction({ kind: "waterway-source" })}
+          onOverride={() => startBoardAction({ kind: "aquatic-override" })}
+          onCancel={() => startBoardAction(null)}
+        />
 
         <FullscreenButton />
 
@@ -879,13 +873,15 @@ function FullscreenButton() {
   return (
     <button
       className="tbl-chip tbl-fullscreen"
+      aria-label={fullscreen ? "Exit fullscreen" : "Fullscreen"}
       aria-pressed={fullscreen}
       onClick={() => {
         if (document.fullscreenElement) void document.exitFullscreen();
         else void document.documentElement.requestFullscreen().catch(() => {});
       }}
     >
-      <span aria-hidden="true">{fullscreen ? "⤡" : "⤢"}</span> {fullscreen ? "Exit fullscreen" : "Fullscreen"}
+      <span aria-hidden="true">{fullscreen ? "⤡" : "⤢"}</span>{" "}
+      <span className="tbl-fullscreen-label">{fullscreen ? "Exit fullscreen" : "Fullscreen"}</span>
     </button>
   );
 }
