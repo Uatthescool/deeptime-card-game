@@ -1538,6 +1538,11 @@ button:disabled {
 .card-back:first-child {
   margin-left: 0;
 }
+.card-back.has-art {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
 .card-back i {
   display: block;
   width: 26px;

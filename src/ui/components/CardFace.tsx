@@ -150,10 +150,15 @@ export function CardFace({ card, compact = false, selected = false }: CardFacePr
   );
 }
 
+/** The card back every hidden card shows. Collectible backs will choose among several; for now there is one. */
+const CARD_BACK_ART = "/card-backs/pocket-watch.webp";
+
 export function CardBack() {
   return (
-    <div className="card-back" aria-label="Hidden card">
-      <i />
-    </div>
+    <div
+      className="card-back has-art"
+      aria-label="Hidden card"
+      style={{ backgroundImage: `url("${assetUrl(CARD_BACK_ART)}")` }}
+    />
   );
 }

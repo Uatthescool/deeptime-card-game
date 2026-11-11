@@ -244,6 +244,11 @@ button.tbl-pile {
     radial-gradient(circle at 50% 50%, rgba(210, 163, 90, 0.35) 0 22%, transparent 23%),
     repeating-linear-gradient(45deg, #24402f 0 calc(var(--u) * 0.8), #2b4b38 calc(var(--u) * 0.8) calc(var(--u) * 1.6));
 }
+.tbl-page .card-back.has-art {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
 .tbl-page .card-back i {
   width: 34%;
   height: auto;
