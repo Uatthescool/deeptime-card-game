@@ -896,6 +896,74 @@ button.tbl-pile {
   opacity: 1;
 }
 
+/* On larger screens the dock is invisible and each panel takes its own corner. */
+.tbl-info-dock {
+  display: contents;
+}
+/* The small panel sits just above the fullscreen button in the bottom-right corner. */
+.tbl-info.small {
+  margin-bottom: calc(var(--u) * 6);
+}
+.tbl-fullscreen {
+  position: absolute;
+  right: calc(var(--u) * 1.2);
+  bottom: calc(var(--u) * 1.2);
+  z-index: 30;
+}
+.tbl-fullscreen span {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+/*
+ * Phones (held sideways): the Biome panel moves left, joined to the top of the large panel as one, leaving the
+ * right corner to the fullscreen button. Your Event slot moves to the top of its space to make room.
+ */
+@media (max-height: 540px) {
+  .tbl-info-dock {
+    grid-column: outer-l / center;
+    grid-row: own-b / end;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: calc(var(--u) * 1.2);
+    pointer-events: none;
+  }
+  .tbl-info-dock > .tbl-info {
+    align-self: flex-start;
+    width: min(100%, calc(var(--u) * 40));
+    margin: 0;
+    pointer-events: auto;
+  }
+  .tbl-info-dock > .tbl-info.small {
+    order: -1;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 calc(var(--u) * 1);
+    border-bottom: 0;
+    border-radius: calc(var(--u) * 1.4) calc(var(--u) * 1.4) 0 0;
+    padding: calc(var(--u) * 0.6) calc(var(--u) * 1.2) 0;
+  }
+  .tbl-info-dock > .tbl-info.small strong {
+    font-size: max(10px, calc(var(--u) * 1.6));
+  }
+  .tbl-info-dock > .tbl-info.large {
+    border-top: 0;
+    border-radius: 0 0 calc(var(--u) * 1.4) calc(var(--u) * 1.4);
+    padding-top: calc(var(--u) * 0.5);
+  }
+  .tbl-info-dock > .tbl-info.small .tbl-biome-rule {
+    left: 0;
+    right: auto;
+  }
+  .tbl-area-own-event {
+    align-items: start;
+  }
+}
+
 /* ---- Rule explanations over the board ---- */
 .tbl-board .legality-panel.as-sheet {
   display: block;
