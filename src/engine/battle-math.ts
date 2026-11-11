@@ -7,10 +7,13 @@ import {
 } from "../data/cards.ts";
 import {
   clone,
+  countsAsCarnivore,
   effectiveHasTag,
   findCreature,
   hasNoAdjacentFriendly,
+  huntedDiet,
   huntingDiet,
+  huntingDiets,
   nicheIsFrozen,
   otherPlayer,
   overrideTags,
@@ -161,8 +164,9 @@ function targetBlockers(
     blockers.push(reason("charge-lane", "Charge Creatures Hunt only the Creature directly opposite them."));
   }
   // Filter Feeders are Hunted as Herbivores. Combo with Gigantic: it may Hunt Herbivores of Level 1 or below.
+  const attackerDiets = huntingDiets(attackerDef);
   const attackerDiet = huntingDiet(attackerDef);
-  const targetDiet = huntingDiet(targetDef);
+  const targetDiet = huntedDiet(targetDef);
   const giganticFilterFeeder = attackerDef.tags.includes("Filter Feeder") && effectiveHasTag(attackerDef, "Gigantic");
   const filterFeederPrey = giganticFilterFeeder && targetDiet === "Herbivore" && targetDef.printedLevel <= 1;
   const dietWaived =
@@ -170,8 +174,9 @@ function targetBlockers(
     charge ||
     filterFeederPrey ||
     (effectiveHasTag(attackerDef, "Territorial") && attackerLane === targetLane) ||
-    (activeSuperpredators(state) && (attackerDiet === "Carnivore" || attackerDiet === "Omnivore")) ||
-    (attacker.intraguildPredationTurn === state.turnNumber && attackerDiet === targetDiet);
+    (activeSuperpredators(state) && (attackerDiets.has("Carnivore") || attackerDiets.has("Omnivore"))) ||
+    (attacker.intraguildPredationTurn === state.turnNumber &&
+      [...huntingDiets(targetDef)].some((diet) => attackerDiets.has(diet)));
   if (!dietWaived) {
     if (attackerDiet === "Herbivore") {
       blockers.push(
@@ -184,10 +189,13 @@ function targetBlockers(
                 : `${attackerDef.name} is a Filter Feeder, which Hunts as a Herbivore: it can't Hunt without Charge or Territorial.`,
             ),
       );
+    } else if (attackerDiets.has("Carnivore")) {
+      // An Omnivore with Apex Predator Hunts as a Carnivore too: Herbivores and Omnivores.
+      if (targetDiet === "Carnivore") {
+        blockers.push(reason("diet-carnivore", "Carnivores can Hunt only Herbivores or Omnivores."));
+      }
     } else if (attackerDiet === "Omnivore" && targetDiet !== "Herbivore") {
       blockers.push(reason("diet-omnivore", "Omnivores can Hunt only Herbivores."));
-    } else if (attackerDiet === "Carnivore" && targetDiet === "Carnivore") {
-      blockers.push(reason("diet-carnivore", "Carnivores can Hunt only Herbivores or Omnivores."));
     }
   }
   return blockers;
@@ -292,14 +300,39 @@ export type BattleNumbers = {
   defenderNotes: string[];
 };
 
+/** Neighbours whose Bastion shields Level 0–1 Creatures: Level 2+ Bastion, or Circle Defense at any Level. */
 function adjacentHighBastionCount(state: GameState, playerId: PlayerId, laneIndex: number) {
   const lanes = state.players[playerId].lanes;
-  return [lanes[laneIndex - 1], lanes[laneIndex + 1]].filter(
-    (lane) =>
+  return [lanes[laneIndex - 1], lanes[laneIndex + 1]].filter((lane) => {
+    const definition = lane?.creature?.card.definition;
+    return (
       !nicheIsFrozen(lane) &&
-      lane?.creature?.card.definition.tags.includes("Bastion") &&
-      lane.creature.card.definition.printedLevel >= 2,
+      definition &&
+      effectiveHasTag(definition, "Bastion") &&
+      (definition.printedLevel >= 2 || definition.tags.includes("Circle Defense"))
+    );
+  }).length;
+}
+
+/**
+ * Circle Defense's Bastion, each time its Creature is Hunted: +100 Battle Power per friendly Herd Creature in play,
+ * itself included, and −50 per opposing Carnivore other than the hunter (−100 for a Pack Hunter); never below 0.
+ */
+function circleDefenseBonus(state: GameState, ownerId: PlayerId, hunterUid: string) {
+  const herds = state.players[ownerId].lanes.filter(
+    (lane) => lane.creature && effectiveHasTag(lane.creature.card.definition, "Herd"),
   ).length;
+  let penalty = 0;
+  for (const lane of state.players[otherPlayer(ownerId)].lanes) {
+    const definition = lane.creature?.card.definition;
+    if (!definition || lane.creature!.card.uid === hunterUid || !countsAsCarnivore(definition)) continue;
+    penalty += definition.tags.includes("Pack Hunter") ? BATTLE_POWER_PER_LEVEL : BATTLE_POWER_PER_LEVEL / 2;
+  }
+  const bonus = Math.max(0, herds * BATTLE_POWER_PER_LEVEL - penalty);
+  return {
+    bonus,
+    note: `Circle Defense +${bonus} (${herds} Herd${penalty ? `, −${penalty} for other Carnivores` : ""})`,
+  };
 }
 
 export function calculateBattleNumbers(
@@ -457,7 +490,16 @@ export function calculateBattleNumbers(
     defenderTagDefenseBonus += bonus;
     defenderNotes.push(`Osteoderm +${bonus}`);
   }
-  if (defenderHas("Bastion") && defenderDef.printedLevel <= 1 && defender.bastionDefendedTurn !== state.turnNumber) {
+  if (defenderHas("Bastion") && defenderDef.tags.includes("Circle Defense")) {
+    const circle = circleDefenseBonus(state, defenderFound.playerId, attacker.card.uid);
+    defenderOwnReactiveBonus += circle.bonus;
+    defenderTagDefenseBonus += circle.bonus;
+    defenderNotes.push(circle.note);
+  } else if (
+    defenderHas("Bastion") &&
+    defenderDef.printedLevel <= 1 &&
+    defender.bastionDefendedTurn !== state.turnNumber
+  ) {
     const bonus = 2 * tagEffectMultiplier(defenderDef, "Bastion") * BATTLE_POWER_PER_LEVEL;
     defenderOwnReactiveBonus += bonus;
     defenderTagDefenseBonus += bonus;
@@ -500,8 +542,14 @@ export function calculateBattleNumbers(
       attackerPower += bonus;
       attackerNotes.push(`Stampede Osteoderm +${bonus}`);
     }
-    if (
-      attackerDef.tags.includes("Bastion") &&
+    if (attackerDef.tags.includes("Circle Defense")) {
+      // Inverted for Stampede: its circle counts the opposing Carnivores other than the Creature it Hunts.
+      const circle = circleDefenseBonus(state, attackerFound.playerId, defender.card.uid);
+      attackerOwnReactiveBonus += circle.bonus;
+      attackerPower += circle.bonus;
+      attackerNotes.push(`Stampede ${circle.note}`);
+    } else if (
+      effectiveHasTag(attackerDef, "Bastion") &&
       attackerDef.printedLevel <= 1 &&
       attacker.bastionAttackedTurn !== state.turnNumber
     ) {

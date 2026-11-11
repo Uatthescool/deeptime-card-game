@@ -5,6 +5,8 @@ import {
   nicheIsLocked,
   nicheIsOpenToLevelOne,
   otherPlayer,
+  playLevel,
+  underwoolEntry,
   playerHolds,
   resolutionBlocked,
   isGameOver,
@@ -67,8 +69,14 @@ export function explainCreatureLane(
   const allowances = player.allowances;
 
   // Rapid Speciation: the next Creature must override exactly two Levels up.
+  // Underwool lets its Creature into a Frozen Niche on its own side, at 1 Level lower.
+  const underwool = underwoolEntry(state, playerId, laneIndex, creature);
+  const level = playLevel(state, playerId, laneIndex, creature);
+
   if (allowances.rapidSpeciation) {
-    if (nicheIsLocked(state, playerId, laneIndex)) return verdict(entryBlockers(state, playerId, laneIndex));
+    if (nicheIsLocked(state, playerId, laneIndex) && !underwool) {
+      return verdict(entryBlockers(state, playerId, laneIndex));
+    }
     if (allowances.aquaticOverrideLockedLane === laneIndex) return verdict([AQUATIC_LANE_USED]);
     if (!lane.creature) {
       return verdict([reason("rapid-needs-occupied", "Rapid Speciation must override an occupied Niche.")]);
@@ -86,19 +94,21 @@ export function explainCreatureLane(
     return verdict([reason("creature-already-played", "You've already played a Creature this turn.")]);
   }
 
-  const blockedEntry = entryBlockers(state, playerId, laneIndex);
+  const blockedEntry = underwool ? [] : entryBlockers(state, playerId, laneIndex);
   if (blockedEntry.length) return verdict(blockedEntry);
 
   if (!lane.creature) {
     const reasons: Reason[] = [];
-    if (creature.printedLevel > 1) {
+    if (level > 1) {
       reasons.push(
         reason(
           "empty-needs-low-level",
-          `Empty Niches take only Level 0 or 1 Creatures; ${creature.name} is Level ${creature.printedLevel}.`,
+          underwool
+            ? `Empty Niches take only Level 0 or 1 Creatures; with Underwool, ${creature.name} counts as Level ${level}.`
+            : `Empty Niches take only Level 0 or 1 Creatures; ${creature.name} is Level ${creature.printedLevel}.`,
         ),
       );
-    } else if (creature.printedLevel === 1 && !nicheIsOpenToLevelOne(state, playerId, laneIndex)) {
+    } else if (level === 1 && !nicheIsOpenToLevelOne(state, playerId, laneIndex)) {
       reasons.push(
         reason(
           "niche-not-open",

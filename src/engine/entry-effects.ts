@@ -1,5 +1,6 @@
-import { tagEffectMultiplier } from "../data/cards.ts";
+import { expandedTagNames, tagEffectMultiplier } from "../data/cards.ts";
 import {
+  effectiveHasTag,
   addLog,
   adjacentEmptyNiches,
   clone,
@@ -44,7 +45,7 @@ export function continueEntryEffects(state: GameState) {
         .filter(
           (card) =>
             card.definition.kind === "creature" &&
-            card.definition.tags.includes("Herd") &&
+            effectiveHasTag(card.definition, "Herd") &&
             card.definition.printedLevel <= definition.printedLevel + 1,
         )
         .map((card) => card.uid);
@@ -138,7 +139,7 @@ export function queueEntryEffects(state: GameState, playerId: PlayerId, laneInde
     }
   }
 
-  for (const tag of definition.tags) {
+  for (const tag of expandedTagNames(definition)) {
     if (tag === "Herd" && player.herdTriggeredTurn !== state.turnNumber) {
       player.herdTriggeredTurn = state.turnNumber;
       state.entryEffectQueue.push({ kind: "herd", sourceUid: source.card.uid, playerId });

@@ -64,9 +64,29 @@ export function addLog(state: GameState, message: string) {
 export function effectiveHasTag(creature: CreatureCard, tag: string) {
   if (creature.tags.includes(tag)) return true;
   if ((tag === "Transitional" || tag === "Ancestor") && creature.tags.includes("Divergent")) return true;
+  if ((tag === "Herd" || tag === "Bastion") && creature.tags.includes("Circle Defense")) return true;
   if (!creature.tags.includes("Sovereign")) return false;
   if (tag === "Gigantic") return true;
   return tag === "Territorial" && creature.diet !== "Herbivore";
+}
+
+/** Apex Predator: an Omnivore with it also counts as a Carnivore, for everything except overrides. */
+export function countsAsCarnivore(creature: CreatureCard) {
+  return creature.diet === "Carnivore" || (creature.diet === "Omnivore" && effectiveHasTag(creature, "Apex Predator"));
+}
+
+/** The Diets a Creature Hunts with: its Hunting Diet, plus Carnivore for an Omnivore with Apex Predator. */
+export function huntingDiets(creature: CreatureCard): ReadonlySet<CreatureCard["diet"]> {
+  const diet = huntingDiet(creature);
+  return new Set(diet === "Omnivore" && countsAsCarnivore(creature) ? [diet, "Carnivore"] : [diet]);
+}
+
+/**
+ * The Diet a Creature is Hunted as. An Omnivore with Apex Predator is Hunted as a Carnivore, so neither Carnivores
+ * nor Omnivores can Hunt it; only effects that waive Diet can.
+ */
+export function huntedDiet(creature: CreatureCard): CreatureCard["diet"] {
+  return countsAsCarnivore(creature) && huntingDiet(creature) === "Omnivore" ? "Carnivore" : huntingDiet(creature);
 }
 
 /** The Diet a Creature Hunts and is Hunted as: Filter Feeders count as Herbivores in Hunting checks. */
@@ -92,6 +112,7 @@ export function overrideTags(creature: CreatureCard) {
     tags.add("Transitional");
     tags.add("Ancestor");
   }
+  if (tags.has("Circle Defense")) tags.add("Bastion");
   // Aquatic supplies exactly one override category: Taxon when the printed
   // Primary Taxa differ, or Tag when those Primary Taxa already match.
   tags.delete("Aquatic");
@@ -112,6 +133,25 @@ export function nicheIsFrozen(lane: LaneState | undefined) {
 
 export function laneIsFrozen(state: GameState, laneIndex: number) {
   return state.players.some((player) => nicheIsFrozen(player.lanes[laneIndex]));
+}
+
+/**
+ * Underwool: whether `creature` may be played into this Niche of `playerId`'s because the Niche is Frozen. Frozen
+ * Niches are otherwise locked; Wildfire or Drought there still lock it.
+ */
+export function underwoolEntry(state: GameState, playerId: PlayerId, laneIndex: number, creature: CreatureCard) {
+  const lane = state.players[playerId].lanes[laneIndex];
+  return Boolean(
+    creature.tags.includes("Underwool") &&
+    nicheIsFrozen(lane) &&
+    !lane?.drought &&
+    !state.players.some((player) => player.lanes[laneIndex]?.wildfire),
+  );
+}
+
+/** The Level a Creature is played at: its Printed Level, or 1 lower when Underwool lets it into a Frozen Niche. */
+export function playLevel(state: GameState, playerId: PlayerId, laneIndex: number, creature: CreatureCard) {
+  return creature.printedLevel - (underwoolEntry(state, playerId, laneIndex, creature) ? 1 : 0);
 }
 
 /** Whether nothing can be done with or to this Niche's Creature: it is Frozen or Burrowed. */

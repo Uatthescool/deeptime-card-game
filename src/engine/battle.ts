@@ -338,7 +338,9 @@ export function commitBattle(original: GameState, suppliedResults?: boolean | Ba
         ? "Shell"
         : defenderDef.tags.includes("Dermal Armor")
           ? "Dermal Armor"
-          : "Bastion";
+          : defenderDef.tags.includes("Circle Defense")
+            ? "Circle Defense"
+            : "Bastion";
       addLog(
         state,
         `${attackerName} lost ${numbers.attackerPower} to ${numbers.defenderPower}, but the defender's ${defenseTag} clause spared it.`,

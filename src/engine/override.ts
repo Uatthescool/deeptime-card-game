@@ -9,6 +9,8 @@ import {
   laneIsFrozen,
   nicheIsLocked,
   overrideTags,
+  playLevel,
+  underwoolEntry,
 } from "./core.ts";
 import type { ConvergentCategory, GameState, OverrideCheck, PlayerId, Reason } from "./types.ts";
 
@@ -94,7 +96,9 @@ export function checkOverride(
   const current = lane?.creature?.card.definition;
   const blockers: Reason[] = [];
   const block = (code: string, text: string) => blockers.push({ code, text });
-  if (nicheIsLocked(state, playerId, laneIndex)) {
+  // Underwool overrides into a Frozen Niche on its own side; the Frozen Creature there can't stop it.
+  const underwool = underwoolEntry(state, playerId, laneIndex, incoming);
+  if (nicheIsLocked(state, playerId, laneIndex) && !underwool) {
     return blocked(
       laneIsFrozen(state, laneIndex)
         ? { code: "frozen", text: "Snowball Earth has Frozen this lane." }
@@ -104,7 +108,7 @@ export function checkOverride(
     );
   }
   if (!current || !lane?.creature) return blocked({ code: "empty-niche", text: "The Niche is empty." });
-  if (creatureIsUntouchable(lane)) {
+  if (creatureIsUntouchable(lane) && !(underwool && lane.creature.burrowedUntilTurn === null)) {
     return blocked({ code: "burrowed", text: `${current.name} is Burrowed and can't be interacted with.` });
   }
 
@@ -123,7 +127,8 @@ export function checkOverride(
 
   const incomingTags = overrideTags(incoming);
   const currentTags = overrideTags(current);
-  const difference = incoming.printedLevel - current.printedLevel;
+  const incomingLevel = playLevel(state, playerId, laneIndex, incoming);
+  const difference = incomingLevel - current.printedLevel;
   const airSacsJump = Boolean(
     lane.attachment?.definition.key === "air-sacs" &&
     difference === 2 &&
@@ -133,7 +138,7 @@ export function checkOverride(
   );
   const ancestorJump = difference === 2 && ancestorMatch(current, incoming);
   const levelLegal = rapid ? difference === 2 : (difference >= 0 && difference <= 1) || airSacsJump || ancestorJump;
-  const step = `Level ${current.printedLevel} → ${incoming.printedLevel}`;
+  const step = `Level ${current.printedLevel} → ${incomingLevel}${underwool ? " (Underwool counts it 1 lower)" : ""}`;
   const levelText = rapid
     ? levelLegal
       ? `${step}, the two Levels Rapid Speciation requires`

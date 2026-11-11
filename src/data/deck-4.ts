@@ -65,10 +65,24 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     period: "Quaternary",
     periodColor: "Ice Blue",
     taxa: ["Artiodactyl", "Bovid", "Bovine"],
-    tags: ["Herd"],
+    tags: ["Underwool", "Circle Defense"],
     flavorText:
       "Painted by Ice Age artists on the walls of caves like Altamira and Lascaux, steppe bison roamed from Europe across Beringia into North America.",
     cardFace: "/card-faces/steppe-bison.webp",
+  }),
+  creature({
+    key: "bactrian-camel",
+    name: "Bactrian Camel",
+    scientificName: "Camelus bactrianus",
+    printedLevel: 1,
+    diet: "Herbivore",
+    period: "Quaternary",
+    periodColor: "Ice Blue",
+    taxa: ["Artiodactyl", "Camelid", "Cameline"],
+    tags: ["Herd", "Underwool", "Retention"],
+    flavorText:
+      "A shaggy coat carries the two-humped Bactrian camel through Central Asian winters as cold as −30 °C, then peels away in great sheets as the weather warms; in winter, it eats snow for water.",
+    cardFace: "/card-faces/bactrian-camel.webp",
   }),
   creature({
     key: "castoroides",
@@ -163,7 +177,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     period: "Quaternary",
     periodColor: "Ice Blue",
     taxa: ["Perissodactyl", "Rhinocerotoid", "Rhinocerotid"],
-    tags: ["Charge", "Solitary"],
+    tags: ["Charge", "Solitary", "Underwool"],
     flavorText:
       "Painted in Chauvet Cave more than 30,000 years ago, woolly rhinos grew their front horns in yearly bands like tree rings, flattened side to side, possibly for sweeping snow off buried grass.",
     cardFace: "/card-faces/woolly-rhino.webp",
@@ -187,7 +201,6 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
 /** Creatures Deck 4 borrows from Deck 3 and the General Pool candidates. */
 export const DECK_4_SHARED_CREATURE_KEYS = [
   "lystrosaurus",
-  "thrinaxodon",
   "dire-wolf",
   "megatherium",
   "smilodon",

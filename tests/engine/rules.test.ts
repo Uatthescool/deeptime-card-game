@@ -286,7 +286,7 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     SUPPORTS.some((card) => card.key === "wildfire"),
     true,
   );
-  assert.equal(GENERAL_POOL.length, 14);
+  assert.equal(GENERAL_POOL.length, 15);
   assert.ok(
     ["competitive-exclusion-principle", "purussaurus", "epicyon", "diplocaulus", "dimetrodon", "cynognathus"].every(
       (key) => GENERAL_POOL.some((card) => card.key === key),
@@ -409,7 +409,7 @@ test("every card's artwork source is recorded and matches the files on disk", ()
       [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 132);
+  assert.equal(inspectableCards.length, 133);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -492,7 +492,7 @@ test("Deck 4 holds 22 Creatures and 18 Supports, every one Locked", () => {
   assert.equal(DECK_4.length, 22);
   assert.deepEqual(
     [0, 1, 2, 3, 4].map((level) => DECK_4.filter((card) => card.printedLevel === level).length),
-    [3, 7, 7, 4, 1],
+    [2, 8, 7, 4, 1],
   );
   assert.equal(DECK_4_SUPPORTS.length, 18);
   assert.ok(DECK_4.every((card) => card.taxa.includes("Synapsid")));
@@ -2915,7 +2915,8 @@ test("Snowball Earth freezes both edge lanes through the end of your next turn",
   let game = readyGame();
   const frozenHunter = placeCreature(game, 0, 0, "velociraptor");
   const hunter = placeCreature(game, 0, 2, "allosaurus");
-  const frozenPrey = placeLibraryCreature(game, 1, 4, "steppe-bison");
+  // Glyptodon has no Underwool, so Frozen silences its Victory Levels.
+  const frozenPrey = placeLibraryCreature(game, 1, 4, "glyptodon");
   const prey = placeCreature(game, 1, 2, "hoatzin");
   const snowball = putLibraryEventInHand(game, 0, "snowball-earth");
   const sapling = putInHand(game, 0, "compsognathus");

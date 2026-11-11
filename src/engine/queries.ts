@@ -4,6 +4,7 @@ import { hasLegalHunts } from "./battle-math.ts";
 import {
   adjacentEmptyNiches,
   canActInDevelopment,
+  countsAsCarnivore,
   creatureCanEnterNiche,
   creatureCanMoveByEffect,
   creatureIsUntouchable,
@@ -126,7 +127,7 @@ export function adaptationEligible(card: AdaptationCard, creature: CreatureCard)
       return (
         (creature.tags.includes("Aerial") || creature.tags.includes("Aquatic")) &&
         creature.gameplayTaxon === "Synapsid" &&
-        creature.diet === "Carnivore" &&
+        countsAsCarnivore(creature) &&
         !creature.tags.includes("Filter Feeder")
       );
   }

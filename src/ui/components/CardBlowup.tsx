@@ -60,7 +60,9 @@ function bubblesFor(game: GameState, target: InspectionTarget): Bubble[] {
         title: "Frozen",
         lines: [
           `This Niche is Frozen through Turn ${found.lane.frozenUntilTurn}.`,
-          "Frozen Niches and their Creatures can't be interacted with and contribute no Victory Levels.",
+          card.tags.includes("Underwool")
+            ? "Frozen Niches and their Creatures can't be interacted with, but Underwool keeps this Creature's Victory Levels, and another Underwool Creature may override it."
+            : "Frozen Niches and their Creatures can't be interacted with and contribute no Victory Levels.",
         ],
       });
     }
@@ -90,7 +92,11 @@ function bubblesFor(game: GameState, target: InspectionTarget): Bubble[] {
         key: `tag-${tag}`,
         tone: "tag",
         title: tag,
-        lines: [TAG_RULES[tag] ?? "No inherent effect is currently assigned."],
+        lines: [
+          tag === "Bastion" && card.tags.includes("Circle Defense")
+            ? "Granted by Circle Defense, which changes how this Creature's Bastion works."
+            : (TAG_RULES[tag] ?? "No inherent effect is currently assigned."),
+        ],
       });
     }
   }

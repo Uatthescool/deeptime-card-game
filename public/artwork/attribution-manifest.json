@@ -1428,6 +1428,26 @@
       },
       "modifications": "Cropped top and bottom (the bottom crop removes the artist’s signature); resized; converted to sRGB WebP. Also set into the Saurornitholestes card face, with the card’s frame, period border and lettering. Also cropped to a close-up of the head for the Saurornitholestes board card.",
       "derivativeLicense": null
+    },
+    {
+      "cardKey": "bactrian-camel",
+      "cardName": "Bactrian Camel",
+      "cardKind": "creature",
+      "scientificName": "Camelus bactrianus",
+      "commonsFile": "File:Bactrian Camel photo.jpg",
+      "creator": "Jim Winstead",
+      "credit": "Bactrian Camel photo",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bactrian_Camel_photo.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Bactrian_Camel_photo.jpg",
+      "sourceSha1": "d9cbb3bf43a671820841d8184a6ae959c137073a",
+      "sourceDimensions": {
+        "width": 3456,
+        "height": 2304
+      },
+      "modifications": "Cropped to a wide frame around the camel; resized; converted to sRGB WebP. Also set into the Bactrian Camel card face, with the card's frame, period border and lettering. Also cropped to a close-up of the head for the Bactrian Camel board card.",
+      "derivativeLicense": null
     }
   ]
 }

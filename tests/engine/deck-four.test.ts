@@ -20,6 +20,10 @@ import {
   explainEvent,
   feedbackLoopsReturnCards,
   getConceptChoiceOptions,
+  effectiveHasTag,
+  inspectBattlePower,
+  legalAttackTargets,
+  legalCreatureLanes,
   type CardInstance,
   type GameState,
   type PlayerId,
@@ -218,4 +222,147 @@ test("Feedback Loops searches for a card it names, and returns from History when
   assert.ok(game.players[0].hand.some((card) => card.definition.key === "feedback-loops"));
   assert.ok(game.players[0].history.some((card) => card.uid === drought.uid));
   assert.equal(feedbackLoopsReturnCards(game).length, 0, "it is back in hand, so it can't return again");
+});
+
+/** Freezes a lane on both sides through `throughTurn`, as Snowball Earth does to the edge lanes. */
+function freeze(game: GameState, laneIndex: number, throughTurn: number) {
+  for (const player of game.players) player.lanes[laneIndex]!.frozenUntilTurn = throughTurn;
+}
+
+test("Underwool: the cold-steppe Creatures and the Bactrian Camel carry it", () => {
+  for (const key of ["woolly-mammoth", "woolly-rhino", "steppe-bison", "bactrian-camel"]) {
+    assert.ok((CARD_LIBRARY.get(key) as CreatureCard).tags.includes("Underwool"), key);
+  }
+});
+
+test("Underwool Creatures enter an empty Frozen Niche at 1 Level lower; the Mammoth can't", () => {
+  const game = readyGame();
+  freeze(game, 0, 5);
+  const bison = toHand(game, 0, "steppe-bison");
+  const rhino = toHand(game, 0, "woolly-rhino");
+  const mammoth = toHand(game, 0, "woolly-mammoth");
+  const pakicetus = toHand(game, 0, "pakicetus");
+  assert.ok(legalCreatureLanes(game, 0, bison).includes(0), "Level 1 counts as 0");
+  assert.ok(legalCreatureLanes(game, 0, rhino).includes(0), "Level 2 counts as 1");
+  assert.ok(!legalCreatureLanes(game, 0, mammoth).includes(0), "Level 3 counts as 2, too high for an empty Niche");
+  assert.ok(!legalCreatureLanes(game, 0, pakicetus).includes(0), "without Underwool, Frozen locks the Niche");
+  assert.ok(!legalCreatureLanes(game, 1 as PlayerId, rhino).includes(0), "only on its own side");
+});
+
+test("Underwool: next turn the Mammoth may override a Creature in the still-Frozen Niche; others can't", () => {
+  let game = readyGame();
+  freeze(game, 0, 7);
+  const rhino = toHand(game, 0, "woolly-rhino");
+  game = applyAction(game, { type: "playCreature", cardUid: rhino.uid, laneIndex: 0 });
+  assert.equal(game.players[0].lanes[0]!.creature?.card.definition.key, "woolly-rhino");
+  assert.equal(
+    cardVictoryLevel(game, game.players[0].lanes[0]!.creature!),
+    2,
+    "Underwool keeps its Victory Levels while Frozen",
+  );
+
+  game.turnNumber = 5;
+  game.activePlayer = 0;
+  game.phase = "development";
+  game.players[0].allowances = emptyAllowances();
+  const mammoth = toHand(game, 0, "woolly-mammoth");
+  const mastodon = toHand(game, 0, "mastodon");
+  const check = checkOverride(game, 0, mammoth.definition as CreatureCard, 0);
+  assert.ok(check.legal, check.reasons.join(" "));
+  assert.match(check.explanations!.level, /Underwool/);
+  assert.ok(legalCreatureLanes(game, 0, mammoth).includes(0));
+  assert.ok(
+    !legalCreatureLanes(game, 0, mastodon).includes(0),
+    "a Creature without Underwool can't override into the ice",
+  );
+});
+
+test("A Frozen Creature without Underwool still contributes no Victory Levels", () => {
+  const game = readyGame();
+  freeze(game, 4, 5);
+  const bison = place(game, 0, 4, "steppe-bison", { tags: ["Herd"] });
+  assert.equal(cardVictoryLevel(game, bison), 0);
+});
+
+test("Deck 4 swaps Thrinaxodon for the Bactrian Camel, and the Steppe Bison gains Circle Defense", () => {
+  assert.ok(!DECK_4_DECK.some((card) => card.key === "thrinaxodon"));
+  const camel = DECK_4_DECK.find((card) => card.key === "bactrian-camel") as CreatureCard;
+  assert.equal(camel.printedLevel, 1);
+  assert.deepEqual(camel.tags, ["Herd", "Underwool", "Retention"]);
+  assert.deepEqual((CARD_LIBRARY.get("steppe-bison") as CreatureCard).tags, ["Underwool", "Circle Defense"]);
+});
+
+test("Circle Defense counts as Herd and Bastion, so a Steppe Bison entering play searches for a Herd Creature", () => {
+  const bison = CARD_LIBRARY.get("steppe-bison") as CreatureCard;
+  assert.ok(effectiveHasTag(bison, "Herd") && effectiveHasTag(bison, "Bastion"));
+  let game = readyGame();
+  const card = toHand(game, 0, "steppe-bison");
+  game = applyAction(game, { type: "playCreature", cardUid: card.uid, laneIndex: 1 });
+  assert.ok(game.pendingHerd, "its Herd triggers");
+});
+
+test("Circle Defense: +100 per friendly Herd Creature, −50 per other opposing Carnivore (−100 for a Pack Hunter), never below 0", () => {
+  const game = readyGame();
+  const bison = place(game, 0, 1, "steppe-bison");
+  place(game, 0, 3, "woolly-mammoth"); // a second Herd Creature
+  const hunter = place(game, 1, 1, "smilodon");
+  const at = () => inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid);
+  assert.equal(at(), 100 + 200, "Level 1, plus two Herd Creatures");
+  place(game, 1, 0, "hyaenodon"); // another Carnivore
+  assert.equal(at(), 100 + 200 - 50);
+  place(game, 1, 2, "dire-wolf"); // a Pack Hunter
+  assert.equal(at(), 100 + 200 - 50 - 100);
+  place(game, 1, 3, "orca"); // a Pack Hunter too
+  place(game, 1, 4, "basilosaurus");
+  assert.equal(at(), 100, "the bonus never goes below 0");
+});
+
+test("Circle Defense applies every Hunt and shields Level 0–1 neighbours at any Level", () => {
+  const game = readyGame();
+  const bison = place(game, 0, 1, "steppe-bison");
+  bison.bastionDefendedTurn = game.turnNumber; // already Hunted this turn
+  const neighbour = place(game, 0, 2, "castoroides", { tags: [] });
+  const hunter = place(game, 1, 1, "smilodon");
+  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid), 200, "still +100 for itself");
+  assert.equal(
+    inspectBattlePower(game, neighbour.card.uid, "defender", hunter.card.uid),
+    200,
+    "Level 1 + 100 from its Level 1 neighbour",
+  );
+});
+
+test("Apex Predator: an Omnivore with it also Hunts as a Carnivore, so it may Hunt Omnivores", () => {
+  const game = readyGame();
+  game.phase = "battle";
+  const bear = place(game, 0, 0, "arctotherium");
+  const plainOmnivore = place(game, 0, 1, "arctotherium", { tags: [] });
+  const omnivorePrey = place(game, 1, 3, "arctotherium", { tags: [], printedLevel: 1 });
+  assert.ok(legalAttackTargets(game, bear.card.uid).includes(omnivorePrey.card.uid));
+  assert.ok(
+    !legalAttackTargets(game, plainOmnivore.card.uid).includes(omnivorePrey.card.uid),
+    "a plain Omnivore can't",
+  );
+});
+
+test("Circle Defense counts an Omnivore with Apex Predator as a Carnivore", () => {
+  const game = readyGame();
+  const bison = place(game, 0, 1, "steppe-bison");
+  const hunter = place(game, 1, 1, "smilodon");
+  place(game, 1, 2, "arctotherium");
+  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid), 100 + 100 - 50);
+});
+
+test("Apex Predator: an Omnivore with it is Hunted as a Carnivore, so only Diet-waiving effects reach it", () => {
+  const game = readyGame();
+  game.phase = "battle";
+  const smilodon = place(game, 0, 0, "smilodon");
+  const omnivore = place(game, 0, 1, "arctotherium", { tags: [] });
+  const bear = place(game, 1, 3, "arctotherium");
+  assert.ok(!legalAttackTargets(game, smilodon.card.uid).includes(bear.card.uid), "a Carnivore can't Hunt it");
+  assert.ok(!legalAttackTargets(game, omnivore.card.uid).includes(bear.card.uid), "nor can an Omnivore");
+  const plainBear = place(game, 1, 2, "arctotherium", { tags: [] });
+  assert.ok(
+    legalAttackTargets(game, smilodon.card.uid).includes(plainBear.card.uid),
+    "without Apex Predator it can be",
+  );
 });

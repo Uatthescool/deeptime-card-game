@@ -82,5 +82,6 @@ export const FACE_CROPS: Record<string, FaceCrop | null> = {
   smilodon: { x: 0.12, y: 0.33, w: 0.22 },
   arctotherium: { x: 0.17, y: 0.48, w: 0.4 },
   paraceratherium: { x: 0.93, y: 0.08, w: 0.14 },
+  "bactrian-camel": { x: 0.13, y: 0.76, w: 0.22 },
   "woolly-mammoth": { x: 0.68, y: 0.27, w: 0.2 },
 };

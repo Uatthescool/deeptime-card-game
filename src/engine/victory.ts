@@ -25,7 +25,7 @@ export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
   const definition = creature.card.definition;
   const found = findCreature(state, creature.card.uid);
   const sources: VictorySource[] = [];
-  if (found && nicheIsFrozen(found.lane)) {
+  if (found && nicheIsFrozen(found.lane) && !definition.tags.includes("Underwool")) {
     return {
       value: 0,
       sources: [{ label: "Frozen: contributes no Victory Levels", amount: -definition.printedLevel }],

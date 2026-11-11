@@ -230,6 +230,7 @@ export function expandedTagNames(card: CreatureCard): string[] {
     if (card.diet !== "Herbivore") names.push("Territorial");
   }
   if (card.tags.includes("Divergent")) names.push("Transitional", "Ancestor");
+  if (card.tags.includes("Circle Defense")) names.push("Herd", "Bastion");
   return [...new Set(names)];
 }
 
