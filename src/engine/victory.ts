@@ -14,12 +14,25 @@ function isStegosaur(definition: CreatureCard) {
   return definition.taxa.includes("Stegosaur") || definition.taxa.includes("Stegosaurid");
 }
 
-/** The Victory Levels a Creature in play currently contributes. */
-export function cardVictoryLevel(state: GameState, creature: CreatureInPlay) {
+/** One named contribution to a Creature's Victory Levels, for showing players where the total comes from. */
+export type VictorySource = { label: string; amount: number };
+
+/** The Victory Levels a Creature in play contributes, with every source that moved it from its Printed Level. */
+export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
   const definition = creature.card.definition;
   const found = findCreature(state, creature.card.uid);
-  if (found && nicheIsFrozen(found.lane)) return 0;
+  const sources: VictorySource[] = [];
+  if (found && nicheIsFrozen(found.lane)) {
+    return {
+      value: 0,
+      sources: [{ label: "Frozen: contributes no Victory Levels", amount: -definition.printedLevel }],
+    };
+  }
   let value = definition.printedLevel;
+  const add = (label: string, amount: number) => {
+    value += amount;
+    if (amount !== 0) sources.push({ label, amount });
+  };
   if (definition.tags.includes("Apex Predator")) {
     const apexCount = state.players
       .flatMap((player) => player.lanes)
@@ -28,21 +41,27 @@ export function cardVictoryLevel(state: GameState, creature: CreatureInPlay) {
     const protectedDecrease = definition.tags.includes("Spinal Sail")
       ? Math.max(0, otherApexPredators - 1)
       : otherApexPredators;
-    value += Math.max(0, 2 - protectedDecrease);
+    add("Apex Predator", Math.max(0, 2 - protectedDecrease));
   }
-  if (effectiveHasTag(definition, "Gigantic")) value += tagEffectMultiplier(definition, "Gigantic");
-  if (definition.printedLevel === 0) value += activeCambrianExplosions(state);
+  if (effectiveHasTag(definition, "Gigantic")) add("Gigantic", tagEffectMultiplier(definition, "Gigantic"));
+  if (definition.printedLevel === 0) add("Cambrian Explosion", activeCambrianExplosions(state));
 
-  if (found?.lane.engulfed) value += tagEffectMultiplier(definition, "Engulf");
-  if (found?.lane.attachment?.definition.key === "thagomizer" && isStegosaur(definition)) value += 1;
+  if (found?.lane.engulfed) add("Engulf", tagEffectMultiplier(definition, "Engulf"));
+  if (found?.lane.attachment?.definition.key === "thagomizer" && isStegosaur(definition)) add("Thagomizer", 1);
   if (found?.lane.attachment?.definition.key === "island-dwarfism") {
-    value += effectiveHasTag(definition, "Gigantic") ? 2 : 1;
+    add("Island Dwarfism", effectiveHasTag(definition, "Gigantic") ? 2 : 1);
   }
   if (found && state.players[otherPlayer(found.playerId)].lanes[found.laneIndex]!.drought) {
-    value -= definition.tags.includes("Spinal Sail") ? 0 : 1;
+    add("Drought", definition.tags.includes("Spinal Sail") ? 0 : -1);
   }
 
-  return Math.max(0, value);
+  if (value < 0) sources.push({ label: "Can't fall below 0", amount: -value });
+  return { value: Math.max(0, value), sources };
+}
+
+/** The Victory Levels a Creature in play currently contributes. */
+export function cardVictoryLevel(state: GameState, creature: CreatureInPlay) {
+  return victoryBreakdown(state, creature).value;
 }
 
 export function victoryTotals(state: GameState): [number, number] {

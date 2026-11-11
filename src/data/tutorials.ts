@@ -16,11 +16,6 @@ export type TutorialStep = {
   target: string;
   /** The scene for this step, when it differs from the tutorial's. */
   scene?: TutorialScene;
-  /**
-   * On a phone, where the game shows its board, hand and Inspector as separate views: the view to show, and a
-   * different part or text when the part is not on phones.
-   */
-  phone?: { view?: "board" | "hand" | "inspect"; target?: string; body?: TutorialCopy[] };
   title: string;
   body: TutorialCopy[];
 };
@@ -216,15 +211,13 @@ export const TUTORIALS: TutorialDefinition[] = [
         title: "Your Biome, on the board",
         body: [
           "Each half of the table shows its owner’s Biome as a landscape behind the Niches. Yours is Arid; your opponent’s is Aquatic.",
-          "The badge beside each player’s name says which Biome they are playing in.",
         ],
       },
       {
         target: "biome-control",
-        phone: { view: "hand" },
         title: "Your Biome’s status",
         body: [
-          "Your Biome’s ability is summed up here, along with anything it has left to use, such as Temperate’s Season counters.",
+          "This small panel names your Biome and its ability, along with anything it has left to use, such as Temperate’s Season counters. Point at it to read the full rule.",
           "Biomes with an ability you use by choice, such as Aquatic, put its buttons here too.",
         ],
       },
@@ -240,14 +233,14 @@ export const TUTORIALS: TutorialDefinition[] = [
         target: "player-niches adaptation-slot",
         title: "Adaptation slots",
         body: [
-          "Under each Niche is an Adaptation slot. An Adaptation card is played here, attached to the Creature in that Niche, and stays with it.",
+          "Under each of your Niches is an Adaptation slot; your opponent’s are above theirs. An Adaptation card is played here, attached to the Creature in that Niche, and stays with it.",
         ],
       },
       {
-        target: "player-ribbon event-zone",
+        target: "event-zone",
         title: "Event Zone",
         body: [
-          "A Continuous Event is played here and keeps working while it stays in play.",
+          "A Continuous Event is played here and keeps working while it stays in play. Your opponent’s Event Zone is at the top right.",
           "Instantaneous Events take effect at once instead. A few, such as Wildfire and Drought, lock a Niche for a while.",
           "Concepts also take effect at once, then go to your History.",
         ],
@@ -256,8 +249,9 @@ export const TUTORIALS: TutorialDefinition[] = [
         target: "opponent-niches creature",
         title: "A Creature in play",
         body: [
-          "Your opponent has played a Creature. On the board, a Creature shows its Primary Taxon and Level at the top, then its name, Diet and Period, and its Tags.",
-          "At the bottom is how many Victory Levels it is worth right now. Point at it to read the whole card.",
+          "Your opponent has played a Creature. On the board, a Creature shows its name and Diet at the top and a close-up of its face.",
+          "The circle at the bottom left is its Printed Level. A small + or − beside it means it is contributing more or fewer Victory Levels than that. The number at the bottom right is its Battle Power.",
+          "Point at it, or press and hold on a touch screen, to see the whole card with notes on its Tags, Victory Levels and Battle Power.",
         ],
       },
       {
@@ -268,89 +262,64 @@ export const TUTORIALS: TutorialDefinition[] = [
         ],
       },
       {
-        target: "player-ribbon victory",
+        target: "victory",
         title: "Victory",
         body: [
-          "Your Victory total: the Victory Levels of all your Creatures in play, added together.",
+          "Your Victory total and your opponent’s: the Victory Levels of each player’s Creatures in play, added together.",
           "The first player to reach 12 wins.",
         ],
       },
       {
-        target: "player-ribbon piles",
-        phone: {
-          view: "inspect",
-          target: "inspector-history",
-          body: [
-            "On a phone, your History is the History tab of the Inspect view. It is your discard pile: Creatures that leave the board, and Concepts and Events once they are done, go there.",
-          ],
-        },
-        title: "Deck, Hand and History",
+        target: "piles",
+        title: "Deck and History",
         body: [
-          { term: "Deck", text: "How many cards you have left to draw." },
-          { term: "Hand", text: "How many cards you are holding." },
+          { term: "Deck", text: "Your face-down deck, at the right. Point at it to see how many cards are left." },
           {
             term: "History",
-            text: "Your discard pile. Creatures that leave the board, and Concepts and Events once they are done, go here. Click it to look through it.",
+            text: "Your discard pile, just above it. Creatures that leave the board, and Concepts and Events once they are done, go here. Click it to look through it.",
           },
+          "Your opponent’s deck and History are on the left.",
         ],
       },
       {
         target: "turn-summary",
         title: "Turn and phase",
         body: [
-          "The top of the screen shows the turn number and whose phase it is.",
+          "This panel shows the turn number, whose phase it is, and what to do next, with the button that moves the turn on.",
           "Every turn has three phases: the Start Phase, when you draw; the Development Phase, when you play cards; and the Battle Phase, when your Creatures can Hunt.",
         ],
       },
       {
         target: "hand",
-        phone: {
-          view: "hand",
-          body: [
-            "On a phone, your hand has its own view: switch between Board, Hand and Inspect with the tabs at the top. Tap a card to choose it.",
-            "Each player starts with five cards, always including at least one Level 0 or Level 1 Creature, so every player can fill a Niche on their first turn.",
-            "With two players on one device, your hand is covered whenever the device is passed, until the next player confirms it is them.",
-          ],
-        },
         title: "Your hand",
         body: [
-          "Your cards are here, at the bottom of the screen. Point at one to read it, or click it to choose it.",
+          "Your cards are here, at the bottom of the screen. Drag one onto the board to play it, or click it and then click where it goes. Point at one to see it up close.",
           "Each player starts with five cards, always including at least one Level 0 or Level 1 Creature, so every player can fill a Niche on their first turn.",
           "With two players on one device, your hand is covered whenever the device is passed, until the next player confirms it is them.",
         ],
       },
       {
-        target: "player-ribbon piles",
-        phone: { view: "hand", target: "hand" },
+        target: "piles",
         title: "When you draw",
         body: [
-          "At the start of each of your turns, in the Start Phase, you draw one card. You started with five and drew one, so you now hold six.",
+          "At the start of each of your turns, in the Start Phase, you draw one card from your deck. You started with five and drew one, so you now hold six.",
           "You can hold at most 10 cards. A full hand blocks your draws, and ending two of your turns in a row with a full hand, while your deck still has cards, forfeits the game.",
         ],
       },
       {
-        target: "allowances",
-        phone: { view: "hand" },
+        target: "hand",
         title: "What you can play",
         body: [
-          "In your Development Phase you may play one Creature, one Adaptation, one Event and one Concept, in any order. These markers show what you have used this turn.",
+          "In your Development Phase you may play one Creature, one Adaptation, one Event and one Concept, in any order. A card you can’t play right now is dimmed and says why.",
           "Playing a card is the next tutorial.",
         ],
       },
       {
         target: "inspector",
-        phone: {
-          view: "inspect",
-          body: [
-            "Tap any card, on the board or in your hand, and the Inspector shows it in full. On a phone, it is the Inspect view.",
-            "It also keeps the game log: a record of everything that has happened so far.",
-          ],
-        },
-        title: "The Inspector",
+        title: "The game log",
         body: [
-          "Point at any card, on the board or in your hand, and the Inspector shows it in full.",
-          "It also keeps the game log: a record of everything that has happened so far.",
-          "On smaller screens, open it with the Inspector button at the top.",
+          "Game log opens a record of everything that has happened so far, and your History.",
+          "Right-click any card to open it there in full.",
         ],
       },
       {

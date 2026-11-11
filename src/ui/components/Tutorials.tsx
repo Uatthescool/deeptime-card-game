@@ -14,7 +14,7 @@ import { readJson, writeJson } from "../storage.ts";
 import { boardTutorialGame } from "../tutorialGames.ts";
 import { FaceArtCredit } from "./CardFace.tsx";
 import { Dialog } from "./Dialog.tsx";
-import { GameScreen, type MobileView } from "./GameScreen.tsx";
+import { GameScreen } from "./GameScreen.tsx";
 import { BiomeReveal } from "./Pregame.tsx";
 
 const DONE_KEY = "pcg.tutorials.done";
@@ -106,11 +106,7 @@ export function TutorialPlayer({
 }) {
   const [index, setIndex] = useState(0);
   const sceneRef = useRef<HTMLDivElement>(null);
-  const phone = usePhoneLayout();
-  const written = tutorial.steps[index]!;
-  const step = phone
-    ? { ...written, target: written.phone?.target ?? written.target, body: written.phone?.body ?? written.body }
-    : written;
+  const step = tutorial.steps[index]!;
   const scene = step.scene ?? tutorial.scene;
   const last = index === tutorial.steps.length - 1;
   const next = useCallback(() => (last ? onExit(true) : setIndex((i) => i + 1)), [last, onExit]);
@@ -131,7 +127,7 @@ export function TutorialPlayer({
       <div className={`tutorial-scene scene-${scene}`} ref={sceneRef}>
         {scene === "card-anatomy" && <CardAnatomyScene />}
         {scene === "biome-reveal" && <BiomeRevealScene />}
-        {scene === "board" && <BoardScene view={phone ? (written.phone?.view ?? "board") : undefined} />}
+        {scene === "board" && <BoardScene />}
       </div>
       <Spotlight
         sceneRef={sceneRef}
@@ -373,22 +369,7 @@ function BiomeRevealScene() {
   );
 }
 
-function BoardScene({ view }: { view: MobileView | undefined }) {
+function BoardScene() {
   const [game] = useState(boardTutorialGame);
-  return <GameScreen initialGame={game} resumed={false} onExit={() => {}} tutorial mobileView={view} />;
-}
-
-/** True at the width where the game switches to its phone layout (the same breakpoint as the styles). */
-const PHONE_QUERY = "(max-width: 820px)";
-
-function usePhoneLayout() {
-  const [phone, setPhone] = useState(() => window.matchMedia?.(PHONE_QUERY).matches ?? false);
-  useEffect(() => {
-    const query = window.matchMedia?.(PHONE_QUERY);
-    if (!query) return;
-    const update = () => setPhone(query.matches);
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  return phone;
+  return <GameScreen initialGame={game} resumed={false} onExit={() => {}} tutorial />;
 }

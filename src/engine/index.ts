@@ -31,13 +31,15 @@ export {
   VICTORY_THRESHOLD,
 } from "./core.ts";
 export { checkOverride } from "./override.ts";
-export { cardVictoryLevel, victoryTotals } from "./victory.ts";
+export { cardVictoryLevel, victoryBreakdown, victoryTotals, type VictorySource } from "./victory.ts";
 export {
   battleCoinPlan,
   battleNeedsElusiveFlip,
   hasLegalHunts,
   BATTLE_POWER_PER_LEVEL,
   inspectBattlePower,
+  liveBattlePower,
+  type PowerSource,
   legalAttackTargets,
 } from "./battle-math.ts";
 export {

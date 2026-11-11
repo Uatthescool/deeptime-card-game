@@ -634,6 +634,40 @@ export function createBattlePreview(
   };
 }
 
+/** One named always-on Battle Power modifier. */
+export type PowerSource = { label: string; amount: number };
+
+/**
+ * Live Battle Power: Printed Level × 100 plus the modifiers that apply at all times, whoever it faces.
+ * Bonuses that apply only while attacking or defending in a Hunt are left to the Hunt preview.
+ */
+export function liveBattlePower(state: GameState, creatureUid: string) {
+  const found = findCreature(state, creatureUid);
+  if (!found) return null;
+  const definition = found.creature.card.definition;
+  const sources: PowerSource[] = [];
+  let power = definition.printedLevel * BATTLE_POWER_PER_LEVEL;
+  const add = (label: string, amount: number) => {
+    if (!amount) return;
+    power += amount;
+    sources.push({ label, amount });
+  };
+  if (definition.tags.includes("Solitary") && hasNoAdjacentFriendly(state, found.playerId, found.laneIndex)) {
+    add("Solitary", BATTLE_POWER_PER_LEVEL);
+  }
+  add(
+    "Geological Boundary",
+    state.periodAuras.filter((aura) => aura.period === definition.period).length * BATTLE_POWER_PER_LEVEL,
+  );
+  if (found.lane.attachment?.definition.key === "island-dwarfism") {
+    add("Island Dwarfism", -(effectiveHasTag(definition, "Gigantic") ? 2 : 1) * BATTLE_POWER_PER_LEVEL);
+  }
+  if (state.players[otherPlayer(found.playerId)].lanes[found.laneIndex]!.drought) {
+    add("Drought", -BATTLE_POWER_PER_LEVEL);
+  }
+  return { power: Math.max(0, power), base: definition.printedLevel * BATTLE_POWER_PER_LEVEL, sources };
+}
+
 /** Projected Battle Power of a Creature in a hypothetical Hunt against `opposingUid`. */
 export function inspectBattlePower(
   state: GameState,

@@ -9,7 +9,6 @@ import {
   canPlayEvent,
   canUseAquaticOverride,
   type CardInstance,
-  conceptAllowance,
   endingTurnForfeits,
   explainCard,
   explainHunt,
@@ -34,6 +33,8 @@ import {
   NICHE_EVENT_KEYS,
   otherPlayer,
   type PlayerId,
+  type PlayerState,
+  type Verdict,
   VICTORY_THRESHOLD,
   victoryTotals,
 } from "../../engine/index.ts";
@@ -43,7 +44,17 @@ import { useGameSession } from "../useGameSession.ts";
 import { BattleModal } from "./BattleModal.tsx";
 import { EventZone, NicheLane } from "./Board.tsx";
 import { CardBack, CardFace } from "./CardFace.tsx";
-import { type InspectionTarget, inspectionHandlers, type InspectorTab } from "../inspection.ts";
+import { CardBlowup } from "./CardBlowup.tsx";
+import { DrawFlight } from "./DrawFlight.tsx";
+import { CardBackFan, Hand } from "./Hand.tsx";
+import type { DropTarget } from "../dropTarget.ts";
+import {
+  type InspectionTarget,
+  inspectionHandlers,
+  type InspectorTab,
+  type PinHandler,
+  type PreviewHandler,
+} from "../inspection.ts";
 import { type Explanation, huntBadge, type LaneBadge, placementBadge } from "../legality.ts";
 import { Inspector } from "./Inspector.tsx";
 import { LegalityPanel } from "./LegalityPanel.tsx";
@@ -52,7 +63,6 @@ import {
   CarnianPluvialChoiceModal,
   ConceptChoiceModal,
   ConvergentChoiceModal,
-  DrawPresentation,
   EngulfModal,
   EntryChoiceModal,
   FilterFeederModal,
@@ -78,8 +88,6 @@ type BoardAction =
   | { kind: "facultative-destination"; sourceLane: number }
   | null;
 
-export type MobileView = "board" | "hand" | "inspect";
-
 const PHASE_NAMES: Record<GameState["phase"], string> = {
   handoff: "Handoff",
   start: "Start Phase",
@@ -95,18 +103,15 @@ type GameScreenProps = {
   onExit: () => void;
   /** A tutorial's staged game: never saved, so it cannot replace a game in progress. */
   tutorial?: boolean;
-  /** Which of the phone layout's views to show, when something outside the game chooses (a tutorial). */
-  mobileView?: MobileView;
 };
 
-export function GameScreen({
-  initialGame,
-  resumed,
-  onExit,
-  tutorial = false,
-  mobileView: chosenMobileView,
-}: GameScreenProps) {
-  const { game, dispatch: dispatchAny, currentDraw } = useGameSession(initialGame, { persist: !tutorial });
+export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: GameScreenProps) {
+  const {
+    game,
+    dispatch: dispatchAny,
+    currentDraw,
+    pendingDrawUids,
+  } = useGameSession(initialGame, { persist: !tutorial });
   const computerTurn = useComputerOpponent(game, dispatchAny);
   // The person's own moves; ignored while the computer is the one to move.
   const dispatch = (action: GameAction) => {
@@ -124,8 +129,6 @@ export function GameScreen({
   const [hover, setHover] = useState<InspectionTarget | null>(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("log");
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const [ownMobileView, setMobileView] = useState<MobileView>("board");
-  const mobileView = chosenMobileView ?? ownMobileView;
   const [confirmConcede, setConfirmConcede] = useState(false);
 
   // A new viewer takes the device at every handoff: clear everything the previous player had open.
@@ -175,10 +178,7 @@ export function GameScreen({
     setPinned(target);
     setHover(null);
     setInspectorTab("card");
-    if (openInspector) {
-      setInspectorOpen(true);
-      setMobileView("inspect");
-    }
+    if (openInspector) setInspectorOpen(true);
   };
   const preview = (target: InspectionTarget | null) => {
     setHover(target);
@@ -188,7 +188,6 @@ export function GameScreen({
     setHistoryViewer(player);
     setInspectorTab("history");
     setInspectorOpen(true);
-    setMobileView("inspect");
   };
   const clearSelection = () => {
     setSelectedCardUid(null);
@@ -349,7 +348,6 @@ export function GameScreen({
   // A second full-hand turn in a row forfeits: say so before the person ends this one.
   const forfeitWarning =
     !computerTurn && game.activePlayer === viewPlayer && game.phase !== "game-over" && endingTurnForfeits(game);
-  const conceptLimit = conceptAllowance(game, viewPlayer);
   const legalHuntsAvailable = hasLegalHunts(game, viewPlayer);
   const facultativeSources = legalFacultativeSources(game);
   const handHidden = !computer && (Boolean(game.handoff) || resumeCover);
@@ -439,43 +437,9 @@ export function GameScreen({
     "aquatic-override": "Choose a Creature card for the free override.",
   };
 
-  const ribbon = (playerId: PlayerId, label: string) => {
-    const player = game.players[playerId];
-    return (
-      <div
-        className={`player-ribbon ${playerId === viewPlayer ? "active-ribbon" : "opponent-ribbon"}`}
-        data-tutorial-target={playerId === viewPlayer ? "player-ribbon" : "opponent-ribbon"}
-      >
-        <div className="player-identity">
-          <small>{label}</small>
-          <strong>{player.name}</strong>
-          {player.biome.key && (
-            <span className="biome-ribbon-badge" data-tutorial-target="biome-badge">
-              {biomeByKey(player.biome.key).name}
-            </span>
-          )}
-        </div>
-        <div className="ribbon-event" data-tutorial-target="event-zone">
-          <EventZone game={game} playerId={playerId} onPin={pin} onPreview={preview} />
-        </div>
-        <div className="score-pill" data-tutorial-target="victory">
-          <span>Victory</span>
-          <b>
-            {totals[playerId]} / {VICTORY_THRESHOLD}
-          </b>
-        </div>
-        <div className="pile-counts" data-tutorial-target="piles">
-          <span>Deck {player.deck.length}</span>
-          <span className="hand-counter">Hand {player.hand.length}</span>
-          <button onClick={() => openHistory(playerId)}>History {player.history.length}</button>
-        </div>
-      </div>
-    );
-  };
-
   const lanes = (playerId: PlayerId) => (
     <div
-      className={`lanes ${playerId === viewPlayer ? "player-lanes" : "opponent-lanes"}`}
+      className={`tbl-lanes ${playerId === viewPlayer ? "own" : "opponent"}`}
       data-tutorial-target={playerId === viewPlayer ? "player-niches" : "opponent-niches"}
     >
       {LANES.map((laneIndex) => (
@@ -506,93 +470,144 @@ export function GameScreen({
     if (boardAction?.kind !== "aquatic-override") setBoardAction(null);
   };
 
+  // Dragging a card from the hand chooses it, so the board lights where it can go, and letting go plays it.
+  const startDrag = (card: CardInstance) => {
+    if (computerTurn) return;
+    setSelectedCardUid(card.uid);
+    setSelectedAttackerUid(null);
+    if (boardAction?.kind !== "aquatic-override") setBoardAction(null);
+  };
+  const dragOver = (target: DropTarget | null) => {
+    if (target?.kind === "lane" && canExplainLane(target.playerId, target.laneIndex)) {
+      setExplainLane({ playerId: target.playerId, laneIndex: target.laneIndex });
+    } else setExplainLane(null);
+  };
+  const dropCard = (card: CardInstance, target: DropTarget | null) => {
+    setExplainLane(null);
+    const { kind, key } = card.definition;
+    if (target?.kind === "lane" && isLegalSelectedPosition(target.playerId, target.laneIndex)) {
+      handleLaneClick(target.playerId, target.laneIndex);
+      return;
+    }
+    if (target && kind === "event" && !NICHE_EVENT_KEYS.has(key) && canPlayEvent(game, card)) {
+      dispatch({ type: "playEvent", cardUid: card.uid });
+    } else if (target && kind === "concept" && canPlayConcept(game, card)) {
+      dispatch({ type: "playConcept", cardUid: card.uid });
+    }
+    // Anything else goes back to the hand.
+    clearSelection();
+  };
+
+  const openLog = () => {
+    setInspectorTab("log");
+    setInspectorOpen(true);
+  };
+
+  const prompt = computerTurn
+    ? `${game.players[computer!.seat].name} is playing: ${game.log.at(-1) ?? "thinking…"}`
+    : game.pendingCranialDisplay
+      ? "Cranial Display: choose a highlighted opposing Creature."
+      : boardAction
+        ? boardActionPrompt[boardAction.kind]
+        : selectedCard
+          ? selectedCardInstruction(game, selectedCard, selectedTargetCount, false, cardVerdicts)
+          : game.phase === "battle"
+            ? selectedAttackerUid
+              ? attackTargets.length
+                ? "Choose a highlighted target to Hunt."
+                : "No legal target."
+              : "Choose a ready hunter."
+            : game.phase === "development"
+              ? "Choose a card to play: drag it onto the board."
+              : PHASE_NAMES[game.phase];
+
   return (
-    <main className={`game-page mobile-${mobileView}`}>
-      <header className="game-header">
-        <div>
-          <div className="eyebrow">Deep Time</div>
-          <h1>
-            {game.players[0].name} vs. {game.players[1].name}
-          </h1>
-        </div>
-        <div className="turn-summary" data-tutorial-target="turn-summary">
-          <span>
-            Turn {game.turnNumber}
-            {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
-              <em className="final-round">{game.turnNumber >= game.finalTurn ? " · Final turn" : " · Final round"}</em>
-            )}
-            {forfeitWarning && (
-              <em
-                className="forfeit-warning"
-                role="alert"
-                title="Your second turn in a row with a full hand: play a card or Mulligan, or ending the turn forfeits the game."
-              >
-                {" · Full hand: play a card or forfeit"}
-              </em>
-            )}
-          </span>
-          <strong>
-            {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
-          </strong>
-        </div>
-        <div className="header-controls" data-tutorial-target="header-controls">
-          <button className="quiet-button inspector-drawer-toggle" onClick={() => setInspectorOpen(!inspectorOpen)}>
-            {inspectorOpen ? "Close inspector" : "Inspector"}
+    <main className="tbl-page">
+      <p className="tbl-rotate-notice">Turn your device sideways to play.</p>
+      <div className="tbl-table" data-tutorial-target="table">
+        <div
+          className={`tbl-backdrop-half top biome-${opponentState.biome.key ?? "none"}`}
+          style={biomeBoardStyle(opponentState.biome.key)}
+          aria-hidden="true"
+        />
+        <div
+          className={`tbl-backdrop-half bottom biome-${viewer.biome.key ?? "none"}`}
+          style={biomeBoardStyle(viewer.biome.key)}
+          aria-hidden="true"
+        />
+        <div className="tbl-divider" aria-hidden="true" />
+
+        <nav className="tbl-corner" aria-label="Game menu" data-tutorial-target="header-controls">
+          <button className="tbl-chip" onClick={openLog} data-tutorial-target="inspector">
+            Game log
           </button>
-          <button className="quiet-button" onClick={() => setShowRules(!showRules)}>
+          <button className="tbl-chip" onClick={() => setShowRules(!showRules)}>
             {showRules ? "Close rules" : "Rules"}
           </button>
-          <button className="quiet-button" onClick={onExit}>
+          <button className="tbl-chip" onClick={onExit}>
             Main menu
           </button>
+          {confirmConcede ? (
+            <>
+              <button className="tbl-chip danger" onClick={() => dispatch({ type: "concede" })}>
+                Confirm concede
+              </button>
+              <button className="tbl-chip" onClick={() => setConfirmConcede(false)}>
+                Keep playing
+              </button>
+            </>
+          ) : (
+            <button className="tbl-chip" onClick={() => setConfirmConcede(true)}>
+              Concede
+            </button>
+          )}
+        </nav>
+
+        <section className="tbl-area-opp-hand" data-hand-area={opponent} aria-label={`${opponentState.name}'s hand`}>
+          <CardBackFan count={opponentState.hand.length} className="opponent" />
+        </section>
+
+        <div className="tbl-area-opp-deck">
+          <DeckPile player={opponentState} playerId={opponent} />
         </div>
-      </header>
+        <div className="tbl-area-opp-history">
+          <HistoryPile player={opponentState} onOpen={() => openHistory(opponent)} onPreview={preview} onPin={pin} />
+        </div>
+        <div className="tbl-area-opp-event">
+          <EventZone game={game} playerId={opponent} onPin={pin} onPreview={preview} />
+        </div>
+        <div className="tbl-area-own-event" data-tutorial-target="event-zone">
+          <EventZone game={game} playerId={viewPlayer} onPin={pin} onPreview={preview} />
+        </div>
+        <div className="tbl-area-own-history">
+          <HistoryPile player={viewer} onOpen={() => openHistory(viewPlayer)} onPreview={preview} onPin={pin} />
+        </div>
+        <div className="tbl-area-own-deck" data-tutorial-target="piles">
+          <DeckPile player={viewer} playerId={viewPlayer} />
+        </div>
 
-      <nav className="mobile-view-switcher" aria-label="Game views">
-        {(["board", "hand", "inspect"] as const).map((view) => (
-          <button
-            key={view}
-            className={mobileView === view ? "active" : ""}
-            aria-pressed={mobileView === view}
-            onClick={() => setMobileView(view)}
+        <section className="tbl-board" data-drop-board aria-label="Game board">
+          <div
+            className="tbl-half opponent"
+            data-tutorial-target="opponent-half"
+            aria-label={`${opponentState.name}'s ${opponentState.biome.key ? biomeByKey(opponentState.biome.key).name : "standard"} ecosystem`}
           >
-            {view === "board" ? "Board" : view === "hand" ? "Hand" : "Inspect"}
-          </button>
-        ))}
-      </nav>
-
-      <div className="game-layout">
-        <section className="board" aria-label="Game board">
-          <section className="table-board-region" data-tutorial-target="table">
-            <div
-              className={`biome-board-half opponent-biome-half biome-${opponentState.biome.key ?? "none"}`}
-              data-tutorial-target="opponent-half"
-              style={biomeBoardStyle(opponentState.biome.key)}
-              aria-label={`${opponentState.name}'s ${opponentState.biome.key ? biomeByKey(opponentState.biome.key).name : "standard"} ecosystem`}
-            >
-              {ribbon(opponent, computer ? `Computer · ${DIFFICULTY_NAMES[computer.difficulty]}` : "Opponent")}
-              {lanes(opponent)}
-            </div>
-
-            <div className="centerline" data-tutorial-target="centerline">
+            {lanes(opponent)}
+          </div>
+          <div className="tbl-centerline" data-tutorial-target="centerline">
+            {game.periodAuras.length > 0 && (
               <span>
-                {game.periodAuras.length
-                  ? game.periodAuras.map((aura) => `Geological Boundary · ${aura.period} +100 Battle Power`).join(" · ")
-                  : "Directly opposing Niches"}
+                {game.periodAuras.map((aura) => `Geological Boundary · ${aura.period} +100 Battle Power`).join(" · ")}
               </span>
-            </div>
-
-            <div
-              className={`biome-board-half player-biome-half biome-${viewer.biome.key ?? "none"}`}
-              data-tutorial-target="player-half"
-              style={biomeBoardStyle(viewer.biome.key)}
-              aria-label={`${viewer.name}'s ${viewer.biome.key ? biomeByKey(viewer.biome.key).name : "standard"} ecosystem`}
-            >
-              {lanes(viewPlayer)}
-              {ribbon(viewPlayer, computer ? "You" : "Active player")}
-            </div>
-          </section>
-
+            )}
+          </div>
+          <div
+            className="tbl-half own"
+            data-tutorial-target="player-half"
+            aria-label={`${viewer.name}'s ${viewer.biome.key ? biomeByKey(viewer.biome.key).name : "standard"} ecosystem`}
+          >
+            {lanes(viewPlayer)}
+          </div>
           {explanation && (
             // Keep the sheet clear of the Niches being chosen: Hunts target the top row, placements the bottom.
             <LegalityPanel
@@ -600,251 +615,198 @@ export function GameScreen({
               className={`as-sheet ${selectedAttacker ? "over-own" : "over-opponent"}`}
             />
           )}
-
-          <section className="hand-workspace">
-            {computerTurn ? (
-              <section className="action-bar computer-turn" aria-label="Computer's turn" aria-live="polite">
-                <div className="computer-status">
-                  <span className="thinking-dots" aria-hidden="true">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <div>
-                    <small>{game.players[computer!.seat].name} is playing</small>
-                    <strong>{game.log.at(-1) ?? "Thinking…"}</strong>
-                  </div>
-                </div>
-              </section>
-            ) : (
-              <section className="action-bar" aria-label="Turn controls and selected-card actions">
-                <div className="phase-actions">
-                  {game.phase === "development" && (
-                    <button
-                      className="primary-button"
-                      disabled={allowances.rapidSpeciation || boardAction !== null}
-                      onClick={() => {
-                        dispatch({ type: "advanceToBattle" });
-                        setSelectedCardUid(null);
-                      }}
-                    >
-                      {allowances.skipBattlePhase
-                        ? forfeitWarning
-                          ? "Forfeit · Battle skipped"
-                          : "End Turn · Battle skipped"
-                        : legalHuntsAvailable
-                          ? "Enter Battle Phase"
-                          : forfeitWarning
-                            ? "End Turn and forfeit"
-                            : "End Turn"}
-                    </button>
-                  )}
-                  {game.phase === "battle" && (
-                    <p>
-                      {selectedAttackerUid
-                        ? attackTargets.length
-                          ? "Choose a highlighted target."
-                          : "No legal target."
-                        : "Choose a ready hunter."}
-                    </p>
-                  )}
-                  {viewer.event?.definition.key === "carnian-pluvial-episode" && (
-                    <button
-                      className="quiet-button"
-                      disabled={!canActivateCarnianPluvialEpisode(game)}
-                      onClick={() => dispatch({ type: "activateCarnianPluvial" })}
-                    >
-                      {allowances.carnianPluvialUsed ? "Carnian used" : "Use Carnian Pluvial"}
-                    </button>
-                  )}
-                  {game.phase === "development" && facultativeSources.length > 0 && (
-                    <button
-                      className="quiet-button"
-                      disabled={aquaticActive}
-                      onClick={() => startBoardAction(facultativeActive ? null : { kind: "facultative-source" })}
-                    >
-                      {facultativeActive ? "Cancel movement" : "Use Facultative Movement"}
-                    </button>
-                  )}
-                  {canPerformFullHandMulligan(game) && (
-                    <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
-                      Mulligan
-                    </button>
-                  )}
-                </div>
-
-                {selectedCard ? (
-                  <SelectedCardPanel
-                    game={game}
-                    card={selectedCard}
-                    targetCount={selectedTargetCount}
-                    blockedReason={(() => {
-                      const verdict = cardVerdicts?.get(selectedCard.uid);
-                      return verdict && !verdict.legal ? verdict.reasons[0]?.text : undefined;
-                    })()}
-                    aquaticOverride={boardAction?.kind === "aquatic-override"}
-                    onClose={() => setSelectedCardUid(null)}
-                    onPlayEvent={() => {
-                      dispatch({ type: "playEvent", cardUid: selectedCard.uid });
-                      clearSelection();
-                    }}
-                    onPlayConcept={() => {
-                      dispatch({ type: "playConcept", cardUid: selectedCard.uid });
-                      clearSelection();
-                    }}
-                  />
-                ) : (
-                  <div className="selected-action-empty">
-                    <small>Selected card</small>
-                    <span>{boardAction ? boardActionPrompt[boardAction.kind] : "None"}</span>
-                  </div>
-                )}
-
-                <BiomeControl
-                  game={game}
-                  active={aquaticActive}
-                  onReposition={() => startBoardAction({ kind: "waterway-source" })}
-                  onOverride={() => startBoardAction({ kind: "aquatic-override" })}
-                  onCancel={() => startBoardAction(null)}
-                />
-
-                <div className="turn-end-actions">
-                  <button
-                    className="quiet-button"
-                    disabled={boardAction !== null}
-                    onClick={() => {
-                      dispatch({ type: "endTurn" });
-                      clearSelection();
-                    }}
-                  >
-                    {forfeitWarning ? "End turn and forfeit" : "End turn"}
-                  </button>
-                  <button
-                    className="quiet-button"
-                    disabled={!selectedCardUid && !selectedAttackerUid}
-                    onClick={clearSelection}
-                  >
-                    Cancel
-                  </button>
-                  {confirmConcede ? (
-                    <span className="concede-confirm">
-                      <button className="text-button danger" onClick={() => dispatch({ type: "concede" })}>
-                        Confirm concede
-                      </button>
-                      <button className="text-button" onClick={() => setConfirmConcede(false)}>
-                        Keep playing
-                      </button>
-                    </span>
-                  ) : (
-                    <button className="text-button" onClick={() => setConfirmConcede(true)}>
-                      Concede
-                    </button>
-                  )}
-                </div>
-                {game.pendingCranialDisplay && (
-                  <div className="mandatory-control-prompt" role="alert">
-                    <strong>Cranial Display</strong>
-                    <span>Choose a highlighted opposing Creature.</span>
-                  </div>
-                )}
-              </section>
-            )}
-
-            <section className="hand-zone" data-tutorial-target="hand">
-              <div className="section-heading">
-                <div>
-                  <small>{handHidden ? "Hand covered" : "Private hand"}</small>
-                  <h2>
-                    {handHidden
-                      ? "Private hand sealed for handoff"
-                      : selectedCard
-                        ? selectedCard.definition.name
-                        : "Choose a card to play; right-click to inspect"}
-                  </h2>
-                </div>
-                <div className="hand-turn-status">
-                  <span className="turn-phase-label">
-                    Turn {game.turnNumber} · {PHASE_NAMES[game.phase].replace(" Phase", "")}
-                  </span>
-                  <div className="allowances" data-tutorial-target="allowances">
-                    <span className={allowances.creaturePlayed ? "used" : ""}>
-                      Creature {allowances.creaturePlayed ? "used" : "1"}
-                    </span>
-                    <span className={allowances.adaptationPlayed ? "used" : ""}>
-                      Adaptation {allowances.adaptationPlayed ? "used" : "1"}
-                    </span>
-                    <span className={allowances.eventPlayed ? "used" : ""}>
-                      Event {allowances.eventPlayed ? "used" : "1"}
-                    </span>
-                    <span className={allowances.conceptsPlayed >= conceptLimit ? "used" : ""}>
-                      Concept {allowances.conceptsPlayed}/{conceptLimit}
-                    </span>
-                    {allowances.skipBattlePhase && <span className="used">Battle skipped</span>}
-                  </div>
-                </div>
-              </div>
-              {handHidden ? (
-                <div className="covered-hand">
-                  <CardBack />
-                  <CardBack />
-                  <CardBack />
-                  <p>The next player’s cards stay hidden until they confirm the handoff.</p>
-                </div>
-              ) : (
-                <div className="hand-scroll">
-                  {viewer.hand.map((card) => {
-                    const target = { definition: card.definition };
-                    const verdict = cardVerdicts?.get(card.uid);
-                    const blocked = verdict && !verdict.legal ? verdict.reasons[0]?.text : undefined;
-                    return (
-                      <button
-                        className={`hand-card-button ${blocked ? "unplayable" : ""}`}
-                        key={card.uid}
-                        aria-pressed={selectedCardUid === card.uid}
-                        aria-description={blocked ? `Can't play now: ${blocked}` : undefined}
-                        title={blocked ? `Can't play now: ${blocked}` : undefined}
-                        onClick={() => selectHandCard(card)}
-                        {...inspectionHandlers(target, preview, pin)}
-                      >
-                        <CardFace card={card.definition} compact selected={selectedCardUid === card.uid} />
-                        {blocked && <span className="hand-card-note">Can't play now</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          </section>
         </section>
 
-        <aside className={`side-rail ${inspectorOpen ? "open" : ""}`} data-tutorial-target="inspector">
-          {explanation && <LegalityPanel explanation={explanation} className="in-rail" />}
-          <Inspector
-            target={pinned ?? hover}
-            activeTab={inspectorTab}
-            onTabChange={setInspectorTab}
-            onClose={() => {
-              if (pinned ?? hover) {
-                setPinned(null);
-                setHover(null);
-                setInspectorTab("log");
-              } else {
-                setInspectorOpen(false);
-                setMobileView("board");
-              }
-            }}
-            game={game}
-            historyViewer={historyViewer}
-            onHistoryViewer={setHistoryViewer}
-            onPin={pin}
-            onPreview={preview}
-            pinned={Boolean(pinned)}
-          />
-        </aside>
-        {inspectorOpen && (
-          <button className="sidewall-scrim" aria-label="Close inspector" onClick={() => setInspectorOpen(false)} />
-        )}
+        <section
+          className="tbl-info large"
+          aria-label={computerTurn ? "Computer's turn" : "Turn"}
+          aria-live={computerTurn ? "polite" : undefined}
+          data-tutorial-target="turn-summary"
+        >
+          <div className="tbl-score" data-tutorial-target="victory">
+            <span>
+              <small>{computer ? "You" : viewer.name}</small>
+              <b>
+                {totals[viewPlayer]}
+                <i>/{VICTORY_THRESHOLD}</i>
+              </b>
+            </span>
+            <span className="opponent">
+              <small>{computer ? `Computer · ${DIFFICULTY_NAMES[computer.difficulty]}` : opponentState.name}</small>
+              <b>
+                {totals[opponent]}
+                <i>/{VICTORY_THRESHOLD}</i>
+              </b>
+            </span>
+          </div>
+          <p className="tbl-phase">
+            Turn {game.turnNumber} · {game.players[game.activePlayer].name}’s {PHASE_NAMES[game.phase]}
+            {typeof game.finalTurn === "number" && game.phase !== "game-over" && (
+              <em className="final-round">{game.turnNumber >= game.finalTurn ? " · Final turn" : " · Final round"}</em>
+            )}
+          </p>
+          {forfeitWarning && (
+            <p className="forfeit-warning" role="alert">
+              Full hand: play a card or Mulligan, or ending this turn forfeits.
+            </p>
+          )}
+          <p className="tbl-prompt" aria-live="polite">
+            {prompt}
+          </p>
+          {!computerTurn && (
+            <div className="tbl-actions">
+              {game.phase === "development" && (
+                <button
+                  className="primary-button"
+                  disabled={allowances.rapidSpeciation || boardAction !== null}
+                  onClick={() => {
+                    dispatch({ type: "advanceToBattle" });
+                    setSelectedCardUid(null);
+                  }}
+                >
+                  {allowances.skipBattlePhase
+                    ? forfeitWarning
+                      ? "Forfeit · Battle skipped"
+                      : "End Turn · Battle skipped"
+                    : legalHuntsAvailable
+                      ? "Enter Battle Phase"
+                      : forfeitWarning
+                        ? "End Turn and forfeit"
+                        : "End Turn"}
+                </button>
+              )}
+              {(game.phase === "battle" || (game.phase === "development" && legalHuntsAvailable)) && (
+                <button
+                  className="quiet-button"
+                  disabled={boardAction !== null}
+                  onClick={() => {
+                    dispatch({ type: "endTurn" });
+                    clearSelection();
+                  }}
+                >
+                  {forfeitWarning ? "End turn and forfeit" : "End turn"}
+                </button>
+              )}
+              {selectedCard?.definition.kind === "event" && !NICHE_EVENT_KEYS.has(selectedCard.definition.key) && (
+                <button
+                  className="primary-button"
+                  disabled={boardAction !== null || !canPlayEvent(game, selectedCard)}
+                  onClick={() => {
+                    dispatch({ type: "playEvent", cardUid: selectedCard.uid });
+                    clearSelection();
+                  }}
+                >
+                  Play Event
+                </button>
+              )}
+              {selectedCard?.definition.kind === "concept" && (
+                <button
+                  className="primary-button"
+                  disabled={boardAction !== null || !canPlayConcept(game, selectedCard)}
+                  onClick={() => {
+                    dispatch({ type: "playConcept", cardUid: selectedCard.uid });
+                    clearSelection();
+                  }}
+                >
+                  Play Concept
+                </button>
+              )}
+              {(selectedCardUid || selectedAttackerUid) && (
+                <button className="quiet-button" onClick={clearSelection}>
+                  Cancel
+                </button>
+              )}
+              {viewer.event?.definition.key === "carnian-pluvial-episode" && (
+                <button
+                  className="quiet-button"
+                  disabled={!canActivateCarnianPluvialEpisode(game)}
+                  onClick={() => dispatch({ type: "activateCarnianPluvial" })}
+                >
+                  {allowances.carnianPluvialUsed ? "Carnian used" : "Use Carnian Pluvial"}
+                </button>
+              )}
+              {game.phase === "development" && facultativeSources.length > 0 && (
+                <button
+                  className="quiet-button"
+                  disabled={aquaticActive}
+                  onClick={() => startBoardAction(facultativeActive ? null : { kind: "facultative-source" })}
+                >
+                  {facultativeActive ? "Cancel movement" : "Facultative move"}
+                </button>
+              )}
+              {canPerformFullHandMulligan(game) && (
+                <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
+                  Mulligan
+                </button>
+              )}
+            </div>
+          )}
+        </section>
+
+        <BiomeInfo
+          game={game}
+          playerId={viewPlayer}
+          active={aquaticActive}
+          onReposition={() => startBoardAction({ kind: "waterway-source" })}
+          onOverride={() => startBoardAction({ kind: "aquatic-override" })}
+          onCancel={() => startBoardAction(null)}
+        />
+
+        <section
+          className="tbl-area-own-hand"
+          data-hand-area={viewPlayer}
+          data-tutorial-target="hand"
+          aria-label="Your hand"
+        >
+          {handHidden ? (
+            <>
+              <CardBackFan count={viewer.hand.length} className="covered" />
+              <p className="tbl-covered-note">Private hand sealed for handoff</p>
+            </>
+          ) : (
+            <Hand
+              cards={viewer.hand}
+              verdicts={cardVerdicts}
+              selectedUid={selectedCardUid}
+              hiddenUids={pendingDrawUids}
+              onSelect={selectHandCard}
+              onDragStart={startDrag}
+              onDragOver={dragOver}
+              onDrop={dropCard}
+              onPreview={preview}
+              onPin={pin}
+              readOnly={computerTurn}
+            />
+          )}
+        </section>
       </div>
+
+      <aside className={`side-rail ${inspectorOpen ? "open" : ""}`}>
+        <Inspector
+          target={pinned ?? hover}
+          activeTab={inspectorTab}
+          onTabChange={setInspectorTab}
+          onClose={() => {
+            if (pinned ?? hover) {
+              setPinned(null);
+              setHover(null);
+              setInspectorTab("log");
+            } else {
+              setInspectorOpen(false);
+            }
+          }}
+          game={game}
+          historyViewer={historyViewer}
+          onHistoryViewer={setHistoryViewer}
+          onPin={pin}
+          onPreview={preview}
+          pinned={Boolean(pinned)}
+        />
+      </aside>
+      {inspectorOpen && (
+        <button className="sidewall-scrim" aria-label="Close game log" onClick={() => setInspectorOpen(false)} />
+      )}
+      {!inspectorOpen && <CardBlowup game={game} target={hover} />}
 
       {showRules && <RulesDrawer onClose={() => setShowRules(false)} />}
       {game.handoff && !computer && (
@@ -888,7 +850,7 @@ export function GameScreen({
       )}
       {game.phase === "game-over" && <WinnerOverlay game={game} onRestart={onExit} />}
       {currentDraw && (
-        <DrawPresentation
+        <DrawFlight
           game={game}
           event={currentDraw}
           faceVisible={currentDraw.playerId === viewPlayer && (Boolean(computer) || !game.handoff)}
@@ -898,125 +860,126 @@ export function GameScreen({
   );
 }
 
-type SelectedCardPanelProps = {
-  game: GameState;
-  card: CardInstance;
-  targetCount: number;
-  /** Why this card can't be played right now, if it can't. */
-  blockedReason: string | undefined;
-  aquaticOverride: boolean;
-  onClose: () => void;
-  onPlayEvent: () => void;
-  onPlayConcept: () => void;
-};
-
-function SelectedCardPanel({
-  game,
-  card,
-  targetCount,
-  blockedReason,
-  aquaticOverride,
-  onClose,
-  onPlayEvent,
-  onPlayConcept,
-}: SelectedCardPanelProps) {
+/** What to do with the chosen card, or why it can't be played. */
+function selectedCardInstruction(
+  game: GameState,
+  card: CardInstance,
+  targetCount: number,
+  aquaticOverride: boolean,
+  verdicts: Map<string, Verdict> | null,
+) {
+  const verdict = verdicts?.get(card.uid);
+  if (verdict && !verdict.legal) return verdict.reasons[0]?.text ?? "This card can't be played now.";
   const definition = card.definition;
   const allowances = game.players[game.activePlayer].allowances;
   const targets = (noun: string, none: string) =>
-    targetCount ? `Choose one of ${targetCount} highlighted ${noun}.` : none;
-  const instruction =
-    blockedReason ??
-    (definition.kind === "creature"
-      ? aquaticOverride
-        ? targets("Niches for the free override", "This Creature has no legal free override.")
-        : allowances.rapidSpeciation
-          ? "Choose a highlighted occupied Niche exactly two Levels lower."
-          : targets("legal Niches", "No legal Niche.")
-      : definition.kind === "adaptation"
-        ? targets("eligible Niches", "No eligible Adaptation position.")
-        : definition.key === "drought"
-          ? targets("Niches on either side", "No legal Niche for Drought.")
-          : definition.key === "wildfire"
-            ? targets("unlocked Niches on your side", "No legal lane for Wildfire.")
-            : null);
-  const boardPlayed =
-    definition.kind === "creature" || definition.kind === "adaptation" || NICHE_EVENT_KEYS.has(definition.key);
+    targetCount ? `Drag it to one of ${targetCount} highlighted ${noun}.` : none;
+  if (definition.kind === "creature") {
+    if (aquaticOverride) return targets("Niches for the free override", "This Creature has no legal free override.");
+    if (allowances.rapidSpeciation) return "Drag it onto a highlighted Creature exactly two Levels lower.";
+    return targets("Niches", "No legal Niche.");
+  }
+  if (definition.kind === "adaptation") return targets("Niches", "No eligible Adaptation position.");
+  if (definition.key === "drought") return targets("Niches on either side", "No legal Niche for Drought.");
+  if (definition.key === "wildfire") return targets("Niches on your side", "No legal lane for Wildfire.");
+  return `Drag it onto the board to play ${definition.name}.`;
+}
 
+/** A player's deck: a face-down stack. How many cards it holds shows on hover. */
+function DeckPile({ player, playerId }: { player: PlayerState; playerId: PlayerId }) {
+  const count = player.deck.length;
   return (
-    <section className="card-inspector">
-      <div className="selected-card-summary">
-        <small>Selected card</small>
-        <strong>{definition.name}</strong>
-        {instruction && <span>{instruction}</span>}
-      </div>
-      <div className="selected-card-actions">
-        {definition.kind === "event" && !NICHE_EVENT_KEYS.has(definition.key) && (
-          <button
-            className="primary-button"
-            disabled={aquaticOverride || !canPlayEvent(game, card)}
-            onClick={onPlayEvent}
-          >
-            Play Event
-          </button>
-        )}
-        {definition.kind === "concept" && (
-          <button
-            className="primary-button"
-            disabled={aquaticOverride || !canPlayConcept(game, card)}
-            onClick={onPlayConcept}
-          >
-            Play Concept
-          </button>
-        )}
-        {boardPlayed && (
-          <span className={targetCount ? "legal" : "blocked"}>
-            {targetCount ? "Board selection ready" : "Currently blocked"}
-          </span>
-        )}
-      </div>
-      <button className="clear-selected" onClick={onClose} aria-label="Clear selected card">
-        ×
-      </button>
-    </section>
+    <div
+      className={`tbl-pile tbl-deck ${count ? "" : "empty"}`}
+      data-deck-pile={playerId}
+      tabIndex={0}
+      aria-label={`${player.name}'s deck: ${count} ${count === 1 ? "card" : "cards"}`}
+    >
+      {count > 0 ? (
+        <span className="tbl-stack" style={{ "--stack": Math.min(6, Math.ceil(count / 7)) } as CSSProperties}>
+          <CardBack />
+        </span>
+      ) : (
+        <span>Deck</span>
+      )}
+      <span className="tbl-hover-count">
+        {count} {count === 1 ? "card" : "cards"}
+      </span>
+    </div>
   );
 }
 
-type BiomeControlProps = {
+/** A player's History pile: the last card sent there, face up. Click to look through it. */
+function HistoryPile({
+  player,
+  onOpen,
+  onPreview,
+  onPin,
+}: {
+  player: PlayerState;
+  onOpen: () => void;
+  onPreview: PreviewHandler;
+  onPin: PinHandler;
+}) {
+  const top = player.history.at(-1);
+  const count = player.history.length;
+  return (
+    <button
+      className={`tbl-pile tbl-history ${top ? "" : "empty"}`}
+      onClick={onOpen}
+      aria-label={`${player.name}'s History: ${count} ${count === 1 ? "card" : "cards"}`}
+      {...(top ? inspectionHandlers({ definition: top.definition }, onPreview, onPin) : {})}
+    >
+      {top ? <CardFace card={top.definition} compact /> : <span>History</span>}
+      <span className="tbl-hover-count">
+        {count} {count === 1 ? "card" : "cards"}
+      </span>
+    </button>
+  );
+}
+
+type BiomeInfoProps = {
   game: GameState;
+  playerId: PlayerId;
   active: boolean;
   onReposition: () => void;
   onOverride: () => void;
   onCancel: () => void;
 };
 
-function BiomeControl({ game, active, onReposition, onOverride, onCancel }: BiomeControlProps) {
-  const player = game.players[game.activePlayer];
+/** The small info screen: the person's Biome, its ability and anything it has left. The full rule shows on hover. */
+function BiomeInfo({ game, playerId, active, onReposition, onOverride, onCancel }: BiomeInfoProps) {
+  const player = game.players[playerId];
   if (!player.biome.key) {
     return (
-      <section className="biome-control">
-        <small>No Biome</small>
-        <strong>Standard rules</strong>
+      <section className="tbl-info small" data-tutorial-target="biome-control">
+        <strong>No Biome</strong>
       </section>
     );
   }
   const biome = biomeByKey(player.biome.key);
-  let status = biome.shortRules;
-  if (player.biome.key === "temperate") status = `${player.biome.seasonCounters} of 4 Season counters remain`;
+  let status: string | null = null;
+  if (player.biome.key === "temperate") status = `${player.biome.seasonCounters} of 4 Season counters`;
   if (player.biome.key === "aquatic") {
     status = player.biome.waterwaysConnected
       ? player.biome.waterwayRepositionTurn === game.turnNumber
-        ? "Connected · reposition used this turn"
-        : "Connected · reposition available"
-      : "Disconnected · free override spent";
+        ? "Connected · reposition used"
+        : "Connected"
+      : "Disconnected";
   }
+  const ownTurn = game.activePlayer === playerId;
   return (
-    <section className={`biome-control biome-${player.biome.key}`} data-tutorial-target="biome-control">
-      <small>
-        {biome.name} · {biome.abilityName}
-      </small>
-      <strong>{status}</strong>
-      {player.biome.key === "aquatic" && player.biome.waterwaysConnected && game.phase === "development" && (
-        <div className="biome-control-actions">
+    <section
+      className={`tbl-info small biome-${player.biome.key}`}
+      data-tutorial-target="biome-control"
+      tabIndex={0}
+      aria-label={`${biome.name} Biome: ${biome.abilityName}. ${biome.rules}`}
+    >
+      <strong>{biome.name}</strong>
+      <small>{biome.abilityName}</small>
+      {status && <small className="tbl-biome-status">{status}</small>}
+      {ownTurn && player.biome.key === "aquatic" && player.biome.waterwaysConnected && game.phase === "development" && (
+        <div className="tbl-actions">
           <button
             className="quiet-button"
             disabled={!active && legalConnectedWaterwaySources(game).length === 0}
@@ -1029,6 +992,12 @@ function BiomeControl({ game, active, onReposition, onOverride, onCancel }: Biom
           </button>
         </div>
       )}
+      <span className="tbl-biome-rule" role="tooltip">
+        <b>
+          {biome.name} · {biome.abilityName}
+        </b>
+        {biome.rules}
+      </span>
     </section>
   );
 }

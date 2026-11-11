@@ -7,6 +7,8 @@ export type InspectionTarget = {
   definition: CardDefinition;
   context?: string[];
   attachment?: string;
+  /** The Creature in play this card is, so its blow-up can show live Victory, Battle Power and states. */
+  uid?: string;
 };
 
 export type InspectorTab = "card" | "tags" | "state" | "log" | "history";
@@ -14,7 +16,23 @@ export type InspectorTab = "card" | "tags" | "state" | "log" | "history";
 export type PinHandler = (target: InspectionTarget, openInspector?: boolean) => void;
 export type PreviewHandler = (target: InspectionTarget | null) => void;
 
-/** Hover/focus previews a card in the inspector; a touch press pins it and opens the drawer. */
+/** How long a touch must be held before the card's blow-up appears. */
+export const HOLD_MS = 420;
+let holdTimer: number | undefined;
+/** The kind of pointer that last pressed a card: a touch long-press also fires a context menu, which is ignored. */
+let lastPointerType = "mouse";
+
+/** Starts a press-and-hold that previews the target once held; any release cancels it. */
+export function startHold(target: InspectionTarget, onPreview: PreviewHandler) {
+  window.clearTimeout(holdTimer);
+  holdTimer = window.setTimeout(() => onPreview(target), HOLD_MS);
+}
+export function endHold(onPreview: PreviewHandler) {
+  window.clearTimeout(holdTimer);
+  onPreview(null);
+}
+
+/** Hover or focus previews a card (its blow-up); on touch, pressing and holding does. */
 export function inspectionHandlers(target: InspectionTarget, onPreview: PreviewHandler, onPin?: PinHandler) {
   return {
     "data-inspection-card": true,
@@ -23,13 +41,18 @@ export function inspectionHandlers(target: InspectionTarget, onPreview: PreviewH
     onFocus: () => onPreview(target),
     onBlur: () => onPreview(null),
     onPointerDown: (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") onPin?.(target, true);
+      lastPointerType = event.pointerType;
+      if (event.pointerType !== "mouse") startHold(target, onPreview);
     },
+    onPointerUp: (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") endHold(onPreview);
+    },
+    onPointerCancel: () => endHold(onPreview),
     // Right-click opens the card in the Inspector, for cards whose click plays them.
     onContextMenu: (event: MouseEvent) => {
       if (!onPin) return;
       event.preventDefault();
-      onPin(target, true);
+      if (lastPointerType === "mouse") onPin(target, true);
     },
   };
 }

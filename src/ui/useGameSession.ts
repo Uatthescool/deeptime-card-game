@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { applyAction, checkInvariants, type DrawEvent, type GameAction, type GameState } from "../engine/index.ts";
 import { saveGame } from "./save.ts";
@@ -62,5 +62,7 @@ export function useGameSession(initial: GameState, { persist = true }: { persist
     if (persist) saveGame(game);
   }, [game, persist]);
 
-  return { game, dispatch, currentDraw: drawQueue[0] ?? null };
+  // Drawn cards wait out of the hand until their flight from the deck lands.
+  const pendingDrawUids = useMemo(() => new Set(drawQueue.map((event) => event.cardUid)), [drawQueue]);
+  return { game, dispatch, currentDraw: drawQueue[0] ?? null, pendingDrawUids };
 }
