@@ -742,9 +742,11 @@ export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: G
           )}
         </section>
 
+        <BiomeInfo game={game} playerId={opponent} side="opponent" />
         <BiomeInfo
           game={game}
           playerId={viewPlayer}
+          side="own"
           active={aquaticActive}
           onReposition={() => startBoardAction({ kind: "waterway-source" })}
           onOverride={() => startBoardAction({ kind: "aquatic-override" })}
@@ -967,18 +969,25 @@ function HistoryPile({
 type BiomeInfoProps = {
   game: GameState;
   playerId: PlayerId;
-  active: boolean;
-  onReposition: () => void;
-  onOverride: () => void;
-  onCancel: () => void;
+  /** Which side of the dividing line the panel sits on; only your own panel has the Aquatic buttons. */
+  side: "opponent" | "own";
+  active?: boolean;
+  onReposition?: () => void;
+  onOverride?: () => void;
+  onCancel?: () => void;
 };
 
-/** The small info screen: the person's Biome, its ability and anything it has left. The full rule shows on hover. */
-function BiomeInfo({ game, playerId, active, onReposition, onOverride, onCancel }: BiomeInfoProps) {
+/**
+ * A small Biome panel at the right of the table, beside its owner's half: the Biome, its ability and anything
+ * it has left. The full rule shows on hover.
+ */
+function BiomeInfo({ game, playerId, side, active = false, onReposition, onOverride, onCancel }: BiomeInfoProps) {
   const player = game.players[playerId];
+  const className = `tbl-info small ${side}`;
+  const tutorialTarget = side === "own" ? "biome-control" : "opponent-biome";
   if (!player.biome.key) {
     return (
-      <section className="tbl-info small" data-tutorial-target="biome-control">
+      <section className={className} data-tutorial-target={tutorialTarget}>
         <strong>No Biome</strong>
       </section>
     );
@@ -993,31 +1002,34 @@ function BiomeInfo({ game, playerId, active, onReposition, onOverride, onCancel 
         : "Connected"
       : "Disconnected";
   }
-  const ownTurn = game.activePlayer === playerId;
+  const controls = side === "own" && game.activePlayer === playerId;
   return (
     <section
-      className={`tbl-info small biome-${player.biome.key}`}
-      data-tutorial-target="biome-control"
+      className={`${className} biome-${player.biome.key}`}
+      data-tutorial-target={tutorialTarget}
       tabIndex={0}
-      aria-label={`${biome.name} Biome: ${biome.abilityName}. ${biome.rules}`}
+      aria-label={`${player.name}'s Biome, ${biome.name}: ${biome.abilityName}. ${biome.rules}`}
     >
       <strong>{biome.name}</strong>
       <small>{biome.abilityName}</small>
       {status && <small className="tbl-biome-status">{status}</small>}
-      {ownTurn && player.biome.key === "aquatic" && player.biome.waterwaysConnected && game.phase === "development" && (
-        <div className="tbl-actions">
-          <button
-            className="quiet-button"
-            disabled={!active && legalConnectedWaterwaySources(game).length === 0}
-            onClick={active ? onCancel : onReposition}
-          >
-            {active ? "Cancel" : "Reposition"}
-          </button>
-          <button className="quiet-button" disabled={active || !canUseAquaticOverride(game)} onClick={onOverride}>
-            Free override
-          </button>
-        </div>
-      )}
+      {controls &&
+        player.biome.key === "aquatic" &&
+        player.biome.waterwaysConnected &&
+        game.phase === "development" && (
+          <div className="tbl-actions">
+            <button
+              className="quiet-button"
+              disabled={!active && legalConnectedWaterwaySources(game).length === 0}
+              onClick={active ? onCancel : onReposition}
+            >
+              {active ? "Cancel" : "Reposition"}
+            </button>
+            <button className="quiet-button" disabled={active || !canUseAquaticOverride(game)} onClick={onOverride}>
+              Free override
+            </button>
+          </div>
+        )}
       <span className="tbl-biome-rule" role="tooltip">
         <b>
           {biome.name} · {biome.abilityName}

@@ -26,7 +26,8 @@
   overflow: clip;
   /* Lining numerals, so a 1 stands as tall as a 0 (Georgia's old-style 1 sits low and short). */
   --number-font: "Times New Roman", Times, "Liberation Serif", "DejaVu Serif", serif;
-  --u: min(1dvh, calc(100vw / 150));
+  /* 148u of table plus at least 12u of margin each side, where the Biome panels sit. */
+  --u: min(1dvh, calc(100vw / 172));
   --card-h: calc(var(--u) * 25);
   /* Niches and board cards share the piles' card proportions (about 5:7). */
   --card-w: calc(var(--card-h) * 0.714);
@@ -769,7 +770,7 @@ button.tbl-pile {
 .tbl-drag-ghost {
   position: fixed;
   z-index: 120;
-  width: calc(min(1dvh, calc(100vw / 150)) * 18);
+  width: calc(min(1dvh, calc(100vw / 172)) * 18);
   aspect-ratio: 0.714;
   transform: translate(-50%, -60%) rotate(-4deg);
   pointer-events: none;
@@ -797,14 +798,26 @@ button.tbl-pile {
   justify-self: start;
   width: min(100% - calc(var(--u) * 2.4), calc(var(--u) * 40));
 }
+/* The Biome panels sit in the right margin, each on its owner's side of the dividing line. */
 .tbl-info.small {
-  grid-column: side-r / end;
-  grid-row: hand-bottom;
-  justify-self: end;
-  width: min(100% - calc(var(--u) * 2.4), calc(var(--u) * 24));
+  grid-column: outer-r;
+  justify-self: stretch;
+  width: auto;
+  max-width: calc(var(--u) * 26);
+  margin: calc(var(--u) * 0.8) calc(var(--u) * 1);
+  margin-right: max(calc(var(--u) * 1), env(safe-area-inset-right));
+  padding: calc(var(--u) * 0.7) calc(var(--u) * 1);
   display: grid;
-  gap: calc(var(--u) * 0.2);
+  gap: calc(var(--u) * 0.15);
   cursor: help;
+}
+.tbl-info.small.opponent {
+  grid-row: opp-b / div-b;
+  align-self: end;
+}
+.tbl-info.small.own {
+  grid-row: div-b / own-b;
+  align-self: start;
 }
 .tbl-info p {
   margin: 0;
@@ -871,10 +884,10 @@ button.tbl-pile {
 .tbl-info.small small {
   color: rgba(244, 237, 224, 0.72);
 }
+/* The full rule opens to the panel's left, over the board. */
 .tbl-biome-rule {
   position: absolute;
-  right: 0;
-  bottom: calc(100% + var(--u) * 1);
+  right: calc(100% + var(--u) * 1);
   width: min(70vw, calc(var(--u) * 46));
   display: grid;
   gap: calc(var(--u) * 0.5);
@@ -893,9 +906,11 @@ button.tbl-pile {
   opacity: 1;
 }
 
-/* The small panel sits just above the fullscreen button in the bottom-right corner. */
-.tbl-info.small {
-  margin-bottom: calc(var(--u) * 6);
+.tbl-info.small.opponent .tbl-biome-rule {
+  bottom: 0;
+}
+.tbl-info.small.own .tbl-biome-rule {
+  top: 0;
 }
 .tbl-fullscreen {
   position: absolute;
@@ -909,21 +924,25 @@ button.tbl-pile {
 }
 
 /*
- * Phones (held sideways): the large panel fills the left area up to the board with tight text, so it stays short;
- * the small panel sits at the bottom right, just left of an icon-only fullscreen button. Your Event slot moves
- * to the top of its space to leave the large panel room.
+ * Phones (held sideways): the large panel fills the left area up to the board, and the fullscreen button shows
+ * only its icon. Text keeps readable minimum sizes, and items near the screen's corners move inward so rounded
+ * corners (Samsung and others) don't clip them. Your Event slot moves to the top of its space to leave room.
  */
 @media (max-height: 540px) {
+  .tbl-table {
+    --corner: 22px;
+  }
   .tbl-info {
-    padding: calc(var(--u) * 0.6) calc(var(--u) * 1);
-    font-size: max(8px, calc(var(--u) * 1.4));
-    line-height: 1.2;
+    padding: calc(var(--u) * 0.7) calc(var(--u) * 1.2);
+    font-size: max(10.5px, calc(var(--u) * 1.6));
+    line-height: 1.25;
   }
   .tbl-info.large {
     width: auto;
     justify-self: stretch;
     margin: calc(var(--u) * 1);
-    margin-left: max(calc(var(--u) * 1), env(safe-area-inset-left));
+    margin-left: max(var(--corner), env(safe-area-inset-left));
+    margin-bottom: 6px;
   }
   .tbl-score span {
     display: flex;
@@ -931,32 +950,36 @@ button.tbl-pile {
     gap: calc(var(--u) * 0.6);
   }
   .tbl-score b {
-    font-size: max(12px, calc(var(--u) * 2.6));
+    font-size: max(16px, calc(var(--u) * 3));
   }
   .tbl-actions {
-    gap: calc(var(--u) * 0.5);
-    margin-top: calc(var(--u) * 0.5);
+    gap: calc(var(--u) * 0.6);
+    margin-top: calc(var(--u) * 0.6);
   }
   .tbl-actions .primary-button,
   .tbl-actions .quiet-button {
-    padding: calc(var(--u) * 0.4) calc(var(--u) * 1);
-    font-size: max(8px, calc(var(--u) * 1.35));
+    padding: 4px 10px;
+    font-size: max(10.5px, calc(var(--u) * 1.5));
   }
   .tbl-info.small {
-    width: auto;
-    max-width: calc(100% - var(--u) * 2 - 34px);
-    margin: calc(var(--u) * 1);
-    margin-right: calc(var(--u) * 1.8 + 30px + env(safe-area-inset-right));
+    max-width: none;
+    margin-right: max(8px, env(safe-area-inset-right));
+    font-size: max(9.5px, calc(var(--u) * 1.4));
   }
   .tbl-info.small strong {
-    font-size: max(10px, calc(var(--u) * 1.8));
+    font-size: max(12px, calc(var(--u) * 2));
+  }
+  .tbl-corner {
+    padding-right: max(var(--corner), env(safe-area-inset-right));
   }
   .tbl-fullscreen .tbl-fullscreen-label {
     display: none;
   }
   .tbl-fullscreen {
+    right: max(var(--corner), env(safe-area-inset-right));
+    bottom: 6px;
     min-width: 30px;
-    padding: calc(var(--u) * 0.6);
+    padding: 6px 9px;
   }
   .tbl-area-own-event {
     align-items: start;
