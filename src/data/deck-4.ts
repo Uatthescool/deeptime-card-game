@@ -1,7 +1,6 @@
 import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
 
-/** Deck 4 is still being designed: it can be inspected, but no player can select it yet. */
-const STATUS = "Not playable · Work in progress" as const;
+const STATUS = "Locked" as const;
 
 type DeckFourCreature = {
   key: string;
@@ -217,7 +216,7 @@ export const DECK_4_INHERITED_SUPPORT_KEYS = [
 ] as const;
 
 /** Climate events that are feedback loops or their results; some aren't cards yet. */
-const FEEDBACK_LOOP_NAMES = [
+export const FEEDBACK_LOOP_NAMES = [
   "Ice Age",
   "Paleocene–Eocene Thermal Maximum",
   "Drought",
@@ -234,7 +233,6 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | AdaptationCard | ConceptCard)[] =
     name: "Ice Age",
     rules:
       "For overrides, Synapsids from the Paleogene, Neogene, or Quaternary match every Time Period. Creatures from the Cambrian, Triassic, Jurassic, or Cretaceous contribute 1 less Victory Level. When Ice Age leaves your Event Zone, your Creatures contribute no Victory Levels until the end of your third turn after it left.",
-    note: "Working wording; its effects are not built into the game yet.",
     cardFace: "/card-faces/ice-age.webp",
     status: STATUS,
   },
@@ -245,7 +243,6 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | AdaptationCard | ConceptCard)[] =
     name: "Paleocene–Eocene Thermal Maximum",
     rules:
       "Send a Level 0 or 1 Creature on the board to its owner’s History Pile. If it was yours, you may search your deck for up to two Creatures that share at least two taxa listed AFTER its Primary Taxon, reveal them, add them to your hand, then shuffle your deck. If it was your opponent’s, send the Event in your Event Zone, if any, to your History Pile.",
-    note: "Working wording; its effects are not built into the game yet.",
     cardFace: "/card-faces/paleocene-eocene-thermal-maximum.webp",
     status: STATUS,
   },
@@ -258,7 +255,7 @@ export const DECK_4_NEW_SUPPORTS: (EventCard | AdaptationCard | ConceptCard)[] =
       "During your Development Phase, while Feedback Loops is in your History Pile, you may send a card whose name appears below from your hand to your History Pile. If you do, return Feedback Loops to your hand.",
       FEEDBACK_LOOP_NAMES.map((name) => `• ${name}`).join("\n"),
     ].join("\n\n"),
-    note: "Working wording; its effects are not built into the game yet. The Great Oxidation Event isn't a card yet.",
+    note: "The Great Oxidation Event isn't a card yet.",
     cardFace: "/card-faces/feedback-loops.webp",
     status: STATUS,
   },

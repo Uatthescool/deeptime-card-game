@@ -3,6 +3,8 @@ import {
   creatureIsUntouchable,
   effectiveHasTag,
   hasIslandDwarfism,
+  ICE_AGE_SYNAPSID_PERIODS,
+  iceAgeInPlay,
   islandDwarfismBlocksEntry,
   laneIsFrozen,
   nicheIsLocked,
@@ -172,7 +174,11 @@ export function checkOverride(
   const livingFossil = current.tags.includes("Living Fossil") || incoming.tags.includes("Living Fossil");
   const transitional =
     (effectiveHasTag(current, "Transitional") || effectiveHasTag(incoming, "Transitional")) && baseTaxon;
-  let period = incoming.period === current.period || livingFossil || transitional;
+  // Ice Age: Paleogene, Neogene and Quaternary Synapsids match every Time Period for overrides.
+  const iceAgeSynapsid = (card: CreatureCard) =>
+    card.gameplayTaxon === "Synapsid" && ICE_AGE_SYNAPSID_PERIODS.has(card.period);
+  const iceAge = iceAgeInPlay(state) && (iceAgeSynapsid(current) || iceAgeSynapsid(incoming));
+  let period = incoming.period === current.period || livingFossil || transitional || iceAge;
 
   const sharedTag = [...incomingTags].find((value) => currentTags.has(value));
   let tag = aquaticTagMatch || semiAquaticTagMatch || Boolean(sharedTag);
@@ -191,7 +197,9 @@ export function checkOverride(
           ? "Living Fossil bridges Time Periods"
           : transitional
             ? "Transitional bridges Time Periods within a Primary Taxon"
-            : `${incoming.period} vs. ${current.period}`,
+            : iceAge
+              ? "Ice Age lets Paleogene, Neogene and Quaternary Synapsids match every Time Period"
+              : `${incoming.period} vs. ${current.period}`,
     taxon: baseTaxon
       ? `Both ${current.gameplayTaxon}`
       : aquaticTaxonMatch

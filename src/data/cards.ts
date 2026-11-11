@@ -112,14 +112,6 @@ export const DECK_2_SUPPORTS: SupportCard[] = [
 ];
 export const DECK_2_DECK: CardDefinition[] = [...DECK_2, ...DECK_2_SUPPORTS];
 
-export const DECKS: Record<DeckKey, CardDefinition[]> = {
-  "deck-1": DECK_1,
-  "deck-2": DECK_2_DECK,
-  "deck-3": DECK_3_DECK,
-};
-
-export const DECK_KEYS = Object.keys(DECKS) as DeckKey[];
-
 /** Each deck is played in its own Biome. */
 export const DECK_INFO: Record<DeckKey, { number: number; name: string; summary: string; biome: BiomeKey }> = {
   "deck-1": {
@@ -140,7 +132,15 @@ export const DECK_INFO: Record<DeckKey, { number: number; name: string; summary:
     summary: "Marine hunters that use the closed Aquatic override ecosystem.",
     biome: "aquatic",
   },
+  "deck-4": {
+    number: 4,
+    name: "Ice Age Mammals",
+    summary: "Mammals that survive the Ice Age, built around Herds, semi-aquatic whales and the Ice Age Event.",
+    biome: "cold",
+  },
 };
+
+export const DECK_KEYS = Object.keys(DECK_INFO) as DeckKey[];
 
 /** The Biome a deck is always played in. */
 export const deckBiome = (deck: DeckKey): BiomeKey => DECK_INFO[deck].biome;
@@ -160,16 +160,7 @@ export const GENERAL_POOL: CardDefinition[] = POOL_CANDIDATES.filter(
     !(DECK_4_SHARED_CREATURE_KEYS as readonly string[]).includes(card.key),
 );
 
-/**
- * Deck 4 is unfinished: it can be inspected, but it isn't in DECKS, so no player can
- * select it. Its shared Creatures are defined in Deck 3 and the General Pool candidates.
- */
-export const DECK_4_INFO = {
-  number: 4,
-  name: "Ice Age Mammals",
-  summary: "Mammals that survive the Ice Age, built around Herds, semi-aquatic whales and the Ice Age Event.",
-};
-
+/** Deck 4's shared Creatures are defined in Deck 3 and the General Pool candidates. */
 const findCard = (sources: CardDefinition[], key: string) => {
   const card = sources.find((candidate) => candidate.key === key);
   if (!card) throw new Error(`Deck 4 includes "${key}", which does not exist.`);
@@ -177,7 +168,11 @@ const findCard = (sources: CardDefinition[], key: string) => {
 };
 
 export const DECK_4: CreatureCard[] = [
-  ...DECK_4_SHARED_CREATURE_KEYS.map((key) => findCard([...DECK_3, ...POOL_CANDIDATES], key) as CreatureCard),
+  // The General Pool Creatures it borrows are Locked here, as every card in a selectable deck is.
+  ...DECK_4_SHARED_CREATURE_KEYS.map((key): CreatureCard => ({
+    ...(findCard([...DECK_3, ...POOL_CANDIDATES], key) as CreatureCard),
+    status: "Locked",
+  })),
   ...DECK_4_UNIQUE_CREATURES,
 ].sort(byLevelThenName);
 
@@ -188,6 +183,13 @@ export const DECK_4_SUPPORTS: SupportCard[] = [
   ...DECK_4_NEW_SUPPORTS,
 ];
 export const DECK_4_DECK: CardDefinition[] = [...DECK_4, ...DECK_4_SUPPORTS];
+
+export const DECKS: Record<DeckKey, CardDefinition[]> = {
+  "deck-1": DECK_1,
+  "deck-2": DECK_2_DECK,
+  "deck-3": DECK_3_DECK,
+  "deck-4": DECK_4_DECK,
+};
 
 /** Every distinct card definition the game knows about, keyed by card key. */
 export const CARD_LIBRARY: ReadonlyMap<string, CardDefinition> = new Map(

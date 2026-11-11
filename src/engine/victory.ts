@@ -4,6 +4,9 @@ import {
   addLog,
   effectiveHasTag,
   findCreature,
+  ICE_AGE_DIMINISHED_PERIODS,
+  iceAgeInPlay,
+  inIceAgeAftermath,
   nicheIsFrozen,
   otherPlayer,
   VICTORY_THRESHOLD,
@@ -28,6 +31,18 @@ export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
       sources: [{ label: "Frozen: contributes no Victory Levels", amount: -definition.printedLevel }],
     };
   }
+  if (found && inIceAgeAftermath(state, found.playerId)) {
+    const throughTurn = state.players[found.playerId].iceAgeAftermathThroughTurn;
+    return {
+      value: 0,
+      sources: [
+        {
+          label: `Ice Age left play: contributes no Victory Levels through Turn ${throughTurn}`,
+          amount: -definition.printedLevel,
+        },
+      ],
+    };
+  }
   let value = definition.printedLevel;
   const add = (label: string, amount: number) => {
     value += amount;
@@ -50,6 +65,10 @@ export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
   if (found?.lane.attachment?.definition.key === "thagomizer" && isStegosaur(definition)) add("Thagomizer", 1);
   if (found?.lane.attachment?.definition.key === "island-dwarfism") {
     add("Island Dwarfism", effectiveHasTag(definition, "Gigantic") ? 2 : 1);
+  }
+  // Spinal Sail takes 1 off each Event's Victory Level decrease, so it ignores Ice Age's as it does Drought's.
+  if (iceAgeInPlay(state) && ICE_AGE_DIMINISHED_PERIODS.has(definition.period)) {
+    add("Ice Age", definition.tags.includes("Spinal Sail") ? 0 : -1);
   }
   if (found && state.players[otherPlayer(found.playerId)].lanes[found.laneIndex]!.drought) {
     add("Drought", definition.tags.includes("Spinal Sail") ? 0 : -1);

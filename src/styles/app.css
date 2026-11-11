@@ -3641,6 +3641,16 @@ button:disabled {
 .deck-three-pool .pool-section-header > span {
   background: #285a70;
 }
+.deck-four-pool {
+  border-color: rgba(176, 206, 224, 0.4);
+  background: linear-gradient(145deg, rgba(176, 206, 224, 0.1), rgba(255, 255, 255, 0.02));
+}
+.deck-four-pool .pool-section-header small {
+  color: #cfe3ef;
+}
+.deck-four-pool .pool-section-header > span {
+  background: #4d6b7c;
+}
 .general-pool {
   border-color: rgba(201, 133, 60, 0.34);
   background: rgba(201, 133, 60, 0.045);

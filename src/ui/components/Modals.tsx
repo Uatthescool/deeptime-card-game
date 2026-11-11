@@ -255,6 +255,18 @@ export function EngulfModal({ game, dispatch }: { game: GameState; dispatch: Dis
 }
 
 const CONCEPT_PROMPTS: Record<string, { title: string; copy: string }> = {
+  "thermal-maximum-target": {
+    title: "Choose a Level 0 or 1 Creature",
+    copy: "It goes to its owner's History Pile. If it's yours, you may then search your deck for up to two Creatures that share at least two of its taxa listed after its Primary Taxon. If it's your opponent's, the Event in your Event Zone, if any, goes to your History Pile.",
+  },
+  "thermal-maximum-search": {
+    title: "Search for up to two Creatures",
+    copy: "Each must share at least two taxa listed after the sent Creature's Primary Taxon. Stop searching at any time; your deck is then shuffled.",
+  },
+  "feedback-loops-search": {
+    title: "Choose a card Feedback Loops names",
+    copy: "Reveal it and add it to your hand; your deck is then shuffled.",
+  },
   "evolutionary-radiation-card": {
     title: "Choose one effect—or both",
     copy: "Select a Level 0 or Level 1 Creature for a prerequisite you met when this Concept began resolving. After the first play, you may finish or resolve the other effect and skip Battle.",

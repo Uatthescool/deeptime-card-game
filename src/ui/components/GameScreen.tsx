@@ -14,6 +14,7 @@ import {
   explainHunt,
   explainHunter,
   explainPlacement,
+  feedbackLoopsReturnCards,
   findCreature,
   type GameAction,
   type GameState,
@@ -733,6 +734,16 @@ export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: G
                   {facultativeActive ? "Cancel movement" : "Facultative move"}
                 </button>
               )}
+              {feedbackLoopsReturnCards(game).map((card) => (
+                <button
+                  key={card.uid}
+                  className="quiet-button"
+                  title={`Send ${card.definition.name} to History to return Feedback Loops to your hand.`}
+                  onClick={() => dispatch({ type: "returnFeedbackLoops", cardUid: card.uid })}
+                >
+                  Feedback Loops: send {card.definition.name}
+                </button>
+              ))}
               {canPerformFullHandMulligan(game) && (
                 <button className="quiet-button" onClick={() => dispatch({ type: "fullHandMulligan" })}>
                   Mulligan

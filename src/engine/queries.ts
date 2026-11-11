@@ -1,4 +1,5 @@
 import { type AdaptationCard, type CardDefinition, countsAsAquatic, type CreatureCard } from "../data/cards.ts";
+import { FEEDBACK_LOOP_NAMES } from "../data/deck-4.ts";
 import { hasLegalHunts } from "./battle-math.ts";
 import {
   adjacentEmptyNiches,
@@ -177,8 +178,43 @@ export function explainEvent(state: GameState, card: CardInstance): Verdict {
     } else if (!playerHolds(player, card.uid)) {
       reasons.push({ code: "not-in-hand", text: "That card isn't in your hand." });
     } else if (player.allowances.eventPlayed) reasons.push(EVENT_PLAYED);
+    else if (card.definition.key === THERMAL_MAXIMUM && !thermalMaximumTargets(state).length) {
+      reasons.push({
+        code: "no-thermal-maximum-target",
+        text: "There's no Level 0 or 1 Creature on the board for it to send to History.",
+      });
+    }
   }
   return { legal: reasons.length === 0, reasons };
+}
+
+export const THERMAL_MAXIMUM = "paleocene-eocene-thermal-maximum";
+
+/** The Paleocene–Eocene Thermal Maximum's targets: Level 0 or 1 Creatures on either side that can be interacted with. */
+export function thermalMaximumTargets(state: GameState): BoardPosition[] {
+  return ([0, 1] as const).flatMap((playerId) =>
+    state.players[playerId].lanes.flatMap((lane, laneIndex) =>
+      lane.creature && lane.creature.card.definition.printedLevel <= 1 && !creatureIsUntouchable(lane)
+        ? [{ playerId, laneIndex }]
+        : [],
+    ),
+  );
+}
+
+/** Whether a card is one Feedback Loops names. */
+export const isFeedbackLoopCard = (card: CardInstance) =>
+  (FEEDBACK_LOOP_NAMES as readonly string[]).includes(card.definition.name);
+
+/**
+ * Feedback Loops, from History: during your Development Phase, the cards in your hand it names, any one of which
+ * you may send to History to return Feedback Loops to your hand. Empty when it isn't in your History.
+ */
+export function feedbackLoopsReturnCards(state: GameState): CardInstance[] {
+  const player = state.players[state.activePlayer];
+  if (!canActInDevelopment(state) || !player.history.some((card) => card.definition.key === "feedback-loops")) {
+    return [];
+  }
+  return player.hand.filter(isFeedbackLoopCard);
 }
 
 export function canPlayEvent(state: GameState, card: CardInstance) {

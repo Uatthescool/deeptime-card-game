@@ -250,6 +250,48 @@ export function playerHolds(player: PlayerState, uid: string) {
   return player.hand.some((held) => held.uid === uid);
 }
 
+/** Whether Ice Age is in either player's Event Zone; like other Continuous Events, it affects the whole board. */
+export function iceAgeInPlay(state: GameState) {
+  return state.players.some((player) => player.event?.definition.key === "ice-age");
+}
+
+/** Ice Age's Synapsids: from the Paleogene, Neogene or Quaternary, they match every Time Period for overrides. */
+export const ICE_AGE_SYNAPSID_PERIODS: ReadonlySet<string> = new Set(["Paleogene", "Neogene", "Quaternary"]);
+/** Ice Age's older Creatures: from these Periods, they contribute 1 less Victory Level. */
+export const ICE_AGE_DIMINISHED_PERIODS: ReadonlySet<string> = new Set([
+  "Cambrian",
+  "Triassic",
+  "Jurassic",
+  "Cretaceous",
+]);
+
+/**
+ * Sends a player's Event out of their Event Zone to History. When Ice Age leaves its owner's Event Zone, that
+ * player's Creatures contribute no Victory Levels until the end of the owner's third turn after it left.
+ */
+export function removeEventFromZone(state: GameState, playerId: PlayerId, reason: string) {
+  const player = state.players[playerId];
+  const event = player.event;
+  if (!event) return null;
+  player.event = null;
+  sendCardToHistory(state, event, reason);
+  if (event.definition.key === "ice-age") {
+    const throughTurn = nextTurnForPlayer(state, playerId) + 4;
+    player.iceAgeAftermathThroughTurn = throughTurn;
+    addLog(
+      state,
+      `Ice Age left ${player.name}'s Event Zone: ${player.name}'s Creatures contribute no Victory Levels through Turn ${throughTurn}.`,
+    );
+  }
+  return event;
+}
+
+/** Whether a player is still in Ice Age's aftermath, when their Creatures contribute no Victory Levels. */
+export function inIceAgeAftermath(state: GameState, playerId: PlayerId) {
+  const throughTurn = state.players[playerId].iceAgeAftermathThroughTurn;
+  return typeof throughTurn === "number" && state.turnNumber <= throughTurn;
+}
+
 export function activeCambrianExplosions(state: GameState) {
   return state.players.filter((player) => player.event?.definition.key === "cambrian-explosion").length;
 }

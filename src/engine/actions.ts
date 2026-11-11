@@ -9,7 +9,7 @@ import {
   rerollBattleCoin,
 } from "./battle.ts";
 import { legalAttackTargets } from "./battle-math.ts";
-import { chooseConceptOption, getConceptChoiceOptions, playConcept } from "./concepts.ts";
+import { chooseConceptOption, getConceptChoiceOptions, playConcept, returnFeedbackLoops } from "./concepts.ts";
 import { isGameOver, markSettledNiches, otherPlayer } from "./core.ts";
 import {
   activateCarnianPluvialEpisode,
@@ -42,6 +42,7 @@ import {
   canPerformFullHandMulligan,
   canPlayConcept,
   canPlayEvent,
+  feedbackLoopsReturnCards,
   legalAdaptationTargets,
   legalAquaticOverrideLanes,
   legalConnectedWaterwayDestinations,
@@ -85,6 +86,7 @@ export type GameAction =
   | { type: "chooseCarnianPluvial"; optionId: string }
   | { type: "playConcept"; cardUid: string }
   | { type: "chooseConceptOption"; optionId: string }
+  | { type: "returnFeedbackLoops"; cardUid: string }
   | { type: "chooseHerd"; optionId: string }
   | { type: "chooseNesting"; optionId: string }
   | { type: "chooseFilterFeederTop"; cardUid: string }
@@ -144,6 +146,8 @@ function reduce(state: GameState, action: GameAction): GameState {
       return playConcept(state, action.cardUid);
     case "chooseConceptOption":
       return chooseConceptOption(state, action.optionId);
+    case "returnFeedbackLoops":
+      return returnFeedbackLoops(state, action.cardUid);
     case "chooseHerd":
       return chooseHerd(state, action.optionId);
     case "chooseNesting":
@@ -315,6 +319,7 @@ function developmentActions(state: GameState): GameAction[] {
     }
   }
   if (canActivateCarnianPluvialEpisode(state)) actions.push({ type: "activateCarnianPluvial" });
+  for (const card of feedbackLoopsReturnCards(state)) actions.push({ type: "returnFeedbackLoops", cardUid: card.uid });
   if (canPerformFullHandMulligan(state)) actions.push({ type: "fullHandMulligan" });
   if (!player.allowances.rapidSpeciation) actions.push({ type: "advanceToBattle" });
   actions.push({ type: "endTurn" });

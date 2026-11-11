@@ -487,8 +487,8 @@ test("every piece of artwork shown on screen carries a short credit", () => {
   }
 });
 
-test("Deck 4 can be inspected but not selected while it is unfinished", () => {
-  assert.equal("deck-4" in DECKS, false);
+test("Deck 4 holds 22 Creatures and 18 Supports, every one Locked", () => {
+  assert.equal("deck-4" in DECKS, true);
   assert.equal(DECK_4.length, 22);
   assert.deepEqual(
     [0, 1, 2, 3, 4].map((level) => DECK_4.filter((card) => card.printedLevel === level).length),
@@ -496,9 +496,10 @@ test("Deck 4 can be inspected but not selected while it is unfinished", () => {
   );
   assert.equal(DECK_4_SUPPORTS.length, 18);
   assert.ok(DECK_4.every((card) => card.taxa.includes("Synapsid")));
-  // Its new cards are marked unplayable; the cards it shares keep their own status.
-  assert.equal(CARD_LIBRARY.get("mastodon")?.status, "Not playable · Work in progress");
-  assert.equal(CARD_LIBRARY.get("ice-age")?.status, "Not playable · Work in progress");
+  // Its own cards and the General Pool Creatures it borrows are Locked, as in every selectable deck.
+  assert.equal(CARD_LIBRARY.get("mastodon")?.status, "Locked");
+  assert.equal(CARD_LIBRARY.get("ice-age")?.status, "Locked");
+  assert.equal(CARD_LIBRARY.get("lystrosaurus")?.status, "Locked");
   assert.equal(CARD_LIBRARY.get("orca")?.status, "Locked");
 });
 

@@ -118,6 +118,8 @@ export type PlayerState = {
   overreachTriggeredTurn: number | null;
   overreachQueuedDraws: number;
   overreachDueTurn: number | null;
+  /** Ice Age left this player's Event Zone: their Creatures contribute no Victory Levels through this turn. */
+  iceAgeAftermathThroughTurn?: number | null;
   /** The turn whose Start-of-Turn Draw Phase this player skips (Deep-Sea Gigantism). */
   skipDrawPhaseTurn?: number | null;
   allowances: TurnAllowances;
@@ -209,10 +211,14 @@ export type ConceptChoiceKind =
   | "abiogenesis-placement-lane"
   | "deep-sea-gigantism-card"
   | "deep-sea-gigantism-lane"
-  | "intraguild-predation";
+  | "intraguild-predation"
+  | "thermal-maximum-target"
+  | "thermal-maximum-search"
+  | "feedback-loops-search";
 
+/** A multi-step choice from a Concept, or from an Instantaneous Event that works like one (the PETM). */
 export type PendingConceptChoice = {
-  card: ConceptInstance;
+  card: ConceptInstance | EventInstance;
   kind: ConceptChoiceKind;
   selectedCardUid?: string;
   sourceLane?: number;
@@ -220,6 +226,9 @@ export type PendingConceptChoice = {
   eligibleUids?: string[];
   radiationRemainingLevels?: Array<0 | 1>;
   radiationPlacements?: number;
+  /** Paleocene–Eocene Thermal Maximum: the taxa after the sent Creature's Primary Taxon, and searches left. */
+  thermalTaxa?: string[];
+  searchesLeft?: number;
 };
 
 export type ChoiceOption = {

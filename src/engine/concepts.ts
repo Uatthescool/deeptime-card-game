@@ -12,6 +12,7 @@ import {
   moveLaneOccupant,
   nextTurnForPlayer,
   placeCreatureFromHand,
+  removeEventFromZone,
   sendCardToHistory,
   sendCreatureToHistory,
   takeDeckCard,
@@ -22,7 +23,10 @@ import {
   canPlayConcept,
   deepSeaGigantismLanes,
   evolutionaryRadiationLevels,
+  feedbackLoopsReturnCards,
   intraguildPredationLanes,
+  isFeedbackLoopCard,
+  thermalMaximumTargets,
 } from "./queries.ts";
 import { randomInt, shuffle } from "./rng.ts";
 import { finishResolution } from "./turn.ts";
@@ -30,6 +34,7 @@ import type {
   CardInstance,
   ChoiceOption,
   ConceptInstance,
+  EventInstance,
   GameState,
   PendingConceptChoice,
   PlayerId,
@@ -41,9 +46,10 @@ export const FINISH_RADIATION = "__finish-radiation__";
 export const DECLINE_SEMELPARITY = "__decline-semelparity__";
 export const ABIOGENESIS_SEARCH = "__abiogenesis-search__";
 export const ABIOGENESIS_PLACE = "__abiogenesis-place__";
+export const FINISH_THERMAL_SEARCH = "__finish-thermal-search__";
 
-function completeConcept(state: GameState, card: ConceptInstance) {
-  sendCardToHistory(state, card, "Concept resolved");
+function completeConcept(state: GameState, card: ConceptInstance | EventInstance) {
+  sendCardToHistory(state, card, card.definition.kind === "event" ? "Event resolved" : "Concept resolved");
   state.pendingConceptChoice = null;
   return finishResolution(state);
 }
@@ -140,6 +146,13 @@ export function playConcept(original: GameState, cardUid: string): GameState {
       return choose(state, moved, "deep-sea-gigantism-card");
     case "intraguild-predation":
       return choose(state, moved, "intraguild-predation");
+    case "feedback-loops":
+      if (!player.deck.some(isFeedbackLoopCard)) {
+        player.deck = shuffle(state, player.deck);
+        addLog(state, "Feedback Loops found no card it names in the deck; the deck was shuffled.");
+        return completeConcept(state, moved);
+      }
+      return choose(state, moved, "feedback-loops-search");
     default:
       return completeConcept(state, moved);
   }
@@ -303,6 +316,22 @@ export function getConceptChoiceOptions(state: GameState): ChoiceOption[] {
         };
       });
     }
+    case "thermal-maximum-target":
+      return thermalMaximumTargets(state).map(({ playerId, laneIndex }) => {
+        const creature = state.players[playerId].lanes[laneIndex]!.creature!.card.definition;
+        return {
+          id: `${playerId}:${laneIndex}`,
+          label: creature.name,
+          detail: `${playerId === state.activePlayer ? "Your" : "Opponent's"} Niche ${laneIndex + 1} · Level ${creature.printedLevel}`,
+        };
+      });
+    case "thermal-maximum-search":
+      return [
+        ...player.deck.filter((card) => sharesThermalTaxa(card, pending.thermalTaxa ?? [])).map(creatureOption),
+        { id: FINISH_THERMAL_SEARCH, label: "Stop searching", detail: "Shuffle your deck and finish." },
+      ];
+    case "feedback-loops-search":
+      return player.deck.filter(isFeedbackLoopCard).map(creatureOption);
     case "intraguild-predation":
       return intraguildPredationLanes(state, state.activePlayer).map((index) => {
         const creature = player.lanes[index]!.creature!.card.definition;
@@ -562,6 +591,52 @@ export function chooseConceptOption(original: GameState, optionId: string): Game
       return completeConcept(state, pending.card);
     }
 
+    case "thermal-maximum-target": {
+      const [playerId, laneIndex] = optionId.split(":").map(Number) as [PlayerId, number];
+      const creature = state.players[playerId].lanes[laneIndex]!.creature!.card.definition;
+      const primary = creature.taxa.indexOf(creature.gameplayTaxon);
+      sendCreatureToHistory(state, playerId, laneIndex, "effect");
+      addLog(state, `The Paleocene–Eocene Thermal Maximum sent ${creature.name} to History.`);
+      if (playerId === active) {
+        pending.kind = "thermal-maximum-search";
+        pending.thermalTaxa = creature.taxa.slice(primary + 1);
+        pending.searchesLeft = 2;
+        if (player.deck.some((card) => sharesThermalTaxa(card, pending.thermalTaxa!))) return state;
+        player.deck = shuffle(state, player.deck);
+        addLog(state, "No Creature in the deck shares two of its taxa after its Primary Taxon; the deck was shuffled.");
+        return completeConcept(state, pending.card);
+      }
+      if (player.event) {
+        addLog(state, `${player.event.definition.name} left ${player.name}'s Event Zone.`);
+        removeEventFromZone(state, active, "Paleocene–Eocene Thermal Maximum");
+      }
+      return completeConcept(state, pending.card);
+    }
+
+    case "thermal-maximum-search": {
+      if (optionId !== FINISH_THERMAL_SEARCH) {
+        const card = takeDeckCard(player, optionId);
+        if (!card) return state;
+        player.hand.push(card);
+        pending.searchesLeft = (pending.searchesLeft ?? 1) - 1;
+        addLog(state, `The Paleocene–Eocene Thermal Maximum found and revealed ${card.definition.name}.`);
+        const more = player.deck.some((held) => sharesThermalTaxa(held, pending.thermalTaxa ?? []));
+        if (pending.searchesLeft > 0 && more) return state;
+      }
+      player.deck = shuffle(state, player.deck);
+      addLog(state, `${player.name}'s deck was shuffled.`);
+      return completeConcept(state, pending.card);
+    }
+
+    case "feedback-loops-search": {
+      const card = takeDeckCard(player, optionId);
+      if (!card) return state;
+      player.hand.push(card);
+      player.deck = shuffle(state, player.deck);
+      addLog(state, `Feedback Loops found and revealed ${card.definition.name}; the deck was shuffled.`);
+      return completeConcept(state, pending.card);
+    }
+
     case "intraguild-predation": {
       const laneIndex = Number(optionId);
       if (!intraguildPredationLanes(state, active).includes(laneIndex)) return state;
@@ -574,4 +649,29 @@ export function chooseConceptOption(original: GameState, optionId: string): Game
       return completeConcept(state, pending.card);
     }
   }
+}
+
+/** A Creature shares at least two of these taxa (the PETM's sent Creature's taxa after its Primary Taxon). */
+function sharesThermalTaxa(card: CardInstance, taxa: string[]) {
+  if (card.definition.kind !== "creature") return false;
+  const own = card.definition.taxa;
+  return taxa.filter((taxon) => own.includes(taxon)).length >= 2;
+}
+
+/**
+ * Feedback Loops, from History: send a card it names from your hand to History, and return Feedback Loops to
+ * your hand. Usable during your Development Phase whenever it's in your History.
+ */
+export function returnFeedbackLoops(original: GameState, cardUid: string): GameState {
+  const state = clone(original);
+  if (!feedbackLoopsReturnCards(state).some((card) => card.uid === cardUid)) return state;
+  const player = state.players[state.activePlayer];
+  const paid = moveCardFromHand(player, cardUid)!;
+  sendCardToHistory(state, paid, "Feedback Loops");
+  const index = player.history.findIndex((card) => card.definition.key === "feedback-loops");
+  const [loops] = player.history.splice(index, 1);
+  player.hand.push(loops!);
+  player.allowances.developmentActions += 1;
+  addLog(state, `${player.name} sent ${paid.definition.name} to History and returned Feedback Loops to their hand.`);
+  return state;
 }

@@ -18,7 +18,7 @@ export const PERIODS = [
 export type Period = (typeof PERIODS)[number];
 
 export type CardStatus = "Locked" | "Not playable · Work in progress";
-export type DeckKey = "deck-1" | "deck-2" | "deck-3";
+export type DeckKey = "deck-1" | "deck-2" | "deck-3" | "deck-4";
 
 export type CreatureCard = {
   key: string;

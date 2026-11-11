@@ -4,12 +4,14 @@ import {
   clone,
   creatureIsUntouchable,
   drawOne,
+  iceAgeInPlay,
   makeCreatureInPlay,
   moveCardFromHand,
   moveLaneOccupant,
   nextTurnForPlayer,
   otherPlayer,
   PERIOD_SEQUENCE,
+  removeEventFromZone,
   sendCardToHistory,
   sendCreatureToHistory,
   takeDeckCard,
@@ -17,6 +19,7 @@ import {
 import { queueEntryEffects } from "./entry-effects.ts";
 import { checkOverride, isAncestorExtraPlay } from "./override.ts";
 import {
+  THERMAL_MAXIMUM,
   canActivateCarnianPluvialEpisode,
   canPlayEvent,
   carnianPluvialCostOptions,
@@ -332,7 +335,7 @@ export function playWildfire(original: GameState, cardUid: string, laneIndex: nu
 /** Snowball Earth: both edge lanes freeze through the end of your next turn, one turn longer with Ice Age in play. */
 function resolveSnowballEarth(state: GameState, moved: EventInstance) {
   sendCardToHistory(state, moved, "Snowball Earth resolved");
-  const iceAge = state.players.some((side) => side.event?.definition.key === "ice-age");
+  const iceAge = iceAgeInPlay(state);
   const frozenUntilTurn = nextTurnForPlayer(state, state.activePlayer) + (iceAge ? 1 : 0);
   for (const side of state.players) {
     for (const laneIndex of [0, side.lanes.length - 1]) side.lanes[laneIndex]!.frozenUntilTurn = frozenUntilTurn;
@@ -443,6 +446,12 @@ export function playEvent(original: GameState, cardUid: string): GameState {
     return state;
   }
 
+  if (moved.definition.key === THERMAL_MAXIMUM) {
+    // Resolves through the same choice steps as a Concept: first the Creature to send to History.
+    state.pendingConceptChoice = { card: moved, kind: "thermal-maximum-target" };
+    addLog(state, "Choose a Level 0 or 1 Creature on the board to send to History.");
+    return state;
+  }
   if (moved.definition.key === "snowball-earth") return resolveSnowballEarth(state, moved);
   if (moved.definition.key === "the-great-dying") return resolveGreatDying(state, moved);
 
@@ -466,7 +475,7 @@ export function playEvent(original: GameState, cardUid: string): GameState {
 
   if (player.event) {
     addLog(state, `${player.event.definition.name} left ${player.name}'s Event Zone.`);
-    sendCardToHistory(state, player.event, "Event replacement");
+    removeEventFromZone(state, state.activePlayer, "Event replacement");
   }
   player.event = moved;
   if (
@@ -496,12 +505,11 @@ export function chooseGeologicalBoundaryPeriod(original: GameState, period: Peri
       }
     });
   }
-  for (const player of state.players) {
-    if (player.event?.definition.eventType === "continuous") {
-      const ended = player.event;
-      sendCardToHistory(state, ended, "Geological Boundary");
-      player.event = null;
+  for (const playerId of [0, 1] as const) {
+    const ended = state.players[playerId].event;
+    if (ended?.definition.eventType === "continuous") {
       addLog(state, `${ended.definition.name} ended at the Geological Boundary.`);
+      removeEventFromZone(state, playerId, "Geological Boundary");
     }
   }
   const succeeding = PERIOD_SEQUENCE[PERIOD_SEQUENCE.indexOf(period) + 1];

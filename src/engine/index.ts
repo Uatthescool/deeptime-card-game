@@ -61,6 +61,7 @@ export {
   legalFacultativeSources,
   legalWildfireLanes,
   NICHE_EVENT_KEYS,
+  feedbackLoopsReturnCards,
 } from "./queries.ts";
 export {
   acknowledgeHandoff,
