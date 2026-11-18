@@ -204,6 +204,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Paleogene",
+    continents: ["Africa", "Asia"],
     periodColor: "Magenta",
     taxa: ["Artiodactyl", "Cetacean", "Basilosaurid"],
     tags: ["Aquatic", "Apex Predator"],

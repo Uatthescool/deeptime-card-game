@@ -1,4 +1,4 @@
-import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
+import type { AdaptationCard, ConceptCard, Continent, CreatureCard, Diet, EventCard, Period } from "./types";
 
 const STATUS = "Locked" as const;
 
@@ -16,6 +16,7 @@ type DeckThreeCreature = {
   visualTags: string[];
   flavorText: string;
   living?: boolean;
+  continents?: Continent[];
   cardFace?: string;
 };
 
@@ -33,6 +34,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Cambrian",
+    continents: ["North America"],
     periodColor: "Sky Blue",
     gameplayTaxon: "Stem Euarthropod",
     taxa: [
@@ -57,6 +59,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Devonian",
+    continents: ["North America"],
     periodColor: "Ocean Blue",
     gameplayTaxon: "Chondrichthyan",
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Stem Chondrichthyan", "Symmoriiform", "Cladoselachid"],
@@ -73,6 +76,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Jurassic",
+    continents: ["Europe"],
     periodColor: "Logo Red",
     gameplayTaxon: "Pancrustacean",
     taxa: [
@@ -97,6 +101,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Quaternary",
+    continents: ["North America", "South America", "Europe", "Africa"],
     living: true,
     periodColor: "Ice White",
     gameplayTaxon: "Actinopterygian",
@@ -114,6 +119,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Devonian",
+    continents: ["North America"],
     periodColor: "Ocean Blue",
     gameplayTaxon: "Sarcopterygian",
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Sarcopterygian", "Tetrapodomorph", "Elpistostegalian"],
@@ -130,6 +136,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Permian",
+    continents: ["North America", "Oceania"],
     periodColor: "Slate Gray",
     gameplayTaxon: "Chondrichthyan",
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euchondrocephalian", "Eugeneodont", "Helicoprionid"],
@@ -146,6 +153,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Cambrian",
+    continents: ["Asia"],
     periodColor: "Sky Blue",
     gameplayTaxon: "Stem Euarthropod",
     taxa: ["Invertebrate", "Protostome", "Ecdysozoan", "Panarthropod", "Stem Euarthropod"],
@@ -162,6 +170,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Ordovician",
+    continents: ["North America"],
     periodColor: "Sandstone Tan",
     gameplayTaxon: "Mollusk",
     taxa: ["Invertebrate", "Protostome", "Mollusk", "Cephalopod", "Endoceratoid", "Endocerid"],
@@ -178,6 +187,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Cretaceous",
+    continents: ["Europe", "North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Mollusk",
     taxa: ["Invertebrate", "Protostome", "Mollusk", "Cephalopod", "Ammonoid", "Ammonite", "Desmoceratid"],
@@ -194,6 +204,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Carboniferous",
+    continents: ["North America"],
     periodColor: "Navy Blue",
     gameplayTaxon: "Chondrichthyan",
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euchondrocephalian", "Eugeneodont", "Edestid"],
@@ -210,6 +221,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Devonian",
+    continents: ["North America"],
     periodColor: "Ocean Blue",
     gameplayTaxon: "Sarcopterygian",
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Sarcopterygian", "Tetrapodomorph", "Tristichopterid"],
@@ -226,6 +238,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Devonian",
+    continents: ["North America"],
     periodColor: "Ocean Blue",
     gameplayTaxon: "Placoderm",
     taxa: ["Vertebrate", "Gnathostome", "Placoderm", "Arthrodire", "Dunkleosteid"],
@@ -242,6 +255,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Actinopterygian",
     taxa: [
@@ -266,6 +280,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Devonian",
+    continents: ["Europe"],
     periodColor: "Ocean Blue",
     gameplayTaxon: "Chelicerate",
     taxa: ["Invertebrate", "Protostome", "Ecdysozoan", "Euarthropod", "Chelicerate", "Eurypterid", "Pterygotid"],
@@ -282,6 +297,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Cretaceous",
+    continents: ["Europe", "North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Chondrichthyan",
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euselachian", "Shark", "Lamniform", "Ptychodontid"],
@@ -298,6 +314,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Quaternary",
+    continents: ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "Antarctica"],
     living: true,
     periodColor: "Ice White",
     gameplayTaxon: "Synapsid",
@@ -315,6 +332,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Carnivore",
     period: "Neogene",
+    continents: ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"],
     periodColor: "Golden Ochre",
     gameplayTaxon: "Chondrichthyan",
     taxa: ["Vertebrate", "Gnathostome", "Chondrichthyan", "Euselachian", "Shark", "Lamniform", "Otodontid"],
@@ -331,6 +349,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Carnivore",
     period: "Jurassic",
+    continents: ["Europe"],
     periodColor: "Logo Red",
     gameplayTaxon: "Actinopterygian",
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Actinopterygian", "Pachycormiform", "Pachycormid"],
@@ -347,6 +366,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Carnivore",
     period: "Neogene",
+    continents: ["South America"],
     periodColor: "Golden Ochre",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Cetacean", "Odontocete", "Physeteroid"],
@@ -363,6 +383,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 4,
     diet: "Carnivore",
     period: "Quaternary",
+    continents: ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "Antarctica"],
     living: true,
     periodColor: "Ice White",
     gameplayTaxon: "Synapsid",
