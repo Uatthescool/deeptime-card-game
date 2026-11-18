@@ -13,6 +13,8 @@ import {
   DECK_4,
   DECK_4_DECK,
   DECK_4_SUPPORTS,
+  DECK_5,
+  DECK_5_INFO,
   DECK_INFO,
   type DeckKey,
   GENERAL_POOL,
@@ -148,6 +150,22 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
             <header className="pool-section-header">
               <div>
                 <small>Not playable · Work in progress</small>
+                <h2>
+                  Deck {DECK_5_INFO.number}: {DECK_5_INFO.name}
+                </h2>
+                <p>
+                  {DECK_5_INFO.summary} Still being designed: {DECK_5.length} Creatures so far, four of them shared with
+                  Deck 1. It can be inspected, but it can’t be selected during setup yet.
+                </p>
+              </div>
+              <span>{DECK_5.length} of 40 cards</span>
+            </header>
+            {group(`Deck ${DECK_5_INFO.number} Creatures`, DECK_5)}
+          </section>
+          <section className="pool-section general-pool">
+            <header className="pool-section-header">
+              <div>
+                <small>Not playable · Work in progress</small>
                 <h2>General Pool</h2>
                 <p>
                   Candidate cards that aren’t in any deck. They are available for inspection but never enter either
@@ -156,7 +174,14 @@ export function DeckBrowser({ onClose }: { onClose: () => void }) {
               </div>
               <span>{GENERAL_POOL.length} cards</span>
             </header>
-            {group("Candidate cards outside the decks", GENERAL_POOL)}
+            {group(
+              "Candidate cards outside the decks",
+              GENERAL_POOL.filter((card) => !(card.kind === "concept" && card.group)),
+            )}
+            {group(
+              "Group Concepts",
+              GENERAL_POOL.filter((card) => card.kind === "concept" && card.group),
+            )}
           </section>
         </section>
         <aside className="deck-browser-sidewall">

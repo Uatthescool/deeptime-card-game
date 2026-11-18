@@ -8,6 +8,7 @@ import {
   iceAgeInPlay,
   inIceAgeAftermath,
   nicheIsFrozen,
+  underwoolReduction,
   otherPlayer,
   VICTORY_THRESHOLD,
 } from "./core.ts";
@@ -19,6 +20,11 @@ function isStegosaur(definition: CreatureCard) {
 
 /** One named contribution to a Creature's Victory Levels, for showing players where the total comes from. */
 export type VictorySource = { label: string; amount: number };
+
+/** How much less each Event or Tag Victory Level decrease takes from this Creature: Spinal Sail's 1, doubled when Specialized. */
+function spinalSailRelief(definition: CreatureCard) {
+  return definition.tags.includes("Spinal Sail") ? tagEffectMultiplier(definition, "Spinal Sail") : 0;
+}
 
 /** The Victory Levels a Creature in play contributes, with every source that moved it from its Printed Level. */
 export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
@@ -48,15 +54,17 @@ export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
     value += amount;
     if (amount !== 0) sources.push({ label, amount });
   };
+  if (found && nicheIsFrozen(found.lane) && definition.tags.includes("Underwool")) {
+    add("Underwool (Frozen)", underwoolReduction(definition).frozenBonus);
+  }
   if (definition.tags.includes("Apex Predator")) {
     const apexCount = state.players
       .flatMap((player) => player.lanes)
       .filter((lane) => !nicheIsFrozen(lane) && lane.creature?.card.definition.tags.includes("Apex Predator")).length;
     const otherApexPredators = Math.max(0, apexCount - 1);
-    const protectedDecrease = definition.tags.includes("Spinal Sail")
-      ? Math.max(0, otherApexPredators - 1)
-      : otherApexPredators;
-    add("Apex Predator", Math.max(0, 2 - protectedDecrease));
+    const apex = tagEffectMultiplier(definition, "Apex Predator");
+    const decrease = Math.max(0, otherApexPredators * apex - spinalSailRelief(definition));
+    add("Apex Predator", Math.max(0, 2 * apex - decrease));
   }
   if (effectiveHasTag(definition, "Gigantic")) add("Gigantic", tagEffectMultiplier(definition, "Gigantic"));
   if (definition.printedLevel === 0) add("Cambrian Explosion", activeCambrianExplosions(state));
@@ -68,10 +76,10 @@ export function victoryBreakdown(state: GameState, creature: CreatureInPlay) {
   }
   // Spinal Sail takes 1 off each Event's Victory Level decrease, so it ignores Ice Age's as it does Drought's.
   if (iceAgeInPlay(state) && ICE_AGE_DIMINISHED_PERIODS.has(definition.period)) {
-    add("Ice Age", definition.tags.includes("Spinal Sail") ? 0 : -1);
+    add("Ice Age", Math.min(0, -1 + spinalSailRelief(definition)));
   }
   if (found && state.players[otherPlayer(found.playerId)].lanes[found.laneIndex]!.drought) {
-    add("Drought", definition.tags.includes("Spinal Sail") ? 0 : -1);
+    add("Drought", Math.min(0, -1 + spinalSailRelief(definition)));
   }
 
   if (value < 0) sources.push({ label: "Can't fall below 0", amount: -value });

@@ -1,6 +1,6 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 
 import {
   AI_PLACEHOLDER_ARTWORK_KEYS,
@@ -9,6 +9,10 @@ import {
   type ArtworkCredit,
   artworkPath,
   CARD_LIBRARY,
+  CONTINENTS,
+  continentFlags,
+  TAG_RULE_TEMPLATES,
+  tagRuleText,
   countsAsAquatic,
   CREATURES,
   DECK_2,
@@ -19,6 +23,7 @@ import {
   DECK_3_SUPPORTS,
   DECK_4,
   DECK_4_DECK,
+  DECK_5_DECK,
   DECK_4_SUPPORTS,
   DECKS,
   GENERAL_POOL,
@@ -51,7 +56,6 @@ import {
   chooseEngulf,
   chooseGreatDying,
   chooseFilterFeederTop,
-  chooseHerd,
   chooseNesting,
   chooseGeologicalBoundaryPeriod,
   chooseConceptOption,
@@ -68,7 +72,6 @@ import {
   getConceptChoiceOptions,
   GREAT_DYING_CONTINUE,
   greatDyingOptions,
-  getHerdOptions,
   getNestingOptions,
   getCarnianPluvialOptions,
   geologicalBoundaryOptions,
@@ -286,7 +289,7 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
     SUPPORTS.some((card) => card.key === "wildfire"),
     true,
   );
-  assert.equal(GENERAL_POOL.length, 15);
+  assert.equal(GENERAL_POOL.length, 30);
   assert.ok(
     ["competitive-exclusion-principle", "purussaurus", "epicyon", "diplocaulus", "dimetrodon", "cynognathus"].every(
       (key) => GENERAL_POOL.some((card) => card.key === key),
@@ -406,10 +409,10 @@ test("all Revision 2.0 decks contain 40 singleton cards and can be selected inde
 test("every card's artwork source is recorded and matches the files on disk", () => {
   const inspectableCards = [
     ...new Map(
-      [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
+      [...Object.values(DECKS).flat(), ...GENERAL_POOL, ...DECK_4_DECK, ...DECK_5_DECK].map((card) => [card.key, card]),
     ).values(),
   ];
-  assert.equal(inspectableCards.length, 133);
+  assert.equal(inspectableCards.length, 157);
   const inspectableKeys = new Set(inspectableCards.map((card) => card.key));
   for (const key of [...PENDING_ARTWORK_KEYS, ...AI_PLACEHOLDER_ARTWORK_KEYS]) {
     assert.ok(inspectableKeys.has(key), `The artwork registry names unknown card ${key}`);
@@ -492,7 +495,7 @@ test("Deck 4 holds 22 Creatures and 18 Supports, every one Locked", () => {
   assert.equal(DECK_4.length, 22);
   assert.deepEqual(
     [0, 1, 2, 3, 4].map((level) => DECK_4.filter((card) => card.printedLevel === level).length),
-    [2, 8, 7, 4, 1],
+    [2, 7, 8, 4, 1],
   );
   assert.equal(DECK_4_SUPPORTS.length, 18);
   assert.ok(DECK_4.every((card) => card.taxa.includes("Synapsid")));
@@ -2411,25 +2414,164 @@ test("Herd resolves before Nesting, triggers once per player, and Nesting ends t
   const mussaurus = putInHand(game, 0, "mussaurus");
   const protoceratops = putInHand(game, 0, "protoceratops");
   game.players[0].deck.push(takeCard(game, 0, "parasaurolophus"));
+  const handBefore = new Set(game.players[0].hand.map((card) => card.uid));
   game = playCreature(game, 0, mussaurus.uid, 2);
-  assert.ok(game.pendingHerd);
-  assert.equal(game.pendingNesting, null);
-  const herdNames = getHerdOptions(game).map((option) => option.label);
-  assert.ok(herdNames.includes("Parasaurolophus"));
-  assert.equal(herdNames.includes("Shantungosaurus"), false, "Herd cannot search more than one Printed Level higher");
-
-  game = chooseHerd(game, "__decline-herd__");
-  assert.equal(game.pendingHerd, null);
+  const added = game.players[0].hand.filter((card) => !handBefore.has(card.uid));
+  assert.equal(added.length, 1, "Herd puts 1 random Herd Creature into the hand, with no choice to make");
+  const found = added[0]!.definition as CreatureCard;
+  assert.ok(effectiveHasTag(found, "Herd"));
+  assert.ok(found.printedLevel <= 2, "Herd cannot find a Creature more than one Printed Level higher");
+  assert.ok(game.log.some((line) => line.includes("Mussaurus's Herd put 1 random Herd Creature")));
   assert.equal(game.pendingNesting?.stage, "card");
   assert.ok(getNestingOptions(game).some((option) => option.id === protoceratops.uid));
   game = chooseNesting(game, protoceratops.uid);
   assert.equal(game.pendingNesting?.stage, "lane");
   game = chooseNesting(game, "1");
   assert.equal(game.players[0].lanes[1].creature?.card.definition.key, "protoceratops");
-  assert.equal(game.pendingHerd, null, "the nested Herd bearer cannot trigger Herd a second time that turn");
+  assert.equal(
+    game.log.filter((line) => line.includes("'s Herd ")).length,
+    1,
+    "the nested Herd bearer cannot trigger Herd a second time that turn",
+  );
   assert.equal(game.activePlayer, 1);
   assert.equal(game.phase, "handoff");
   assert.ok(game.log.some((line) => line.includes("turn ends now that all entry effects have resolved")));
+});
+
+test("Herd always shuffles the deck after its pick, even when it finds nothing", () => {
+  let game = readyGame(["deck-2", "deck-2"]);
+  const mussaurus = putInHand(game, 0, "mussaurus");
+  game.players[0].deck = game.players[0].deck.filter(
+    (card) => !(card.definition.kind === "creature" && effectiveHasTag(card.definition, "Herd")),
+  );
+  const handSize = game.players[0].hand.length;
+  game = playCreature(game, 0, mussaurus.uid, 2);
+  assert.equal(game.players[0].hand.length, handSize - 1, "only Mussaurus left the hand");
+  assert.ok(
+    game.log.some((line) => line === "Mussaurus's Herd found no eligible Creature to add, then shuffled the deck."),
+  );
+});
+
+test("Herd's pick is random, and Specialized Herd puts 2 random Herd Creatures into the hand", () => {
+  const picks = new Set<string>();
+  for (let run = 0; run < 12; run++) {
+    let game = readyGame(["deck-2", "deck-2"]);
+    const mussaurus = putInHand(game, 0, "mussaurus");
+    const handBefore = new Set(game.players[0].hand.map((card) => card.uid));
+    game = playCreature(game, 0, mussaurus.uid, 2);
+    for (const card of game.players[0].hand) if (!handBefore.has(card.uid)) picks.add(card.definition.key);
+  }
+  assert.ok(picks.size > 1, "different games find different Herd Creatures");
+
+  let game = readyGame(["deck-2", "deck-2"]);
+  const mussaurus = putInHand(game, 0, "mussaurus");
+  mussaurus.definition = { ...(mussaurus.definition as CreatureCard), tags: ["Specialized", "Herd"] };
+  const handBefore = new Set(game.players[0].hand.map((card) => card.uid));
+  game = playCreature(game, 0, mussaurus.uid, 2);
+  const added = game.players[0].hand.filter((card) => !handBefore.has(card.uid));
+  assert.equal(added.length, 2);
+  assert.ok(added.every((card) => effectiveHasTag(card.definition as CreatureCard, "Herd")));
+  assert.ok(game.log.some((line) => line.includes("put 2 random Herd Creatures")));
+});
+
+test("Specialized doubles and stars every marked amount, and the engine doubles every Tag that marks one", () => {
+  const engineDir = new URL("../../src/engine/", import.meta.url);
+  const engineSource = readdirSync(engineDir)
+    .filter((file) => file.endsWith(".ts"))
+    .map((file) => readFileSync(new URL(file, engineDir), "utf8"))
+    .join("\n");
+  for (const [tag, template] of Object.entries(TAG_RULE_TEMPLATES)) {
+    assert.ok(!/[{}|]/.test(TAG_RULES[tag]!), `${tag}'s printed rules still show an amount mark`);
+    if (!/\{\d/.test(template)) continue;
+    const doubled = new RegExp(`tagEffectMultiplier\\([^()]*"${tag}"\\)`);
+    assert.ok(doubled.test(engineSource), `${tag} marks an amount for Specialized, but the engine never doubles it`);
+  }
+  const specialized = (key: string, tag: string) => {
+    const card = CARD_LIBRARY.get(key) as CreatureCard;
+    return tagRuleText({ ...card, tags: ["Specialized", tag] }, tag)!;
+  };
+  assert.equal(
+    tagRuleText(CARD_LIBRARY.get("livyatan") as CreatureCard, "Diver"),
+    "Gets +200* Battle Power while attacking a Creature with the Aquatic Tag.",
+  );
+  assert.equal(
+    tagRuleText(CARD_LIBRARY.get("livyatan") as CreatureCard, "Apex Predator"),
+    TAG_RULES["Apex Predator"],
+    "only the Tag right after Specialized",
+  );
+  assert.equal(
+    tagRuleText(CARD_LIBRARY.get("blue-whale") as CreatureCard, "Gigantic"),
+    "Cannot be Hunted by Level 1 or lower Creatures and contributes +2* Victory Levels.",
+    "thresholds stay as printed",
+  );
+  assert.ok(
+    TAG_RULES["Herd"]!.includes(
+      "put 1 random Herd Creature from your deck whose Printed Level is no more than 1 higher",
+    ),
+  );
+  assert.ok(
+    specialized("woolly-mammoth", "Herd").includes(
+      "put 2* random Herd Creatures from your deck whose Printed Level is no more than 1 higher",
+    ),
+  );
+  assert.ok(specialized("mamenchisaurus", "Overreach").includes("draw 2* additional cards"));
+  assert.ok(specialized("blue-whale", "Filter Feeder").includes("look at the top 4* cards"));
+  const circle = specialized("steppe-bison", "Circle Defense");
+  for (const part of [
+    "+200* Battle Power for each friendly Herd",
+    "−100* for each",
+    "(−200* if",
+    "Level 0–1 Creatures get +200*",
+  ])
+    assert.ok(circle.includes(part), `Specialized Circle Defense reads "${part}"`);
+  assert.ok(specialized("dimetrodon", "Apex Predator").includes("+4* Victory Levels, reduced by 2* for each"));
+});
+
+test("Specialized doubles the engine's numbers for Tags that used to stay fixed", () => {
+  // Solitary: +100 becomes +200.
+  let game = readyGame(["deck-4", "deck-4"]);
+  const rhino = placeCreature(game, 0, 1, "woolly-rhino");
+  const hunter = placeCreature(game, 1, 1, "smilodon");
+  const plain = inspectBattlePower(game, rhino.card.uid, "defender", hunter.card.uid)!;
+  rhino.card.definition = { ...(rhino.card.definition as CreatureCard), tags: ["Specialized", "Solitary"] };
+  assert.equal(inspectBattlePower(game, rhino.card.uid, "defender", hunter.card.uid), plain + 100);
+
+  // Circle Defense: +100 per Herd Creature becomes +200.
+  game = readyGame(["deck-4", "deck-4"]);
+  const bison = placeCreature(game, 0, 1, "steppe-bison");
+  placeCreature(game, 0, 3, "woolly-mammoth");
+  const smilodon = placeCreature(game, 1, 1, "smilodon");
+  bison.card.definition = {
+    ...(bison.card.definition as CreatureCard),
+    tags: ["Underwool", "Specialized", "Circle Defense"],
+  };
+  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", smilodon.card.uid), 200 + 400);
+
+  // Apex Predator: +2 Victory Levels becomes +4.
+  game = readyGame(["deck-4", "deck-4"]);
+  const cat = placeCreature(game, 0, 1, "smilodon");
+  const before = cardVictoryLevel(game, cat);
+  cat.card.definition = {
+    ...(cat.card.definition as CreatureCard),
+    tags: ["Ambush", "Raptorial", "Specialized", "Apex Predator"],
+  };
+  assert.equal(cardVictoryLevel(game, cat), before + 2);
+});
+
+test("Filter Feeder places each looked-at card in turn, so a Specialized one can order the top 4", () => {
+  let game = readyGame(["deck-3", "deck-3"]);
+  const deck = game.players[0].deck;
+  const [a, b, c, d] = deck.slice(0, 4).map((card) => card.uid);
+  game.pendingFilterFeeder = { playerId: 0, sourceUid: "none", cardUids: [a!, b!, c!, d!], placed: 0 };
+  game = chooseFilterFeederTop(game, d!);
+  assert.deepEqual(game.pendingFilterFeeder?.cardUids, [a, b, c]);
+  game = chooseFilterFeederTop(game, b!);
+  game = chooseFilterFeederTop(game, a!);
+  assert.equal(game.pendingFilterFeeder, null, "the last card falls into place");
+  assert.deepEqual(
+    game.players[0].deck.slice(0, 4).map((card) => card.uid),
+    [d, b, a, c],
+  );
 });
 
 test("Specialized Deimatic protects Therizinosaurus through two opposing turns", () => {
@@ -3266,4 +3408,36 @@ test("Eoraptor's Ancestor opens a same-turn Sauropodomorph line that stops at Le
 
 test("Protoceratops has Herd, Retaliation, and Bastion", () => {
   assert.deepEqual(DECK_2.find((card) => card.key === "protoceratops")?.tags, ["Herd", "Retaliation", "Bastion"]);
+});
+
+test("continent marks name real continents, each with its silhouette", () => {
+  const known = new Set<string>(CONTINENTS);
+  const marked = [...CARD_LIBRARY.values()].filter((card) => card.kind === "creature" && card.continents?.length);
+  assert.ok(marked.length >= 7, "the first North America cards carry the mark");
+  for (const card of marked) {
+    if (card.kind !== "creature") continue;
+    assert.equal(new Set(card.continents).size, card.continents!.length, `${card.name} repeats a continent`);
+    for (const continent of card.continents!) {
+      assert.ok(known.has(continent), `${card.name} names unknown continent ${continent}`);
+      const file = `../../design/icons/continents/${continent.toLowerCase().replace(/\s+/g, "-")}.png`;
+      assert.ok(existsSync(new URL(file, import.meta.url)), `No silhouette for ${continent}`);
+    }
+  }
+  assert.deepEqual((CARD_LIBRARY.get("tyrannosaurus-rex") as { continents?: string[] }).continents, ["North America"]);
+});
+
+test("three or more continents make a Creature Widespread, which counts as none of them", () => {
+  const flags = (key: string) => continentFlags(CARD_LIBRARY.get(key) as CreatureCard);
+  assert.deepEqual(flags("tyrannosaurus-rex"), ["North America"]);
+  assert.deepEqual(flags("smilodon"), ["North America", "South America"]);
+  assert.deepEqual(flags("lystrosaurus"), ["Widespread"]);
+  assert.deepEqual(flags("woolly-mammoth"), ["Widespread"]);
+});
+
+test("living species are Quaternary", () => {
+  const living = [...CARD_LIBRARY.values()].filter((card) => card.kind === "creature" && card.living);
+  assert.ok(living.length >= 6);
+  for (const card of living)
+    assert.equal(card.kind === "creature" && card.period, "Quaternary", `${card.name} is living`);
+  assert.deepEqual((CARD_LIBRARY.get("hippopotamus") as { continents?: string[] }).continents, ["Africa", "Europe"]);
 });

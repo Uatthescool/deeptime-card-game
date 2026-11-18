@@ -149,9 +149,21 @@ export function underwoolEntry(state: GameState, playerId: PlayerId, laneIndex: 
   );
 }
 
-/** The Level a Creature is played at: its Printed Level, or 1 lower when Underwool lets it into a Frozen Niche. */
+/**
+ * Underwool's reduction, 1 Level (2 when Specialized): `applied` is how far it actually lowers the Creature, never
+ * below Level 1. If the Level 1 floor stopped any of it, the Creature gains `frozenBonus` Victory Levels while Frozen
+ * instead: +1, or +2 when Specialized.
+ */
+export function underwoolReduction(creature: CreatureCard) {
+  const multiplier = creature.tags.includes("Underwool") ? tagEffectMultiplier(creature, "Underwool") : 0;
+  const applied = Math.min(multiplier, Math.max(0, creature.printedLevel - 1));
+  return { applied, frozenBonus: applied < multiplier ? multiplier : 0 };
+}
+
+/** The Level a Creature is played at: its Printed Level, lowered by Underwool when it enters a Frozen Niche. */
 export function playLevel(state: GameState, playerId: PlayerId, laneIndex: number, creature: CreatureCard) {
-  return creature.printedLevel - (underwoolEntry(state, playerId, laneIndex, creature) ? 1 : 0);
+  if (!underwoolEntry(state, playerId, laneIndex, creature)) return creature.printedLevel;
+  return creature.printedLevel - underwoolReduction(creature).applied;
 }
 
 /** Whether nothing can be done with or to this Niche's Creature: it is Frozen or Burrowed. */
@@ -378,11 +390,30 @@ export function drawOne(state: GameState, playerId: PlayerId, reason: string): C
 }
 
 export function sendCardToHistory(state: GameState, card: CardInstance, reason = "effect") {
+  // Dead End sees the History Pile as it was before this card arrived, so the card or Concept that sent it
+  // here is never yet a choice.
+  queueDeadEnd(state, card);
   state.players[card.owner].history.push(card);
   if (card.definition.key === "dental-battery") {
     drawOne(state, card.owner, "Dental Battery");
     addLog(state, `${state.players[card.owner].name} drew 1 card because Dental Battery entered History (${reason}).`);
   }
+}
+
+/**
+ * Dead End: when a Creature with it goes to its owner's History Pile from anywhere, that player may return a
+ * Concept from their History Pile to their hand. Once per turn across all their Creatures; a trigger with no
+ * Concept to choose doesn't use it up.
+ */
+function queueDeadEnd(state: GameState, card: CardInstance) {
+  if (card.definition.kind !== "creature" || !card.definition.tags.includes("Dead End")) return;
+  const player = state.players[card.owner];
+  if (player.deadEndUsedTurn === state.turnNumber) return;
+  const conceptUids = player.history.filter((entry) => entry.definition.kind === "concept").map((entry) => entry.uid);
+  if (!conceptUids.length) return;
+  player.deadEndUsedTurn = state.turnNumber;
+  (state.deadEndQueue ??= []).push({ playerId: card.owner, sourceName: card.definition.name, conceptUids });
+  addLog(state, `${card.definition.name}'s Dead End lets ${player.name} return a Concept from History.`);
 }
 
 function moveAdaptationSlotToHistory(state: GameState, lane: LaneState) {
@@ -430,6 +461,19 @@ export function sendCreatureToHistory(
     addLog(state, `${card.definition.name} was marked for its once-per-game Living Fossil return.`);
   }
   resolveScavenger(state, playerId, laneIndex, huntInitiatorUid);
+  return card;
+}
+
+/** Returns the Creature in a Niche to its owner's hand; its Adaptation Slot goes to History, and it has left play. */
+export function returnCreatureToHand(state: GameState, playerId: PlayerId, laneIndex: number) {
+  const player = state.players[playerId];
+  const lane = player.lanes[laneIndex]!;
+  if (!lane.creature) return null;
+  moveAdaptationSlotToHistory(state, lane);
+  const card = lane.creature.card;
+  lane.creature = null;
+  player.hand.push(card);
+  resolveScavenger(state, playerId, laneIndex, null);
   return card;
 }
 
@@ -493,7 +537,6 @@ export function resolutionBlocked(state: GameState) {
   return Boolean(
     state.handoff ||
     state.pendingBattle ||
-    state.pendingHerd ||
     state.pendingNesting ||
     state.entryEffectQueue.length ||
     state.pendingCranialDisplay ||
@@ -504,7 +547,8 @@ export function resolutionBlocked(state: GameState) {
     state.pendingFilterFeeder ||
     state.pendingGeologicalBoundary ||
     state.pendingGreatDying ||
-    state.pendingEngulf,
+    state.pendingEngulf ||
+    state.deadEndQueue?.length,
   );
 }
 

@@ -125,7 +125,8 @@ export function determinize(state: GameState, me: PlayerId, seed: number): GameS
   opponent.deck = pool.slice(opponent.hand.length);
 
   const own = copy.players[me];
-  const revealed = copy.pendingBiodiversity?.playerId === me || copy.pendingFilterFeeder?.playerId === me ? 2 : 0;
+  const feeder = copy.pendingFilterFeeder?.playerId === me ? copy.pendingFilterFeeder : null;
+  const revealed = feeder ? feeder.placed + feeder.cardUids.length : copy.pendingBiodiversity?.playerId === me ? 2 : 0;
   own.deck = [...own.deck.slice(0, revealed), ...shuffleInPlace(own.deck.slice(revealed).sort(byUid), random)];
   copy.rng = Math.floor(random() * 0xffffffff) >>> 0;
   return copy;

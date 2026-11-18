@@ -88,15 +88,15 @@ describe("App", () => {
     const browserCard = (name: string) =>
       screen.getAllByRole("article", { name: new RegExp(`^${name},`) })[0]!.closest("button")!;
 
-    await user.click(browserCard("Spinosaurus"));
-    const enlarged = screen.getByRole("dialog", { name: "Spinosaurus card" });
-    expect(within(enlarged).getByRole("img", { name: "Spinosaurus card" })).toHaveAttribute(
+    await user.click(browserCard("Carnotaurus"));
+    const enlarged = screen.getByRole("dialog", { name: "Carnotaurus card" });
+    expect(within(enlarged).getByRole("img", { name: "Carnotaurus card" })).toHaveAttribute(
       "src",
-      expect.stringContaining("/card-faces/spinosaurus.webp"),
+      expect.stringContaining("/card-faces/carnotaurus.webp"),
     );
     expect(within(enlarged).getByText("Placeholder art · AI-generated")).toBeInTheDocument();
     await user.keyboard("{Escape}");
-    expect(screen.queryByRole("dialog", { name: "Spinosaurus card" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Carnotaurus card" })).not.toBeInTheDocument();
 
     // Support cards have finished faces too.
     await user.click(browserCard("Wildfire"));

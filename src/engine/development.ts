@@ -36,6 +36,7 @@ import { flipCoin, shuffle } from "./rng.ts";
 import { continueStampede, endTurn, finishResolution } from "./turn.ts";
 import type {
   AdaptationInstance,
+  CardInstance,
   ChoiceOption,
   ConvergentCategory,
   CreatureInPlay,
@@ -165,6 +166,39 @@ function playCreatureWithSource(
     );
   }
   return finishResolution(state);
+}
+
+/** The state an extra Creature play granted by a card is judged in: as if no Creature had been played this turn. */
+function extraPlayProbe(state: GameState, playerId: PlayerId) {
+  const probe = clone(state);
+  probe.pendingConceptChoice = null;
+  const allowances = probe.players[playerId].allowances;
+  allowances.creaturePlayed = false;
+  allowances.filledEmpty = false;
+  allowances.rapidSpeciation = false;
+  allowances.convergentEvolution = false;
+  return probe;
+}
+
+/** Niches where a card-granted extra Creature play could put the card, following the normal placement rules. */
+export function extraPlayLanes(state: GameState, playerId: PlayerId, card: CardInstance): number[] {
+  return legalCreatureLanes(extraPlayProbe(state, playerId), playerId, card);
+}
+
+/**
+ * An extra Creature play granted by a card (Kaleidoscope of Butterflies, Tower of Giraffes): any placement legal
+ * as a Creature play, without using the normal play or the turn's one empty-Niche fill.
+ */
+export function playExtraCreature(state: GameState, playerId: PlayerId, cardUid: string, laneIndex: number) {
+  const before = state.players[playerId].allowances;
+  const next = playCreatureWithSource(extraPlayProbe(state, playerId), playerId, cardUid, laneIndex, "normal");
+  const after = next.players[playerId].allowances;
+  after.creaturePlayed = before.creaturePlayed;
+  after.filledEmpty = before.filledEmpty;
+  after.rapidSpeciation = before.rapidSpeciation;
+  after.convergentEvolution = before.convergentEvolution;
+  next.pendingConceptChoice = structuredClone(state.pendingConceptChoice);
+  return next;
 }
 
 export function playCreature(

@@ -45,6 +45,17 @@ This builds `design/support-faces/<key>.png` on the same frame, changed for Supp
 - **Footer:** the type, as the game names it, for example "Instantaneous Event".
 - **Not on the face:** rulings and work-in-progress notes.
 
+## Continent mark
+
+A Creature's `continents` (in the card data) are the present-day continents where its fossils have been found. On the face:
+
+- **Stamp:** each continent's silhouette from `icons/continents/<continent>.png`, in the lettering ink, in the bottom-right corner of the flavor panel. It sits 20 px from the panel's inner right edge and 20 px from its bottom edge. Each continent is 104 px on its long side; several sit side by side, 6 px apart, with their bottoms aligned. They stay full size whenever they fit the room between the centred footer rule and the right margin (about 273 px, so any two continents fit) and shrink together only as much as needed beyond that. A Creature found on three or more continents is **Widespread**: it gets a single globe (`icons/continents/world.png`) in place of the individual marks, and in play it counts as Widespread, a place of its own, and as none of its continents (`continentFlags` in the card data). The card preview shows "Widespread" followed by every continent.
+- **Footer:** the period and the gold rule above it are centred between the Level badge and the stamp.
+- **Flavor text:** lines whose letters reach the stamp's height stop 18 px short of it.
+- **Cards without continents yet:** keep the period on the right, as before.
+
+`--continents north-america[,asia…]` overrides the data, for trying a layout. A card whose art is CC BY-SA in the attribution manifest automatically gets the "no card art" placeholder on its face. The game shows the same list as "Fossils found" in the card preview.
+
 ## Checking a card
 
 ```bash

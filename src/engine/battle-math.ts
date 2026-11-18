@@ -300,39 +300,51 @@ export type BattleNumbers = {
   defenderNotes: string[];
 };
 
-/** Neighbours whose Bastion shields Level 0–1 Creatures: Level 2+ Bastion, or Circle Defense at any Level. */
-function adjacentHighBastionCount(state: GameState, playerId: PlayerId, laneIndex: number) {
+/**
+ * The shield from neighbours whose Bastion protects Level 0–1 Creatures (Level 2+ Bastion, or Circle Defense at any
+ * Level): +100 each, doubled by a Specialized Bastion or Circle Defense.
+ */
+function adjacentBastionBonus(state: GameState, playerId: PlayerId, laneIndex: number) {
   const lanes = state.players[playerId].lanes;
-  return [lanes[laneIndex - 1], lanes[laneIndex + 1]].filter((lane) => {
+  let bonus = 0;
+  for (const lane of [lanes[laneIndex - 1], lanes[laneIndex + 1]]) {
     const definition = lane?.creature?.card.definition;
-    return (
-      !nicheIsFrozen(lane) &&
-      definition &&
-      effectiveHasTag(definition, "Bastion") &&
-      (definition.printedLevel >= 2 || definition.tags.includes("Circle Defense"))
-    );
-  }).length;
+    if (!definition || nicheIsFrozen(lane) || !effectiveHasTag(definition, "Bastion")) continue;
+    if (definition.tags.includes("Circle Defense"))
+      bonus += tagEffectMultiplier(definition, "Circle Defense") * BATTLE_POWER_PER_LEVEL;
+    else if (definition.printedLevel >= 2) bonus += tagEffectMultiplier(definition, "Bastion") * BATTLE_POWER_PER_LEVEL;
+  }
+  return bonus;
 }
 
 /**
  * Circle Defense's Bastion, each time its Creature is Hunted: +100 Battle Power per friendly Herd Creature in play,
  * itself included, and −50 per opposing Carnivore other than the hunter (−100 for a Pack Hunter); never below 0.
  */
-function circleDefenseBonus(state: GameState, ownerId: PlayerId, hunterUid: string) {
+function circleDefenseBonus(state: GameState, ownerId: PlayerId, hunterUid: string, definition: CreatureCard) {
+  const multiplier = tagEffectMultiplier(definition, "Circle Defense");
   const herds = state.players[ownerId].lanes.filter(
     (lane) => lane.creature && effectiveHasTag(lane.creature.card.definition, "Herd"),
   ).length;
   let penalty = 0;
   for (const lane of state.players[otherPlayer(ownerId)].lanes) {
-    const definition = lane.creature?.card.definition;
-    if (!definition || lane.creature!.card.uid === hunterUid || !countsAsCarnivore(definition)) continue;
-    penalty += definition.tags.includes("Pack Hunter") ? BATTLE_POWER_PER_LEVEL : BATTLE_POWER_PER_LEVEL / 2;
+    const carnivore = lane.creature?.card.definition;
+    if (!carnivore || lane.creature!.card.uid === hunterUid || !countsAsCarnivore(carnivore)) continue;
+    penalty +=
+      multiplier * (carnivore.tags.includes("Pack Hunter") ? BATTLE_POWER_PER_LEVEL : BATTLE_POWER_PER_LEVEL / 2);
   }
-  const bonus = Math.max(0, herds * BATTLE_POWER_PER_LEVEL - penalty);
+  const bonus = Math.max(0, herds * multiplier * BATTLE_POWER_PER_LEVEL - penalty);
   return {
     bonus,
     note: `Circle Defense +${bonus} (${herds} Herd${penalty ? `, −${penalty} for other Carnivores` : ""})`,
   };
+}
+
+/** Shell's or Dermal Armor's +100 while defending, doubled when Specialized. */
+function hardShellBonus(definition: CreatureCard, tag: "Shell" | "Dermal Armor") {
+  const multiplier =
+    tag === "Shell" ? tagEffectMultiplier(definition, "Shell") : tagEffectMultiplier(definition, "Dermal Armor");
+  return multiplier * BATTLE_POWER_PER_LEVEL;
 }
 
 export function calculateBattleNumbers(
@@ -361,27 +373,32 @@ export function calculateBattleNumbers(
     attackerDef.tags.includes("Solitary") &&
     hasNoAdjacentFriendly(state, attackerFound.playerId, attackerFound.laneIndex)
   ) {
-    attackerPower += BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Solitary +100");
+    const bonus = tagEffectMultiplier(attackerDef, "Solitary") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
+    attackerNotes.push(`Solitary +${bonus}`);
   }
   if (
     defenderDef.tags.includes("Solitary") &&
     hasNoAdjacentFriendly(state, defenderFound.playerId, defenderFound.laneIndex)
   ) {
-    defenderPower += BATTLE_POWER_PER_LEVEL;
-    defenderNotes.push("Solitary +100");
+    const bonus = tagEffectMultiplier(defenderDef, "Solitary") * BATTLE_POWER_PER_LEVEL;
+    defenderPower += bonus;
+    defenderNotes.push(`Solitary +${bonus}`);
   }
   if (attackerDef.tags.includes("Bruiser") && defenderDef.printedLevel >= 2) {
-    attackerPower += BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Bruiser +100");
+    const bonus = tagEffectMultiplier(attackerDef, "Bruiser") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
+    attackerNotes.push(`Bruiser +${bonus}`);
   }
   if (attackerDef.tags.includes("Small Game Hunter") && defenderDef.printedLevel === 0) {
-    attackerPower += BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Small Game Hunter +100");
+    const bonus = tagEffectMultiplier(attackerDef, "Small Game Hunter") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
+    attackerNotes.push(`Small Game Hunter +${bonus}`);
   }
   if (attackerDef.tags.includes("Pack Hunter") && targetAlreadyAttacked) {
-    attackerPower += BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Pack Hunter +100");
+    const bonus = tagEffectMultiplier(attackerDef, "Pack Hunter") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
+    attackerNotes.push(`Pack Hunter +${bonus}`);
   }
   if (attackerDef.tags.includes("Diver") && hasPrintedAquatic(defenderDef)) {
     const diverBonus = tagEffectMultiplier(attackerDef, "Diver") * BATTLE_POWER_PER_LEVEL;
@@ -389,8 +406,9 @@ export function calculateBattleNumbers(
     attackerNotes.push(`Diver +${diverBonus}`);
   }
   if (attacker.mobFeederBonusTurn === state.turnNumber) {
-    attackerPower += BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Mob Feeder +100");
+    const bonus = tagEffectMultiplier(attackerDef, "Mob Feeder") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
+    attackerNotes.push(`Mob Feeder +${bonus}`);
   }
   if (attackerDef.tags.includes("Rivalry") && sameLane) {
     const bonus = tagEffectMultiplier(attackerDef, "Rivalry") * BATTLE_POWER_PER_LEVEL;
@@ -413,12 +431,14 @@ export function calculateBattleNumbers(
     defenderNotes.push(`Armament +${bonus}`);
   }
   if (attackerDef.tags.includes("Visual") && !attacker.visualUsed) {
-    attackerPower += BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Visual +100");
+    const bonus = tagEffectMultiplier(attackerDef, "Visual") * BATTLE_POWER_PER_LEVEL;
+    attackerPower += bonus;
+    attackerNotes.push(`Visual +${bonus}`);
   }
   if (defenderDef.tags.includes("Visual") && !defender.visualUsed) {
-    defenderPower += BATTLE_POWER_PER_LEVEL;
-    defenderNotes.push("Visual +100");
+    const bonus = tagEffectMultiplier(defenderDef, "Visual") * BATTLE_POWER_PER_LEVEL;
+    defenderPower += bonus;
+    defenderNotes.push(`Visual +${bonus}`);
   }
   const attackerPeriodBonus =
     state.periodAuras.filter((aura) => aura.period === attackerDef.period).length * BATTLE_POWER_PER_LEVEL;
@@ -468,8 +488,9 @@ export function calculateBattleNumbers(
     !attackerDef.tags.includes("Ambush") &&
     !attackerDef.tags.includes("Sovereign")
   ) {
-    attackerPower -= BATTLE_POWER_PER_LEVEL;
-    attackerNotes.push("Aerial defense -100");
+    const penalty = tagEffectMultiplier(defenderDef, "Aerial") * BATTLE_POWER_PER_LEVEL;
+    attackerPower -= penalty;
+    attackerNotes.push(`Aerial defense -${penalty}`);
   }
 
   if (offensiveCoinSuccesses > 0) {
@@ -481,9 +502,11 @@ export function calculateBattleNumbers(
   // Reactive defense Tags. Crushing Bite reduces only this pool.
   let defenderTagDefenseBonus = 0;
   if (defenderHas("Shell") || defenderHas("Dermal Armor")) {
-    defenderOwnReactiveBonus += BATTLE_POWER_PER_LEVEL;
-    defenderTagDefenseBonus += BATTLE_POWER_PER_LEVEL;
-    defenderNotes.push(`${defenderHas("Shell") ? "Shell" : "Dermal Armor"} +100`);
+    const tag = defenderHas("Shell") ? "Shell" : "Dermal Armor";
+    const bonus = hardShellBonus(defenderDef, tag);
+    defenderOwnReactiveBonus += bonus;
+    defenderTagDefenseBonus += bonus;
+    defenderNotes.push(`${tag} +${bonus}`);
   }
   if (defenderHas("Osteoderm")) {
     const bonus = 2 * tagEffectMultiplier(defenderDef, "Osteoderm") * BATTLE_POWER_PER_LEVEL;
@@ -491,7 +514,7 @@ export function calculateBattleNumbers(
     defenderNotes.push(`Osteoderm +${bonus}`);
   }
   if (defenderHas("Bastion") && defenderDef.tags.includes("Circle Defense")) {
-    const circle = circleDefenseBonus(state, defenderFound.playerId, attacker.card.uid);
+    const circle = circleDefenseBonus(state, defenderFound.playerId, attacker.card.uid, defenderDef);
     defenderOwnReactiveBonus += circle.bonus;
     defenderTagDefenseBonus += circle.bonus;
     defenderNotes.push(circle.note);
@@ -507,7 +530,7 @@ export function calculateBattleNumbers(
   }
   const defenderBastions =
     defenderDef.printedLevel <= 1 && !defenseIgnored(ignoreDefenses, "Bastion")
-      ? adjacentHighBastionCount(state, defenderFound.playerId, defenderFound.laneIndex) * BATTLE_POWER_PER_LEVEL
+      ? adjacentBastionBonus(state, defenderFound.playerId, defenderFound.laneIndex)
       : 0;
   if (defenderBastions) {
     defenderTagDefenseBonus += defenderBastions;
@@ -533,9 +556,11 @@ export function calculateBattleNumbers(
   // Stampede inverts defensive Tags: a stampeding Herbivore attacks with them.
   if (origin === "stampede") {
     if (attackerDef.tags.includes("Shell") || attackerDef.tags.includes("Dermal Armor")) {
-      attackerOwnReactiveBonus += BATTLE_POWER_PER_LEVEL;
-      attackerPower += BATTLE_POWER_PER_LEVEL;
-      attackerNotes.push(`Stampede ${attackerDef.tags.includes("Shell") ? "Shell" : "Dermal Armor"} +100`);
+      const tag = attackerDef.tags.includes("Shell") ? "Shell" : "Dermal Armor";
+      const bonus = hardShellBonus(attackerDef, tag);
+      attackerOwnReactiveBonus += bonus;
+      attackerPower += bonus;
+      attackerNotes.push(`Stampede ${tag} +${bonus}`);
     }
     if (attackerDef.tags.includes("Osteoderm")) {
       const bonus = 2 * tagEffectMultiplier(attackerDef, "Osteoderm") * BATTLE_POWER_PER_LEVEL;
@@ -544,7 +569,7 @@ export function calculateBattleNumbers(
     }
     if (attackerDef.tags.includes("Circle Defense")) {
       // Inverted for Stampede: its circle counts the opposing Carnivores other than the Creature it Hunts.
-      const circle = circleDefenseBonus(state, attackerFound.playerId, defender.card.uid);
+      const circle = circleDefenseBonus(state, attackerFound.playerId, defender.card.uid, attackerDef);
       attackerOwnReactiveBonus += circle.bonus;
       attackerPower += circle.bonus;
       attackerNotes.push(`Stampede ${circle.note}`);
@@ -559,9 +584,7 @@ export function calculateBattleNumbers(
       attackerNotes.push(`Stampede Bastion +${bonus}`);
     }
     const attackerBastions =
-      attackerDef.printedLevel <= 1
-        ? adjacentHighBastionCount(state, attackerFound.playerId, attackerFound.laneIndex) * BATTLE_POWER_PER_LEVEL
-        : 0;
+      attackerDef.printedLevel <= 1 ? adjacentBastionBonus(state, attackerFound.playerId, attackerFound.laneIndex) : 0;
     if (attackerBastions) {
       attackerPower += attackerBastions;
       attackerNotes.push(`Stampede adjacent Bastion +${attackerBastions}`);
@@ -701,7 +724,7 @@ export function liveBattlePower(state: GameState, creatureUid: string) {
     sources.push({ label, amount });
   };
   if (definition.tags.includes("Solitary") && hasNoAdjacentFriendly(state, found.playerId, found.laneIndex)) {
-    add("Solitary", BATTLE_POWER_PER_LEVEL);
+    add("Solitary", tagEffectMultiplier(definition, "Solitary") * BATTLE_POWER_PER_LEVEL);
   }
   add(
     "Geological Boundary",

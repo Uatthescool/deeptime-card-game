@@ -1,4 +1,4 @@
-import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
+import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period, Continent } from "./types";
 
 const STATUS = "Locked" as const;
 
@@ -13,6 +13,8 @@ type DeckFourCreature = {
   taxa: string[];
   tags: string[];
   flavorText: string;
+  living?: boolean;
+  continents?: Continent[];
   cardFace?: string;
 };
 
@@ -35,6 +37,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Paleogene",
+    continents: ["Asia"],
     periodColor: "Magenta",
     taxa: ["Artiodactyl", "Cetacean", "Pakicetid"],
     tags: ["Semi-Aquatic", "Transitional"],
@@ -49,6 +52,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Paleogene",
+    continents: ["Africa"],
     periodColor: "Magenta",
     taxa: ["Proboscidean", "Elephantiform"],
     tags: ["Transitional"],
@@ -60,9 +64,10 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     key: "steppe-bison",
     name: "Steppe Bison",
     scientificName: "Bison priscus",
-    printedLevel: 1,
+    printedLevel: 2,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["Europe", "Asia", "North America"],
     periodColor: "Ice Blue",
     taxa: ["Artiodactyl", "Bovid", "Bovine"],
     tags: ["Underwool", "Circle Defense"],
@@ -77,6 +82,8 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Quaternary",
+    living: true,
+    continents: ["Asia"],
     periodColor: "Ice Blue",
     taxa: ["Artiodactyl", "Camelid", "Cameline"],
     tags: ["Herd", "Underwool", "Retention"],
@@ -91,6 +98,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["North America"],
     periodColor: "Ice Blue",
     taxa: ["Rodent", "Castorid"],
     tags: ["Semi-Aquatic", "Generalist"],
@@ -105,6 +113,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["South America"],
     periodColor: "Ice Blue",
     taxa: ["Xenarthran", "Cingulate", "Glyptodont"],
     tags: ["Osteoderm"],
@@ -119,6 +128,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Paleogene",
+    continents: ["North America"],
     periodColor: "Magenta",
     taxa: ["Hyaenodont", "Hyaenodontid"],
     tags: ["Apex Predator", "Mob Feeder"],
@@ -133,6 +143,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Paleogene",
+    continents: ["Asia"],
     periodColor: "Magenta",
     taxa: ["Artiodactyl", "Cetacean", "Ambulocetid"],
     tags: ["Semi-Aquatic", "Ambush"],
@@ -147,6 +158,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["North America"],
     periodColor: "Ice Blue",
     taxa: ["Proboscidean", "Mammutid"],
     tags: ["Gigantic", "Herd"],
@@ -161,6 +173,8 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Quaternary",
+    living: true,
+    continents: ["Africa", "Europe"],
     periodColor: "Ice Blue",
     taxa: ["Artiodactyl", "Hippopotamid"],
     tags: ["Semi-Aquatic", "Territorial", "Herd"],
@@ -175,6 +189,7 @@ export const DECK_4_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["Europe", "Asia"],
     periodColor: "Ice Blue",
     taxa: ["Perissodactyl", "Rhinocerotoid", "Rhinocerotid"],
     tags: ["Charge", "Solitary", "Underwool"],

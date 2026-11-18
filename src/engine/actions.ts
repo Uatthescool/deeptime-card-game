@@ -11,6 +11,7 @@ import {
 import { legalAttackTargets } from "./battle-math.ts";
 import { chooseConceptOption, getConceptChoiceOptions, playConcept, returnFeedbackLoops } from "./concepts.ts";
 import { isGameOver, markSettledNiches, otherPlayer } from "./core.ts";
+import { chooseDeadEnd, getDeadEndOptions, pendingDeadEnd } from "./dead-end.ts";
 import {
   activateCarnianPluvialEpisode,
   chooseCarnianPluvialOption,
@@ -32,9 +33,7 @@ import {
 import {
   chooseCranialDisplayTarget,
   chooseFilterFeederTop,
-  chooseHerd,
   chooseNesting,
-  getHerdOptions,
   getNestingOptions,
 } from "./entry-effects.ts";
 import {
@@ -87,7 +86,6 @@ export type GameAction =
   | { type: "playConcept"; cardUid: string }
   | { type: "chooseConceptOption"; optionId: string }
   | { type: "returnFeedbackLoops"; cardUid: string }
-  | { type: "chooseHerd"; optionId: string }
   | { type: "chooseNesting"; optionId: string }
   | { type: "chooseFilterFeederTop"; cardUid: string }
   | { type: "chooseCranialDisplayTarget"; targetUid: string }
@@ -97,6 +95,7 @@ export type GameAction =
   | { type: "rerollBattleCoin"; playerId: PlayerId; group: CoinGroup; index: number }
   | { type: "commitHunt" }
   | { type: "chooseEngulf"; accept: boolean }
+  | { type: "chooseDeadEnd"; optionId: string }
   | { type: "advanceToBattle" }
   | { type: "endTurn" }
   | { type: "fullHandMulligan" }
@@ -111,6 +110,8 @@ export function applyAction(state: GameState, action: GameAction): GameState {
 }
 
 function reduce(state: GameState, action: GameAction): GameState {
+  // A waiting Dead End resolves before anything else continues.
+  if (pendingDeadEnd(state) && action.type !== "chooseDeadEnd" && action.type !== "concede") return state;
   switch (action.type) {
     case "acknowledgeHandoff":
       return acknowledgeHandoff(state);
@@ -148,8 +149,6 @@ function reduce(state: GameState, action: GameAction): GameState {
       return chooseConceptOption(state, action.optionId);
     case "returnFeedbackLoops":
       return returnFeedbackLoops(state, action.cardUid);
-    case "chooseHerd":
-      return chooseHerd(state, action.optionId);
     case "chooseNesting":
       return chooseNesting(state, action.optionId);
     case "chooseFilterFeederTop":
@@ -168,6 +167,8 @@ function reduce(state: GameState, action: GameAction): GameState {
       return commitBattle(state);
     case "chooseEngulf":
       return chooseEngulf(state, action.accept);
+    case "chooseDeadEnd":
+      return chooseDeadEnd(state, action.optionId);
     case "advanceToBattle":
       return advanceToBattleOrEndTurn(state);
     case "endTurn":
@@ -193,6 +194,9 @@ export function replay(state: GameState, actions: readonly GameAction[]): GameSt
 export function listLegalActions(state: GameState): GameAction[] {
   if (isGameOver(state)) return [];
   if (state.handoff) return [{ type: "acknowledgeHandoff" }];
+  if (pendingDeadEnd(state)) {
+    return getDeadEndOptions(state).map((option) => ({ type: "chooseDeadEnd", optionId: option.id }));
+  }
   if (state.pendingBiodiversity) {
     return state.pendingBiodiversity.cardUids.map((cardUid) => ({ type: "chooseBiodiversityTop", cardUid }));
   }
@@ -212,7 +216,6 @@ export function listLegalActions(state: GameState): GameAction[] {
   if (state.pendingConvergentChoice) {
     return state.pendingConvergentChoice.categories.map((category) => ({ type: "chooseConvergentCategory", category }));
   }
-  if (state.pendingHerd) return getHerdOptions(state).map((option) => ({ type: "chooseHerd", optionId: option.id }));
   if (state.pendingNesting)
     return getNestingOptions(state).map((option) => ({ type: "chooseNesting", optionId: option.id }));
   if (state.pendingCranialDisplay) {
@@ -329,7 +332,8 @@ function developmentActions(state: GameState): GameAction[] {
 /** The player who must act next: the handoff recipient, the chooser of a pending choice, or the active player. */
 export function actingPlayer(state: GameState): PlayerId {
   if (state.handoff) return state.handoff.to;
-  if (state.pendingHerd) return state.pendingHerd.playerId;
+  const deadEnd = pendingDeadEnd(state);
+  if (deadEnd) return deadEnd.playerId;
   if (state.pendingNesting) return state.pendingNesting.playerId;
   if (state.pendingFilterFeeder) return state.pendingFilterFeeder.playerId;
   if (state.pendingBiodiversity) return state.pendingBiodiversity.playerId;

@@ -77,11 +77,8 @@ export {
 export {
   chooseCranialDisplayTarget,
   chooseFilterFeederTop,
-  chooseHerd,
   chooseNesting,
-  DECLINE_HERD,
   DECLINE_NESTING,
-  getHerdOptions,
   getNestingOptions,
 } from "./entry-effects.ts";
 export {
@@ -104,6 +101,7 @@ export {
   repositionConnectedWaterway,
 } from "./development.ts";
 export { chooseConceptOption, getConceptChoiceOptions, playConcept } from "./concepts.ts";
+export { chooseDeadEnd, DECLINE_DEAD_END, getDeadEndOptions, pendingDeadEnd } from "./dead-end.ts";
 export {
   cancelBattlePreview,
   canRerollBattleCoin,

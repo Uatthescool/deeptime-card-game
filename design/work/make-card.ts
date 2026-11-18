@@ -22,6 +22,41 @@ const epochs = JSON.parse((await import("node:fs")).readFileSync("design/card-ep
 const epoch = opt("epoch") ?? epochs[key];
 if (epoch === undefined) throw new Error(`No epoch for "${key}" in design/card-epochs.json (use "" for the period alone).`);
 const out = opt("out") ?? `design/card-faces/${key}.png`;
+// Continent mark: the present-day continents where the Creature's fossils have been found (the card's
+// `continents`), stamped bottom right, with the period and its rule centred. A card without them keeps the
+// period on the right. --continents north-america[,asia…] overrides the data, for trying a layout.
+const continents = (opt("continents")?.split(",") ?? ((card.continents as string[] | undefined) ?? []).map((name) => name.toLowerCase().replace(/\s+/g, "-"))).filter(Boolean);
+// The stamp's layout: the silhouettes side by side, bottoms aligned, each at full size (BOX on its long side)
+// whenever they fit, and shrunk together only as much as needed to fit the room between the centred footer rule
+// (it ends at x = RULE_END, plus CLEARANCE) and the panel's right margin. The group sits MARGIN from the flavor
+// panel's inner right and bottom edges (measured on the frame), and flavor lines at its height stop CLEARANCE
+// short of it.
+const STAMP = { box: 104, gap: 6, margin: 20, panelRight: 954, panelBottom: 1367, clearance: 18, ruleEnd: 633 };
+const stampRoom = STAMP.panelRight - STAMP.margin - (STAMP.ruleEnd + STAMP.clearance);
+// Three or more continents: the Creature is Widespread (continentFlags in src/data/types.ts), and one globe stands
+// in for them all (the card preview still lists each continent).
+const markFiles = (continents.length >= 3 ? ["world"] : continents).map((name) => {
+  const file = `design/icons/continents/${name}.png`;
+  if (!existsSync(file)) throw new Error(`No continent mark at ${file}.`);
+  return file;
+});
+const fullWidths = await Promise.all(
+  markFiles.map(async (file) => {
+    const { width = 1, height = 1 } = await sharp(file).metadata();
+    return (width * Math.min(STAMP.box / width, STAMP.box / height));
+  }),
+);
+const gaps = STAMP.gap * Math.max(0, markFiles.length - 1);
+const stampScale = Math.min(1, (stampRoom - gaps) / Math.max(1, fullWidths.reduce((sum, w) => sum + w, 0)));
+const markBox = Math.floor(STAMP.box * stampScale);
+const marks = await Promise.all(
+  markFiles.map((file) => sharp(file).resize(markBox, markBox, { fit: "inside", kernel: "lanczos3" }).ensureAlpha().raw().toBuffer({ resolveWithObject: true })),
+);
+if (stampScale < 1) console.log(`continent marks at ${Math.round(stampScale * 100)}% to fit ${markFiles.length} side by side`);
+const stampWidth = marks.reduce((sum, m) => sum + m.info.width, 0) + STAMP.gap * Math.max(0, marks.length - 1);
+const stampHeight = Math.max(0, ...marks.map((m) => m.info.height));
+const stampLeft = STAMP.panelRight - STAMP.margin - stampWidth;
+const stampTop = STAMP.panelBottom - STAMP.margin - stampHeight;
 
 const INK = "#1c1e12";
 /** The list separator used on the in-game cards: a bold bullet between single spaces. */
@@ -152,7 +187,9 @@ const shrinkToFit = async (content: string, f: Font, max: number) => {
     let i = 0;
     while (i < words.length) {
       const baseline = s.first + lines.length * pitch;
-      const region = baseline >= s.besideFrom ? s.beside : s.full;
+      let region = baseline >= s.besideFrom ? s.beside : s.full;
+      // A line whose letters reach the stamp's height stops short of it.
+      if (marks.length && baseline + 8 >= stampTop) region = [region[0]!, Math.min(region[1]!, stampLeft - STAMP.clearance)];
       let j = i + 1;
       while (j < words.length && (await inkWidth(esc(words.slice(i, j + 1).join(" ")), font)) <= region[1]! - region[0]!) j++;
       lines.push({ text: words.slice(i, j).join(" "), region, baseline });
@@ -172,10 +209,12 @@ const shrinkToFit = async (content: string, f: Font, max: number) => {
     font = { ...font, size: font.size * 0.95 };
   }
   for (const l of lines) text((l.region[0]! + l.region[1]!) / 2, l.baseline, font, esc(l.text), "middle");
+  if (font.size < s.font.size) console.log(`flavor at ${Math.round((100 * font.size) / s.font.size)}% size`);
 }
 
 // Period, then Level.
-text(SPEC.footer.x, SPEC.footer.baseline, SPEC.footer.font, esc(`${epoch ? `${epoch} ` : ""}${card.period}`), "end");
+if (continents.length) text(W / 2, SPEC.footer.baseline, SPEC.footer.font, esc(`${epoch ? `${epoch} ` : ""}${card.period}`), "middle");
+else text(SPEC.footer.x, SPEC.footer.baseline, SPEC.footer.font, esc(`${epoch ? `${epoch} ` : ""}${card.period}`), "end");
 text(SPEC.levelLabel.x, SPEC.levelLabel.baseline, SPEC.levelLabel.font, "LEVEL", "middle");
 text(SPEC.level.x, SPEC.level.baseline, SPEC.level.font, String(card.printedLevel), "middle");
 
@@ -240,8 +279,12 @@ const tex = await sharp(textureFile).resize(W, H, { fit: "fill", kernel: "lanczo
   // Art, cover-fitted into the rounded art window. A card without art gets the "no card art" placeholder:
   // its period's texture, darkened, with a hairline frame and a centred label.
   const artFile = `public/artwork/${key}.webp`;
+  // CC BY-SA art never goes on a face (it may still show in the game's card preview, credited).
+  const credits = JSON.parse((await import("node:fs")).readFileSync("public/artwork/attribution-manifest.json", "utf8")) as { assets: Array<{ cardKey: string; license: string }> };
+  const shareAlike = credits.assets.some((asset) => asset.cardKey === key && /BY-SA/i.test(asset.license));
+  if (shareAlike) console.log(`${key}: its art is CC BY-SA, so the face gets the placeholder`);
   const aw = ART.x1 - ART.x0 + 1, ah = ART.y1 - ART.y0 + 1;
-  const art = existsSync(artFile) && !args.includes("--no-art")
+  const art = existsSync(artFile) && !args.includes("--no-art") && !shareAlike
     ? await sharp(artFile).resize(aw, ah, { fit: "cover", kernel: "lanczos3" }).removeAlpha().raw().toBuffer()
     : await placeholderArt(aw, ah);
   for (let y = ART.y0; y <= ART.y1; y++) for (let x = ART.x0; x <= ART.x1; x++) {
@@ -270,6 +313,44 @@ async function placeholderArt(aw: number, ah: number) {
     for (let c = 0; c < 3; c++) ground[q + c] = Math.round((tex[p + c]! * 0.7 + grey * 0.3) * 0.36);
   }
   return sharp(ground, { raw: { width: aw, height: ah, channels: 3 } }).composite([{ input: Buffer.from(svg) }]).removeAlpha().raw().toBuffer();
+}
+
+if (continents.length) await continentBadge();
+
+/**
+ * The continent mark: the continents where the Creature's fossils have been found, stamped in the bottom-right
+ * corner. The footer rule moves to the centre with the period beneath it.
+ */
+async function continentBadge() {
+  // The footer rule: the run of columns around its middle that differ from the plain panel just above.
+  const RULE = [1309, 1317], PLAIN = 1302;
+  const lum = (p: number) => 0.299 * face[p]! + 0.587 * face[p + 1]! + 0.114 * face[p + 2]!;
+  const onRule = (x: number) => Math.abs(lum((1313 * W + x) * 4) - lum((PLAIN * W + x) * 4)) > 12;
+  let x0 = 810, x1 = 810;
+  while (onRule(x0 - 1)) x0--;
+  while (onRule(x1 + 1)) x1++;
+  const shift = Math.round(W / 2 - (x0 + x1) / 2);
+  const rule = new Map<number, Buffer>();
+  for (let y = RULE[0]!; y <= RULE[1]!; y++) rule.set(y, Buffer.from(face.subarray((y * W + x0 - 3) * 4, (y * W + x1 + 4) * 4)));
+  // Paint the old rule over with the panel above it, then set it down centred.
+  for (let y = RULE[0]!; y <= RULE[1]!; y++) for (let x = x0 - 3; x <= x1 + 3; x++) {
+    const to = (y * W + x) * 4, from = (PLAIN * W + x) * 4;
+    for (let c = 0; c < 4; c++) face[to + c] = face[from + c]!;
+  }
+  for (const [y, row] of rule) row.copy(face, (y * W + x0 - 3 + shift) * 4);
+
+  let ox = stampLeft;
+  for (const { data, info } of marks) {
+    const oy = STAMP.panelBottom - STAMP.margin - info.height;
+    const left = ox;
+    ox += info.width + STAMP.gap;
+    for (let j = 0; j < info.height; j++) for (let k = 0; k < info.width; k++) {
+      const a = data[(j * info.width + k) * 4 + 3]! / 255;
+      if (a === 0) continue;
+      const p = ((oy + j) * W + left + k) * 4;
+      for (let c = 0; c < 3; c++) face[p + c] = Math.round(face[p + c]! * (1 - a) + data[(j * info.width + k) * 4 + c]! * a);
+    }
+  }
 }
 
 // --- Lettering ----------------------------------------------------------------------------------------------

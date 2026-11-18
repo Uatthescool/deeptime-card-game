@@ -142,6 +142,7 @@ export function createGame(
     overreachQueuedDraws: 0,
     overreachDueTurn: null,
     skipDrawPhaseTurn: null,
+    deadEndUsedTurn: null,
     allowances: emptyAllowances(),
     biome: createBiomeState(biomes[id]),
   });
@@ -166,7 +167,6 @@ export function createGame(
     },
     pendingBattle: null,
     entryEffectQueue: [],
-    pendingHerd: null,
     pendingNesting: null,
     endTurnAfterEntryEffects: false,
     pendingStampede: null,
@@ -179,6 +179,7 @@ export function createGame(
     pendingGeologicalBoundary: null,
     pendingGreatDying: null,
     pendingEngulf: null,
+    deadEndQueue: [],
     periodAuras: [],
     winner: null,
     winReason: null,

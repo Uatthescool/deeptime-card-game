@@ -120,6 +120,8 @@ export type PlayerState = {
   overreachDueTurn: number | null;
   /** Ice Age left this player's Event Zone: their Creatures contribute no Victory Levels through this turn. */
   iceAgeAftermathThroughTurn?: number | null;
+  /** The turn this player last used Dead End (once per turn across all their Creatures). */
+  deadEndUsedTurn?: number | null;
   /** The turn whose Start-of-Turn Draw Phase this player skips (Deep-Sea Gigantism). */
   skipDrawPhaseTurn?: number | null;
   allowances: TurnAllowances;
@@ -172,18 +174,19 @@ export type PendingEntryEffect = {
   playerId: PlayerId;
 };
 
-export type PendingHerd = {
-  sourceUid: string;
-  playerId: PlayerId;
-  eligibleUids: string[];
-};
-
 export type PendingNesting = {
   sourceUid: string;
   playerId: PlayerId;
   stage: "card" | "lane";
   eligibleUids: string[];
   selectedCardUid?: string;
+};
+
+/** Dead End: its owner may return one of these Concepts, which were in History when the Creature arrived there. */
+export type PendingDeadEnd = {
+  playerId: PlayerId;
+  sourceName: string;
+  conceptUids: string[];
 };
 
 export type PendingStampede = {
@@ -214,7 +217,13 @@ export type ConceptChoiceKind =
   | "intraguild-predation"
   | "thermal-maximum-target"
   | "thermal-maximum-search"
-  | "feedback-loops-search";
+  | "feedback-loops-search"
+  | "owls-shuffle"
+  | "owls-history"
+  | "butterflies-return"
+  | "butterflies-replay"
+  | "giraffes-search"
+  | "giraffes-play";
 
 /** A multi-step choice from a Concept, or from an Instantaneous Event that works like one (the PETM). */
 export type PendingConceptChoice = {
@@ -287,7 +296,6 @@ export type GameState = {
   handoff: HandoffState | null;
   pendingBattle: BattlePreview | null;
   entryEffectQueue: PendingEntryEffect[];
-  pendingHerd: PendingHerd | null;
   pendingNesting: PendingNesting | null;
   endTurnAfterEntryEffects: boolean;
   pendingStampede: PendingStampede | null;
@@ -296,10 +304,16 @@ export type GameState = {
   pendingConceptChoice: PendingConceptChoice | null;
   pendingCarnianPluvial: PendingCarnianPluvial | null;
   pendingBiodiversity: { playerId: PlayerId; cardUids: [string, string] } | null;
-  pendingFilterFeeder: { playerId: PlayerId; sourceUid: string; cardUids: [string, string] } | null;
+  /**
+   * Filter Feeder's look at the top of the deck. `placed` cards are already fixed on top, in order; `cardUids` are the
+   * looked-at cards still to place, which sit directly beneath them.
+   */
+  pendingFilterFeeder: { playerId: PlayerId; sourceUid: string; cardUids: string[]; placed: number } | null;
   pendingGeologicalBoundary: { card: EventInstance } | null;
   pendingGreatDying?: PendingGreatDying | null;
   pendingEngulf: { holderPlayer: PlayerId; holderLane: number; defeatedOwner: PlayerId; defeatedUid: string } | null;
+  /** Dead End choices waiting to resolve, first in first out; each resolves before anything else continues. */
+  deadEndQueue?: PendingDeadEnd[];
   periodAuras: Array<{ owner: PlayerId; period: Period; expiresAtTurnStart: number }>;
   winner: PlayerId | null;
   /** True when the game ended with tied Victory totals after both decks ran out. */

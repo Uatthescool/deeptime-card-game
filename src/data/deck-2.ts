@@ -1,4 +1,4 @@
-import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period } from "./types";
+import type { AdaptationCard, ConceptCard, CreatureCard, Diet, EventCard, Period, Continent } from "./types";
 
 const STATUS = "Locked" as const;
 
@@ -15,6 +15,8 @@ type DeckTwoCreature = {
   tags: string[];
   visualTags: string[];
   flavorText: string;
+  living?: boolean;
+  continents?: Continent[];
   cardFace?: string;
 };
 
@@ -32,6 +34,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["Asia"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Marginocephalian"],
@@ -48,6 +51,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Omnivore",
     period: "Triassic",
+    continents: ["South America"],
     periodColor: "Amber Orange",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph"],
@@ -64,6 +68,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["Asia"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -89,6 +94,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -114,6 +120,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["Africa"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -139,6 +146,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Marginocephalian", "Pachycephalosaurid"],
@@ -155,6 +163,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Triassic",
+    continents: ["Europe"],
     periodColor: "Amber Orange",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Plateosaurid"],
@@ -171,6 +180,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["South America"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph"],
@@ -187,6 +197,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["Oceania"],
     periodColor: "Ice White",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -217,6 +228,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -243,6 +255,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["South America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -268,6 +281,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -294,6 +308,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["North America"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -319,6 +334,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["Asia"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -345,6 +361,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["Europe"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Ornithopod", "Iguanodontian"],
@@ -361,6 +378,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -387,6 +405,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["Asia"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Sauropod"],
@@ -403,6 +422,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["South America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -429,6 +449,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["Asia"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -455,6 +476,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["North America"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -480,6 +502,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -506,6 +529,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["Asia"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -531,6 +555,7 @@ export const DECK_2_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 4,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["South America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph", "Sauropod", "Titanosaur"],

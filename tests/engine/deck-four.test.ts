@@ -128,7 +128,7 @@ test("Ice Age: Cambrian, Triassic, Jurassic and Cretaceous Creatures contribute 
   setEvent(game, 1, "ice-age");
   assert.equal(cardVictoryLevel(game, jurassic), 1);
   assert.equal(cardVictoryLevel(game, sail), 2, "Spinal Sail takes 1 off an Event's Victory Level decrease");
-  assert.equal(cardVictoryLevel(game, quaternary), 1, "younger Creatures are unaffected");
+  assert.equal(cardVictoryLevel(game, quaternary), 2, "younger Creatures are unaffected");
 });
 
 test("Ice Age leaving its owner's Event Zone silences their Victory Levels through their third turn after", () => {
@@ -155,7 +155,7 @@ test("PETM needs a Level 0 or 1 Creature on the board to send to History", () =>
   const petm = toHand(game, 0, "paleocene-eocene-thermal-maximum");
   place(game, 1, 0, "mastodon");
   assert.equal(explainEvent(game, petm).legal, false);
-  place(game, 1, 1, "steppe-bison");
+  place(game, 1, 1, "bactrian-camel");
   assert.equal(explainEvent(game, petm).legal, true);
 });
 
@@ -163,7 +163,7 @@ test("PETM on your own Creature searches for up to two that share two of its tax
   let game = readyGame();
   const petm = toHand(game, 0, "paleocene-eocene-thermal-maximum");
   place(game, 0, 0, "pakicetus");
-  place(game, 1, 0, "steppe-bison");
+  place(game, 1, 0, "bactrian-camel");
   game = applyAction(game, { type: "playEvent", cardUid: petm.uid });
   assert.deepEqual(
     getConceptChoiceOptions(game).map((option) => option.id),
@@ -235,14 +235,19 @@ test("Underwool: the cold-steppe Creatures and the Bactrian Camel carry it", () 
   }
 });
 
-test("Underwool Creatures enter an empty Frozen Niche at 1 Level lower; the Mammoth can't", () => {
+test("Underwool Creatures enter an empty Frozen Niche at 1 Level lower, never below Level 1; the Mammoth can't", () => {
   const game = readyGame();
   freeze(game, 0, 5);
+  const camel = toHand(game, 0, "bactrian-camel");
   const bison = toHand(game, 0, "steppe-bison");
   const rhino = toHand(game, 0, "woolly-rhino");
   const mammoth = toHand(game, 0, "woolly-mammoth");
   const pakicetus = toHand(game, 0, "pakicetus");
-  assert.ok(legalCreatureLanes(game, 0, bison).includes(0), "Level 1 counts as 0");
+  assert.ok(
+    legalCreatureLanes(game, 0, camel).includes(0),
+    "Level 1 stays Level 1, still low enough for an empty Niche",
+  );
+  assert.ok(legalCreatureLanes(game, 0, bison).includes(0), "Level 2 counts as 1");
   assert.ok(legalCreatureLanes(game, 0, rhino).includes(0), "Level 2 counts as 1");
   assert.ok(!legalCreatureLanes(game, 0, mammoth).includes(0), "Level 3 counts as 2, too high for an empty Niche");
   assert.ok(!legalCreatureLanes(game, 0, pakicetus).includes(0), "without Underwool, Frozen locks the Niche");
@@ -277,6 +282,27 @@ test("Underwool: next turn the Mammoth may override a Creature in the still-Froz
   );
 });
 
+test("If Underwool would reduce a Creature below Level 1, it gains +1 Victory Level (+2 Specialized) while Frozen instead", () => {
+  const game = readyGame();
+  freeze(game, 0, 5);
+  freeze(game, 4, 5);
+  const camel = place(game, 0, 0, "bactrian-camel");
+  assert.equal(cardVictoryLevel(game, camel), 1 + 1, "Level 1: the reduction would go below 1");
+  const rhino = place(game, 0, 4, "woolly-rhino");
+  assert.equal(cardVictoryLevel(game, rhino), 2, "Level 2: lowered to 1, nothing stopped");
+  rhino.card.definition = { ...rhino.card.definition, tags: ["Charge", "Solitary", "Specialized", "Underwool"] };
+  assert.equal(
+    cardVictoryLevel(game, rhino),
+    2 + 2,
+    "Specialized Level 2: lowered to 1, and the floor stopped the rest",
+  );
+  camel.card.definition = { ...camel.card.definition, tags: ["Specialized", "Underwool", "Circle Defense"] };
+  assert.equal(cardVictoryLevel(game, camel), 1 + 2, "a Specialized Level 1, like the Muskox, gets +2");
+  const unfrozen = place(game, 0, 2, "bactrian-camel");
+  assert.equal(cardVictoryLevel(game, unfrozen), 1, "only while Frozen");
+  assert.equal((CARD_LIBRARY.get("steppe-bison") as CreatureCard).printedLevel, 2);
+});
+
 test("A Frozen Creature without Underwool still contributes no Victory Levels", () => {
   const game = readyGame();
   freeze(game, 4, 5);
@@ -296,9 +322,14 @@ test("Circle Defense counts as Herd and Bastion, so a Steppe Bison entering play
   const bison = CARD_LIBRARY.get("steppe-bison") as CreatureCard;
   assert.ok(effectiveHasTag(bison, "Herd") && effectiveHasTag(bison, "Bastion"));
   let game = readyGame();
+  // At Level 2 it can't fill an empty Niche, but Underwool lets it into a Frozen one at Level 1.
+  freeze(game, 0, 5);
   const card = toHand(game, 0, "steppe-bison");
-  game = applyAction(game, { type: "playCreature", cardUid: card.uid, laneIndex: 1 });
-  assert.ok(game.pendingHerd, "its Herd triggers");
+  game = applyAction(game, { type: "playCreature", cardUid: card.uid, laneIndex: 0 });
+  assert.ok(
+    game.log.some((line) => line.includes("Steppe Bison's Herd ")),
+    "its Herd triggers",
+  );
 });
 
 test("Circle Defense: +100 per friendly Herd Creature, −50 per other opposing Carnivore (−100 for a Pack Hunter), never below 0", () => {
@@ -307,14 +338,14 @@ test("Circle Defense: +100 per friendly Herd Creature, −50 per other opposing 
   place(game, 0, 3, "woolly-mammoth"); // a second Herd Creature
   const hunter = place(game, 1, 1, "smilodon");
   const at = () => inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid);
-  assert.equal(at(), 100 + 200, "Level 1, plus two Herd Creatures");
+  assert.equal(at(), 200 + 200, "Level 2, plus two Herd Creatures");
   place(game, 1, 0, "hyaenodon"); // another Carnivore
-  assert.equal(at(), 100 + 200 - 50);
+  assert.equal(at(), 200 + 200 - 50);
   place(game, 1, 2, "dire-wolf"); // a Pack Hunter
-  assert.equal(at(), 100 + 200 - 50 - 100);
+  assert.equal(at(), 200 + 200 - 50 - 100);
   place(game, 1, 3, "orca"); // a Pack Hunter too
   place(game, 1, 4, "basilosaurus");
-  assert.equal(at(), 100, "the bonus never goes below 0");
+  assert.equal(at(), 200, "the bonus never goes below 0");
 });
 
 test("Circle Defense applies every Hunt and shields Level 0–1 neighbours at any Level", () => {
@@ -323,7 +354,7 @@ test("Circle Defense applies every Hunt and shields Level 0–1 neighbours at an
   bison.bastionDefendedTurn = game.turnNumber; // already Hunted this turn
   const neighbour = place(game, 0, 2, "castoroides", { tags: [] });
   const hunter = place(game, 1, 1, "smilodon");
-  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid), 200, "still +100 for itself");
+  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid), 300, "still +100 for itself");
   assert.equal(
     inspectBattlePower(game, neighbour.card.uid, "defender", hunter.card.uid),
     200,
@@ -349,7 +380,7 @@ test("Circle Defense counts an Omnivore with Apex Predator as a Carnivore", () =
   const bison = place(game, 0, 1, "steppe-bison");
   const hunter = place(game, 1, 1, "smilodon");
   place(game, 1, 2, "arctotherium");
-  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid), 100 + 100 - 50);
+  assert.equal(inspectBattlePower(game, bison.card.uid, "defender", hunter.card.uid), 200 + 100 - 50);
 });
 
 test("Apex Predator: an Omnivore with it is Hunted as a Carnivore, so only Diet-waiving effects reach it", () => {

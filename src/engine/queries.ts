@@ -432,6 +432,10 @@ function missingRequiredChoice(state: GameState, key: string): Reason | null {
       )
         ? null
         : missing("Needs a Creature that can move and an empty Niche on the same side of the board.");
+    case "kaleidoscope-of-butterflies":
+      return player.lanes.some((lane) => creatureCanMoveByEffect(lane))
+        ? null
+        : missing("Needs a Creature on your side of the board that an effect can return to your hand.");
     case "intraguild-predation":
       return intraguildPredationLanes(state, state.activePlayer).length
         ? null

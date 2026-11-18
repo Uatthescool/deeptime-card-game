@@ -19,7 +19,9 @@ import {
   DECK_4_UNIQUE_CREATURES,
   DECK_4_UNIQUE_KEYS,
 } from "./deck-4.ts";
+import { DECK_5_INFO, DECK_5_SHARED_CREATURE_KEYS, DECK_5_UNIQUE_CREATURES, DECK_5_UNIQUE_KEYS } from "./deck-5.ts";
 import { GENERAL_POOL_CANDIDATES } from "./general-pool.ts";
+import { GROUP_CONCEPTS } from "./group-concepts.ts";
 import type { BiomeKey } from "./biomes.ts";
 import type { CardDefinition, CreatureCard, DeckKey, ImplementationRegister, SupportCard } from "./types.ts";
 
@@ -40,7 +42,31 @@ export {
 export const IMPLEMENTATION_REGISTER = registerJson as unknown as ImplementationRegister;
 export const CREATURES = IMPLEMENTATION_REGISTER.creatures;
 export const SUPPORTS = IMPLEMENTATION_REGISTER.supports;
-export const TAG_RULES = IMPLEMENTATION_REGISTER.tagRules;
+/**
+ * Tag rules as written in the register. Amounts that Specialized doubles are marked: {100} is a number, and
+ * {1|card|cards} is a number with its noun in the singular and the plural. Conditions and thresholds, such as
+ * "Level 1 or lower", are left unmarked, because Specialized never changes them.
+ */
+export const TAG_RULE_TEMPLATES = IMPLEMENTATION_REGISTER.tagRules;
+
+const MARKED_AMOUNT = /\{(\d+)(?:\|([^|{}]*)\|([^|{}]*))?\}/g;
+
+/**
+ * A Tag's rules with its marked amounts multiplied. Multiplied amounts are starred, as Hearthstone stars a boosted
+ * number ("Deal 12* damage"), and their nouns agree with the new number.
+ */
+export function formatTagRule(template: string, multiplier = 1): string {
+  return template.replace(MARKED_AMOUNT, (_, amount: string, singular?: string, plural?: string) => {
+    const value = Number(amount) * multiplier;
+    const number = `${value}${multiplier === 1 ? "" : "*"}`;
+    return singular === undefined ? number : `${number} ${value === 1 ? singular : plural}`;
+  });
+}
+
+/** Tag rules as printed, with the amount marks removed. */
+export const TAG_RULES: Record<string, string> = Object.fromEntries(
+  Object.entries(TAG_RULE_TEMPLATES).map(([tag, template]) => [tag, formatTagRule(template)]),
+);
 export const TAG_COMBOS = IMPLEMENTATION_REGISTER.tagCombos;
 
 /** How a defensive Tag protects its Creature while it is Hunted. */
@@ -150,7 +176,11 @@ export const DECK_LABELS: Record<DeckKey, string> = Object.fromEntries(
 ) as Record<DeckKey, string>;
 
 /** Candidate cards, including the Creatures Deck 4 borrows, before cards in a deck are taken out. */
-const POOL_CANDIDATES: CardDefinition[] = [...IMPLEMENTATION_REGISTER.generalPool, ...GENERAL_POOL_CANDIDATES];
+const POOL_CANDIDATES: CardDefinition[] = [
+  ...IMPLEMENTATION_REGISTER.generalPool,
+  ...GENERAL_POOL_CANDIDATES,
+  ...GROUP_CONCEPTS,
+];
 
 /** Candidate cards that aren't in any deck: inspectable, never dealt. */
 export const GENERAL_POOL: CardDefinition[] = POOL_CANDIDATES.filter(
@@ -184,6 +214,15 @@ export const DECK_4_SUPPORTS: SupportCard[] = [
 ];
 export const DECK_4_DECK: CardDefinition[] = [...DECK_4, ...DECK_4_SUPPORTS];
 
+export { DECK_5_INFO };
+
+/** Deck 5 is unfinished: inspectable, but not in DECKS, so no player can select it. It shares Deck 1 Creatures. */
+export const DECK_5: CreatureCard[] = [
+  ...DECK_5_SHARED_CREATURE_KEYS.map((key) => findCard(DECK_1, key) as CreatureCard),
+  ...DECK_5_UNIQUE_CREATURES,
+].sort(byLevelThenName);
+export const DECK_5_DECK: CardDefinition[] = [...DECK_5];
+
 export const DECKS: Record<DeckKey, CardDefinition[]> = {
   "deck-1": DECK_1,
   "deck-2": DECK_2_DECK,
@@ -193,7 +232,10 @@ export const DECKS: Record<DeckKey, CardDefinition[]> = {
 
 /** Every distinct card definition the game knows about, keyed by card key. */
 export const CARD_LIBRARY: ReadonlyMap<string, CardDefinition> = new Map(
-  [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL, ...DECK_4_DECK].map((card) => [card.key, card]),
+  [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL, ...DECK_4_DECK, ...DECK_5_DECK].map((card) => [
+    card.key,
+    card,
+  ]),
 );
 
 /**
@@ -248,6 +290,12 @@ export function tagEffectMultiplier(card: CreatureCard, tag: string): number {
   return card.tags.some((listedTag, index) => listedTag === tag && card.tags[index - 1] === "Specialized") ? 2 : 1;
 }
 
+/** A Tag's rules as they apply to this card: with Specialized's doubled numbers starred. */
+export function tagRuleText(card: CreatureCard, tag: string): string | undefined {
+  const template = TAG_RULE_TEMPLATES[tag];
+  return template === undefined ? undefined : formatTagRule(template, tagEffectMultiplier(card, tag));
+}
+
 /**
  * Structural checks on the deck registers. Every problem is reported by name so
  * a bad data edit fails loudly at startup instead of corrupting a game.
@@ -257,6 +305,8 @@ export function validateCardData(): string[] {
   const expect = (condition: boolean, message: string) => {
     if (!condition) problems.push(message);
   };
+  for (const [tag, rule] of Object.entries(TAG_RULES))
+    expect(!/[{}|]/.test(rule), `${tag}'s rules have a malformed amount mark: write {100} or {1|card|cards}.`);
   const unique = (cards: CardDefinition[]) => new Set(cards.map((card) => card.key)).size === cards.length;
   const register = IMPLEMENTATION_REGISTER.deck;
 
@@ -306,6 +356,10 @@ export function validateCardData(): string[] {
   expect(DECK_4_DECK.length <= 40, `Deck 4 has ${DECK_4_DECK.length} cards; a deck holds at most 40.`);
   for (const card of [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL]) {
     expect(!DECK_4_UNIQUE_KEYS.has(card.key), `Deck 4 defines "${card.key}", which another deck already defines.`);
+  }
+  expect(unique(DECK_5_DECK), "Deck 5 contains a duplicate card; decks are singleton.");
+  for (const card of [...DECK_1, ...DECK_2_DECK, ...DECK_3_DECK, ...GENERAL_POOL, ...DECK_4_DECK]) {
+    expect(!DECK_5_UNIQUE_KEYS.has(card.key), `Deck 5 defines "${card.key}", which another deck already defines.`);
   }
   for (const key of DECK_3_INHERITED_SUPPORT_KEYS) {
     expect(

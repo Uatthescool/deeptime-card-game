@@ -10,7 +10,6 @@ import {
   checkOverride,
   chooseEngulf,
   chooseFilterFeederTop,
-  chooseHerd,
   chooseNesting,
   chooseGeologicalBoundaryPeriod,
   chooseCarnianPluvialOption,
@@ -24,7 +23,6 @@ import {
   findCreature,
   getCarnianPluvialOptions,
   getConceptChoiceOptions,
-  getHerdOptions,
   getNestingOptions,
   geologicalBoundaryOptions,
   hasLegalHunts,
@@ -535,14 +533,6 @@ function chooseDevelopmentAction(
 }
 
 function pendingOptionActions(state: GameState): Action[] {
-  if (state.pendingHerd) {
-    return getHerdOptions(state).map((option) => ({
-      kind: "herd-choice",
-      label: option.label,
-      prior: option.id === "__decline-herd__" ? -0.2 : 0.35,
-      apply: (current) => chooseHerd(current, option.id),
-    }));
-  }
   if (state.pendingNesting) {
     return getNestingOptions(state).map((option) => ({
       kind: "nesting-choice",
@@ -613,7 +603,6 @@ function futurePendingScore(state: GameState, playerId: PlayerId, style: Style, 
     depth <= 0 ||
     (!state.pendingConceptChoice &&
       !state.pendingCarnianPluvial &&
-      !state.pendingHerd &&
       !state.pendingNesting &&
       !state.pendingFilterFeeder &&
       !state.pendingGeologicalBoundary &&
@@ -822,7 +811,6 @@ function inspectCounterfactuals(
     state.handoff ||
     state.pendingConceptChoice ||
     state.pendingCarnianPluvial ||
-    state.pendingHerd ||
     state.pendingNesting ||
     state.pendingFilterFeeder ||
     state.pendingGeologicalBoundary ||
@@ -989,7 +977,6 @@ function runGame(gameNumber: number, seed: number, styles: [Style, Style], decks
       !state.pendingConvergentChoice &&
       !state.pendingConceptChoice &&
       !state.pendingCarnianPluvial &&
-      !state.pendingHerd &&
       !state.pendingNesting &&
       !state.pendingFilterFeeder &&
       !state.pendingGeologicalBoundary &&
@@ -1035,7 +1022,6 @@ function runGame(gameNumber: number, seed: number, styles: [Style, Style], decks
     if (
       state.pendingConceptChoice ||
       state.pendingCarnianPluvial ||
-      state.pendingHerd ||
       state.pendingNesting ||
       state.pendingFilterFeeder ||
       state.pendingGeologicalBoundary ||

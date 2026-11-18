@@ -17,6 +17,31 @@ export const PERIODS = [
 
 export type Period = (typeof PERIODS)[number];
 
+/** The seven continents, as present-day landmasses where a Creature's fossils have been found. */
+export const CONTINENTS = [
+  "North America",
+  "South America",
+  "Europe",
+  "Africa",
+  "Asia",
+  "Oceania",
+  "Antarctica",
+] as const;
+export type Continent = (typeof CONTINENTS)[number];
+
+/** A Creature found on three or more continents is Widespread: one place of its own, shown as the globe. */
+export const WIDESPREAD = "Widespread" as const;
+export type ContinentFlag = Continent | typeof WIDESPREAD;
+
+/**
+ * The places a Creature counts as: its continents when it has one or two, otherwise only Widespread, which
+ * counts as none of its continents.
+ */
+export function continentFlags(card: { continents?: readonly Continent[] }): ContinentFlag[] {
+  const continents = card.continents ?? [];
+  return continents.length >= 3 ? [WIDESPREAD] : [...continents];
+}
+
 export type CardStatus = "Locked" | "Not playable · Work in progress";
 export type DeckKey = "deck-1" | "deck-2" | "deck-3" | "deck-4";
 
@@ -34,6 +59,10 @@ export type CreatureCard = {
   tags: string[];
   visualTags: string[];
   flavorText: string;
+  /** True for a species alive today. Its continents then cover where it lives as well as its fossils. */
+  living?: boolean;
+  /** Present-day continents where its fossils have been found (and, for a living species, where it lives); shown as the continent mark. Not yet recorded for every Creature. */
+  continents?: Continent[];
   status: CardStatus;
   artwork?: string;
   cardFace?: string;
@@ -74,6 +103,8 @@ export type AdaptationCard = {
 export type ConceptCard = {
   key: string;
   kind: "concept";
+  /** A Group Concept, named for a group of animals ("Concept · Group"). */
+  group?: boolean;
   name: string;
   rules: string;
   note?: string;

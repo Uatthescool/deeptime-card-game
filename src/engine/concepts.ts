@@ -6,6 +6,8 @@ import {
   creatureCanMoveByEffect,
   creatureIsUntouchable,
   drawOne,
+  effectiveHasTag,
+  otherPlayer,
   enterableEmptyNiches,
   hasEnterableEmptyNiche,
   moveCardFromHand,
@@ -13,10 +15,12 @@ import {
   nextTurnForPlayer,
   placeCreatureFromHand,
   removeEventFromZone,
+  returnCreatureToHand,
   sendCardToHistory,
   sendCreatureToHistory,
   takeDeckCard,
 } from "./core.ts";
+import { extraPlayLanes, playExtraCreature } from "./development.ts";
 import { queueEntryEffects } from "./entry-effects.ts";
 import {
   abiogenesisModes,
@@ -47,6 +51,7 @@ export const DECLINE_SEMELPARITY = "__decline-semelparity__";
 export const ABIOGENESIS_SEARCH = "__abiogenesis-search__";
 export const ABIOGENESIS_PLACE = "__abiogenesis-place__";
 export const FINISH_THERMAL_SEARCH = "__finish-thermal-search__";
+export const DECLINE_EXTRA_PLAY = "__decline-extra-play__";
 
 function completeConcept(state: GameState, card: ConceptInstance | EventInstance) {
   sendCardToHistory(state, card, card.definition.kind === "event" ? "Event resolved" : "Concept resolved");
@@ -146,6 +151,32 @@ export function playConcept(original: GameState, cardUid: string): GameState {
       return choose(state, moved, "deep-sea-gigantism-card");
     case "intraguild-predation":
       return choose(state, moved, "intraguild-predation");
+    case "parliament-of-owls": {
+      const drawn = Array.from({ length: 3 }, () => drawOne(state, state.activePlayer, "Parliament of Owls")).filter(
+        (entry): entry is CardInstance => Boolean(entry),
+      );
+      if (!drawn.length) return completeConcept(state, moved);
+      state.pendingConceptChoice = { card: moved, kind: "owls-shuffle", eligibleUids: drawn.map((entry) => entry.uid) };
+      return state;
+    }
+    case "dazzle-of-zebras": {
+      const opponent = state.players[otherPlayer(state.activePlayer)];
+      const returned = opponent.hand.length;
+      opponent.deck = shuffle(state, [...opponent.deck, ...opponent.hand]);
+      opponent.hand = [];
+      addLog(state, `Dazzle of Zebras shuffled ${opponent.name}'s hand of ${returned} into their deck.`);
+      for (let index = 0; index < 3; index += 1) drawOne(state, opponent.id, "Dazzle of Zebras");
+      return completeConcept(state, moved);
+    }
+    case "kaleidoscope-of-butterflies":
+      return choose(state, moved, "butterflies-return");
+    case "tower-of-giraffes":
+      if (!player.deck.some(isArtiodactyl)) {
+        player.deck = shuffle(state, player.deck);
+        addLog(state, "Tower of Giraffes found no Artiodactyl in the deck; the deck was shuffled.");
+        return completeConcept(state, moved);
+      }
+      return choose(state, moved, "giraffes-search");
     case "feedback-loops":
       if (!player.deck.some(isFeedbackLoopCard)) {
         player.deck = shuffle(state, player.deck);
@@ -332,6 +363,36 @@ export function getConceptChoiceOptions(state: GameState): ChoiceOption[] {
       ];
     case "feedback-loops-search":
       return player.deck.filter(isFeedbackLoopCard).map(creatureOption);
+    case "owls-shuffle":
+    case "owls-history":
+      return player.hand.filter((card) => pending.eligibleUids?.includes(card.uid)).map(creatureOption);
+    case "butterflies-return":
+      return butterfliesReturnLanes(state, state.activePlayer).map((index) => ({
+        id: String(index),
+        label: player.lanes[index]!.creature!.card.definition.name,
+        detail: `Niche ${index + 1}`,
+      }));
+    case "giraffes-search":
+      return player.deck.filter(isArtiodactyl).map(creatureOption);
+    case "butterflies-replay":
+    case "giraffes-play": {
+      const card = player.hand.find((held) => held.uid === pending.selectedCardUid);
+      const lanes = card ? extraPlayLanes(state, state.activePlayer, card) : [];
+      return [
+        ...lanes.map((index) => ({
+          id: String(index),
+          label: `Niche ${index + 1}`,
+          detail: player.lanes[index]!.creature
+            ? `Override ${player.lanes[index]!.creature!.card.definition.name}`
+            : "Empty Niche",
+        })),
+        {
+          id: DECLINE_EXTRA_PLAY,
+          label: "Keep it in hand",
+          detail: pending.kind === "butterflies-replay" ? "Don't play it again this turn." : "Don't play it now.",
+        },
+      ];
+    }
     case "intraguild-predation":
       return intraguildPredationLanes(state, state.activePlayer).map((index) => {
         const creature = player.lanes[index]!.creature!.card.definition;
@@ -628,6 +689,65 @@ export function chooseConceptOption(original: GameState, optionId: string): Game
       return completeConcept(state, pending.card);
     }
 
+    case "owls-shuffle": {
+      const card = moveCardFromHand(player, optionId);
+      if (!card) return state;
+      player.deck = shuffle(state, [...player.deck, card]);
+      addLog(state, `Parliament of Owls shuffled one of the drawn cards back into ${player.name}'s deck.`);
+      const rest = (pending.eligibleUids ?? []).filter(
+        (uid) => uid !== optionId && player.hand.some((held) => held.uid === uid),
+      );
+      if (!rest.length) return completeConcept(state, pending.card);
+      pending.kind = "owls-history";
+      pending.eligibleUids = rest;
+      return state;
+    }
+
+    case "owls-history": {
+      const card = moveCardFromHand(player, optionId);
+      if (!card) return state;
+      sendCardToHistory(state, card, "Parliament of Owls");
+      addLog(state, `Parliament of Owls sent ${card.definition.name} to ${player.name}'s History Pile.`);
+      return completeConcept(state, pending.card);
+    }
+
+    case "butterflies-return": {
+      const laneIndex = Number(optionId);
+      const card = returnCreatureToHand(state, active, laneIndex);
+      if (!card) return state;
+      addLog(state, `Kaleidoscope of Butterflies returned ${card.definition.name} to ${player.name}'s hand.`);
+      if (!extraPlayLanes(state, active, card).length) return completeConcept(state, pending.card);
+      pending.kind = "butterflies-replay";
+      pending.selectedCardUid = card.uid;
+      return state;
+    }
+
+    case "giraffes-search": {
+      const card = takeDeckCard(player, optionId);
+      if (!card) return state;
+      player.hand.push(card);
+      player.deck = shuffle(state, player.deck);
+      addLog(state, `Tower of Giraffes found and revealed ${card.definition.name}; the deck was shuffled.`);
+      const overreach = card.definition.kind === "creature" && effectiveHasTag(card.definition, "Overreach");
+      if (!overreach || !extraPlayLanes(state, active, card).length) return completeConcept(state, pending.card);
+      pending.kind = "giraffes-play";
+      pending.selectedCardUid = card.uid;
+      return state;
+    }
+
+    case "butterflies-replay":
+    case "giraffes-play": {
+      if (optionId === DECLINE_EXTRA_PLAY) return completeConcept(state, pending.card);
+      const conceptCard = pending.card;
+      const next = playExtraCreature(state, active, pending.selectedCardUid!, Number(optionId));
+      addLog(next, `${conceptCard.definition.name} let ${player.name} play it as an extra Creature play.`);
+      if (pending.kind === "butterflies-replay") {
+        next.phase = "battle";
+        addLog(next, "Kaleidoscope of Butterflies ended the Development Phase.");
+      }
+      return completeConcept(next, conceptCard);
+    }
+
     case "feedback-loops-search": {
       const card = takeDeckCard(player, optionId);
       if (!card) return state;
@@ -649,6 +769,14 @@ export function chooseConceptOption(original: GameState, optionId: string): Game
       return completeConcept(state, pending.card);
     }
   }
+}
+
+const isArtiodactyl = (card: CardInstance) =>
+  card.definition.kind === "creature" && card.definition.taxa.includes("Artiodactyl");
+
+/** Kaleidoscope of Butterflies: your Creatures that an effect may return to your hand. */
+export function butterfliesReturnLanes(state: GameState, playerId: PlayerId): number[] {
+  return state.players[playerId].lanes.flatMap((lane, index) => (creatureCanMoveByEffect(lane) ? [index] : []));
 }
 
 /** A Creature shares at least two of these taxa (the PETM's sent Creature's taxa after its Primary Taxon). */

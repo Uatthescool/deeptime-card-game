@@ -9,11 +9,12 @@ import {
   geologicalBoundaryOptions,
   getCarnianPluvialOptions,
   getConceptChoiceOptions,
-  getHerdOptions,
+  getDeadEndOptions,
   GREAT_DYING_CONTINUE,
   greatDyingOptions,
   getNestingOptions,
   otherPlayer,
+  pendingDeadEnd,
   VICTORY_THRESHOLD,
   victoryTotals,
 } from "../../engine/index.ts";
@@ -127,8 +128,12 @@ export function FilterFeederModal({ game, dispatch }: { game: GameState; dispatc
     <TopTwoModal
       label="Filter Feeder deck ordering"
       eyebrow={`${source?.card.definition.name ?? "Filter Feeder"} · Filter Feeder`}
-      title="Choose which card remains on top."
-      copy="The other card remains directly beneath it. Neither card is drawn by this effect."
+      title={pending.placed ? "Choose the next card down." : "Choose which card remains on top."}
+      copy={
+        pending.cardUids.length === 2
+          ? `The other card goes directly beneath it.${pending.placed ? ` ${pending.placed} ${pending.placed === 1 ? "card is" : "cards are"} already placed above.` : ""} None of these cards is drawn by this effect.`
+          : `Place the looked-at cards one at a time, from the top down${pending.placed ? ` (${pending.placed} placed so far)` : ""}. None of them is drawn by this effect.`
+      }
       cards={revealedCards(game, pending.playerId, pending.cardUids)}
       buttonLabel="Place on top"
       onChoose={(cardUid) => dispatch({ type: "chooseFilterFeederTop", cardUid })}
@@ -255,6 +260,30 @@ export function EngulfModal({ game, dispatch }: { game: GameState; dispatch: Dis
 }
 
 const CONCEPT_PROMPTS: Record<string, { title: string; copy: string }> = {
+  "owls-shuffle": {
+    title: "Shuffle one drawn card back",
+    copy: "Choose one of the cards you just drew to shuffle into your deck. You'll then send another of them to your History Pile.",
+  },
+  "owls-history": {
+    title: "Send one drawn card to History",
+    copy: "Choose another of the cards you just drew to send to your History Pile.",
+  },
+  "butterflies-return": {
+    title: "Return a Creature to your hand",
+    copy: "Choose one of your Creatures. Its Adaptation Slot goes to your History Pile. You may then play it again as an extra Creature play.",
+  },
+  "butterflies-replay": {
+    title: "Play it again?",
+    copy: "Play the returned Creature as an extra Creature play, following the normal placement rules. If you do, your Development Phase ends once its effects have resolved.",
+  },
+  "giraffes-search": {
+    title: "Choose an Artiodactyl",
+    copy: "Reveal it and add it to your hand; your deck is then shuffled. Whales are Artiodactyls too.",
+  },
+  "giraffes-play": {
+    title: "Play it now?",
+    copy: "It has Overreach, so you may play it into a Niche as an extra Creature play, following normal Level rules.",
+  },
   "thermal-maximum-target": {
     title: "Choose a Level 0 or 1 Creature",
     copy: "It goes to its owner's History Pile. If it's yours, you may then search your deck for up to two Creatures that share at least two of its taxa listed after its Primary Taxon. If it's your opponent's, the Event in your Event Zone, if any, goes to your History Pile.",
@@ -357,21 +386,22 @@ export function ConceptChoiceModal({ game, dispatch }: { game: GameState; dispat
   );
 }
 
+export function DeadEndModal({ game, dispatch }: { game: GameState; dispatch: Dispatch }) {
+  const pending = pendingDeadEnd(game)!;
+  return (
+    <ChoiceModal
+      label="Dead End choice"
+      eyebrow={`${pending.sourceName} · Dead End`}
+      title="Return a Concept to your hand?"
+      copy={`${pending.sourceName} went to the History Pile. You may choose a Concept in your History Pile and add it to your hand.`}
+      options={getDeadEndOptions(game)}
+      onChoose={(optionId) => dispatch({ type: "chooseDeadEnd", optionId })}
+    />
+  );
+}
+
 export function EntryChoiceModal({ game, dispatch }: { game: GameState; dispatch: Dispatch }) {
-  const herd = game.pendingHerd;
   const nesting = game.pendingNesting;
-  if (herd) {
-    return (
-      <ChoiceModal
-        label="Herd choice"
-        eyebrow="Herd"
-        title="Choose another Herd Creature"
-        copy="You may reveal an eligible Herd Creature from your deck and add it to your hand, or decline the search."
-        options={getHerdOptions(game)}
-        onChoose={(optionId) => dispatch({ type: "chooseHerd", optionId })}
-      />
-    );
-  }
   const cardStage = nesting?.stage === "card";
   return (
     <ChoiceModal

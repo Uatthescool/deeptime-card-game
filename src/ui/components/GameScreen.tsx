@@ -33,6 +33,7 @@ import {
   legalWildfireLanes,
   NICHE_EVENT_KEYS,
   otherPlayer,
+  pendingDeadEnd,
   type PlayerId,
   type PlayerState,
   type Verdict,
@@ -64,6 +65,7 @@ import {
   CarnianPluvialChoiceModal,
   ConceptChoiceModal,
   ConvergentChoiceModal,
+  DeadEndModal,
   EngulfModal,
   EntryChoiceModal,
   FilterFeederModal,
@@ -840,7 +842,9 @@ export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: G
         />
       )}
       {/* The computer makes its own choices out of sight; only the Hunt itself is shown to the person. */}
-      {!resumeCover && !computerTurn && (
+      {/* A waiting Dead End resolves first, so it shows alone. */}
+      {!resumeCover && !computerTurn && pendingDeadEnd(game) && <DeadEndModal game={game} dispatch={dispatch} />}
+      {!resumeCover && !computerTurn && !pendingDeadEnd(game) && (
         <>
           {game.pendingBiodiversity && <BiodiversityModal game={game} dispatch={dispatch} />}
           {game.pendingFilterFeeder && <FilterFeederModal game={game} dispatch={dispatch} />}
@@ -848,7 +852,7 @@ export function GameScreen({ initialGame, resumed, onExit, tutorial = false }: G
           {game.pendingGreatDying && <GreatDyingModal game={game} dispatch={dispatch} />}
           {game.pendingEngulf && <EngulfModal game={game} dispatch={dispatch} />}
           {game.pendingConvergentChoice && <ConvergentChoiceModal game={game} dispatch={dispatch} />}
-          {(game.pendingHerd || game.pendingNesting) && <EntryChoiceModal game={game} dispatch={dispatch} />}
+          {game.pendingNesting && <EntryChoiceModal game={game} dispatch={dispatch} />}
           {game.pendingConceptChoice && <ConceptChoiceModal game={game} dispatch={dispatch} />}
           {game.pendingCarnianPluvial && <CarnianPluvialChoiceModal game={game} dispatch={dispatch} />}
         </>

@@ -1,4 +1,11 @@
-import { type CreatureCard, expandedTagNames, TAG_RULES, tagCombos } from "../../data/cards.ts";
+import {
+  continentFlags,
+  type CreatureCard,
+  expandedTagNames,
+  tagCombos,
+  tagRuleText,
+  WIDESPREAD,
+} from "../../data/cards.ts";
 import type { GameState, PlayerId } from "../../engine/index.ts";
 import {
   type InspectionTarget,
@@ -23,7 +30,7 @@ export function CardTagRules({ card }: { card: CreatureCard }) {
               {tag}
               {inherited && <small>from Sovereign</small>}
             </h3>
-            <p>{TAG_RULES[tag] ?? "No inherent effect is currently assigned."}</p>
+            <p>{tagRuleText(card, tag) ?? "No inherent effect is currently assigned."}</p>
             {tagCombos(card, tag).map((combo) => (
               <p key={combo.with} className={`tag-combo ${combo.active ? "active" : ""}`}>
                 <b>Combo · {combo.with}</b>
@@ -146,6 +153,16 @@ export function Inspector({
                 <div>
                   <dt>Taxonomy</dt>
                   <dd>{card.taxa.join(" · ")}</dd>
+                </div>
+                <div>
+                  <dt>{card.living ? "Found in" : "Fossils found"}</dt>
+                  <dd>
+                    {!card.continents?.length
+                      ? "Not recorded yet"
+                      : continentFlags(card)[0] === WIDESPREAD
+                        ? `${WIDESPREAD} (${card.continents.join(" · ")})`
+                        : card.continents.join(" · ")}
+                  </dd>
                 </div>
               </dl>
             </>

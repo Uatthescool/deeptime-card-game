@@ -14,20 +14,19 @@ import {
   takeDeckCard,
 } from "./core.ts";
 import { shuffle } from "./rng.ts";
-import { finishResolution, orderTopTwo } from "./turn.ts";
+import { finishResolution } from "./turn.ts";
 import type { ChoiceOption, CreatureInstance, GameState, PlayerId } from "./types.ts";
 
 /**
  * Entry effects trigger when a Creature fills or overrides a Niche. Passive
- * ones (Deimatic, Overreach) apply immediately; choices (Herd, Nesting,
- * Cranial Display, Filter Feeder) are queued and resolved one at a time.
+ * ones (Deimatic, Overreach) apply immediately; Herd (which needs no choice), Nesting,
+ * Cranial Display and Filter Feeder are queued and resolved one at a time.
  */
 
-export const DECLINE_HERD = "__decline-herd__";
 export const DECLINE_NESTING = "__decline-nesting__";
 
 function hasActiveEntryChoice(state: GameState) {
-  return Boolean(state.pendingHerd || state.pendingNesting || state.pendingCranialDisplay || state.pendingFilterFeeder);
+  return Boolean(state.pendingNesting || state.pendingCranialDisplay || state.pendingFilterFeeder);
 }
 
 /** Opens the next queued entry choice that has a legal resolution; skips the rest with a log line. */
@@ -41,21 +40,25 @@ export function continueEntryEffects(state: GameState) {
     const player = state.players[effect.playerId];
 
     if (effect.kind === "herd") {
-      const eligibleUids = player.deck
-        .filter(
-          (card) =>
-            card.definition.kind === "creature" &&
-            effectiveHasTag(card.definition, "Herd") &&
-            card.definition.printedLevel <= definition.printedLevel + 1,
-        )
-        .map((card) => card.uid);
-      if (!eligibleUids.length || player.hand.length >= HAND_LIMIT) {
-        addLog(state, `${definition.name}'s Herd found no eligible Creature to add.`);
-        continue;
-      }
-      state.pendingHerd = { sourceUid: effect.sourceUid, playerId: effect.playerId, eligibleUids };
-      addLog(state, `${definition.name}'s Herd may search for another eligible Herd Creature.`);
-      return state;
+      // A random pick from the eligible cards (nobody looks through the deck), then the deck is always shuffled,
+      // whether or not anything was found.
+      const count = definition.kind === "creature" ? tagEffectMultiplier(definition, "Herd") : 1;
+      const eligible = player.deck.filter(
+        (candidate) =>
+          candidate.definition.kind === "creature" &&
+          effectiveHasTag(candidate.definition, "Herd") &&
+          candidate.definition.printedLevel <= definition.printedLevel + 1,
+      );
+      const picks = shuffle(state, eligible).slice(0, Math.max(0, Math.min(count, HAND_LIMIT - player.hand.length)));
+      for (const card of picks) player.hand.push(takeDeckCard(player, card.uid)!);
+      player.deck = shuffle(state, player.deck);
+      addLog(
+        state,
+        picks.length
+          ? `${definition.name}'s Herd put ${picks.length} random Herd ${picks.length === 1 ? "Creature" : "Creatures"} into ${player.name}'s hand, then shuffled the deck.`
+          : `${definition.name}'s Herd found no eligible Creature to add, then shuffled the deck.`,
+      );
+      continue;
     }
 
     if (effect.kind === "nesting") {
@@ -89,17 +92,22 @@ export function continueEntryEffects(state: GameState) {
       return state;
     }
 
-    // Filter Feeder
-    if (player.deck.length < 2) {
+    // Filter Feeder: the top 2 cards, 4 when Specialized.
+    const looked = player.deck.slice(
+      0,
+      2 * (definition.kind === "creature" ? tagEffectMultiplier(definition, "Filter Feeder") : 1),
+    );
+    if (looked.length < 2) {
       addLog(state, `${definition.name}'s Filter Feeder found fewer than two cards to reorder.`);
       continue;
     }
     state.pendingFilterFeeder = {
       playerId: effect.playerId,
       sourceUid: effect.sourceUid,
-      cardUids: [player.deck[0]!.uid, player.deck[1]!.uid],
+      cardUids: looked.map((card) => card.uid),
+      placed: 0,
     };
-    addLog(state, `${definition.name}'s Filter Feeder revealed the top two cards for ordering.`);
+    addLog(state, `${definition.name}'s Filter Feeder revealed the top ${looked.length} cards for ordering.`);
     return state;
   }
   return state;
@@ -153,47 +161,6 @@ export function queueEntryEffects(state: GameState, playerId: PlayerId, laneInde
     state.entryEffectQueue.push({ kind: "nesting", sourceUid: source.card.uid, playerId });
   }
   continueEntryEffects(state);
-}
-
-// ---------------------------------------------------------------------------
-// Herd
-// ---------------------------------------------------------------------------
-
-export function getHerdOptions(state: GameState): ChoiceOption[] {
-  const pending = state.pendingHerd;
-  if (!pending) return [];
-  return [
-    ...state.players[pending.playerId].deck
-      .filter((card) => pending.eligibleUids.includes(card.uid))
-      .map((card) => ({
-        id: card.uid,
-        label: card.definition.name,
-        detail:
-          card.definition.kind === "creature"
-            ? `Level ${card.definition.printedLevel} · ${card.definition.period}`
-            : "Creature",
-      })),
-    { id: DECLINE_HERD, label: "Decline Herd", detail: "Continue resolving this Creature's remaining entry effects." },
-  ];
-}
-
-export function chooseHerd(original: GameState, optionId: string): GameState {
-  const state = clone(original);
-  const pending = state.pendingHerd;
-  if (!pending || !getHerdOptions(state).some((option) => option.id === optionId)) return state;
-  const player = state.players[pending.playerId];
-  if (optionId !== DECLINE_HERD) {
-    const card = takeDeckCard(player, optionId);
-    if (!card) return state;
-    player.hand.push(card);
-    player.deck = shuffle(state, player.deck);
-    addLog(state, `${player.name} revealed and added ${card.definition.name} with Herd, then shuffled.`);
-  } else {
-    addLog(state, `${player.name} declined the optional Herd search.`);
-  }
-  state.pendingHerd = null;
-  continueEntryEffects(state);
-  return finishResolution(state);
 }
 
 // ---------------------------------------------------------------------------
@@ -266,15 +233,24 @@ export function chooseNesting(original: GameState, optionId: string): GameState 
 // Filter Feeder and Cranial Display
 // ---------------------------------------------------------------------------
 
+/** Places `cardUid` next, beneath the cards Filter Feeder has already placed; the last card falls into place. */
 export function chooseFilterFeederTop(original: GameState, cardUid: string): GameState {
   const state = clone(original);
   const pending = state.pendingFilterFeeder;
   if (!pending || !pending.cardUids.includes(cardUid)) return state;
-  if (!orderTopTwo(state, pending.playerId, pending.cardUids, cardUid)) return state;
+  const deck = state.players[pending.playerId].deck;
+  const region = deck.slice(pending.placed, pending.placed + pending.cardUids.length).map((card) => card.uid);
+  if (region.length !== pending.cardUids.length || region.some((uid) => !pending.cardUids.includes(uid))) return state;
+  const from = deck.findIndex((card) => card.uid === cardUid);
+  const [card] = deck.splice(from, 1);
+  deck.splice(pending.placed, 0, card!);
+  pending.placed++;
+  pending.cardUids = pending.cardUids.filter((uid) => uid !== cardUid);
+  if (pending.cardUids.length > 1) return state;
   const source = findCreature(state, pending.sourceUid);
   addLog(
     state,
-    `${source?.creature.card.definition.name ?? "Filter Feeder"} ordered the top two cards of ${state.players[pending.playerId].name}'s deck.`,
+    `${source?.creature.card.definition.name ?? "Filter Feeder"} ordered the top ${pending.placed + 1} cards of ${state.players[pending.playerId].name}'s deck.`,
   );
   state.pendingFilterFeeder = null;
   continueEntryEffects(state);

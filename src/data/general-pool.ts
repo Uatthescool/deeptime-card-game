@@ -1,4 +1,4 @@
-import type { CreatureCard, Diet, Period } from "./types";
+import type { CreatureCard, Diet, Period, Continent } from "./types";
 
 const STATUS = "Not playable · Work in progress" as const;
 
@@ -14,6 +14,8 @@ type Candidate = {
   taxa: string[];
   tags: string[];
   flavorText: string;
+  living?: boolean;
+  continents?: Continent[];
   visualTags?: string[];
   cardFace?: string;
 };
@@ -33,6 +35,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -57,6 +60,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["Africa"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Thyreophoran", "Stegosaurid"],
@@ -72,6 +76,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Marginocephalian", "Pachycephalosaurid"],
@@ -87,6 +92,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["Asia"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -111,6 +117,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["Asia"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Ornithischian", "Marginocephalian"],
@@ -126,6 +133,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Omnivore",
     period: "Triassic",
+    continents: ["South America"],
     periodColor: "Amber Orange",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Dinosaur", "Saurischian", "Sauropodomorph"],
@@ -142,6 +150,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Herbivore",
     period: "Permian",
+    continents: ["Africa", "Asia", "Antarctica"],
     periodColor: "Slate Gray",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Dicynodont"],
@@ -158,6 +167,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Herbivore",
     period: "Permian",
+    continents: ["North America"],
     periodColor: "Slate Gray",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Eupelycosaur", "Edaphosaurid"],
@@ -174,6 +184,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Jurassic",
+    continents: ["North America"],
     periodColor: "Logo Red",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -198,6 +209,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Cretaceous",
+    continents: ["North America"],
     periodColor: "Lime Green",
     gameplayTaxon: "Archosaur",
     taxa: [
@@ -223,6 +235,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Permian",
+    continents: ["North America"],
     periodColor: "Slate Gray",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Caseasaur", "Caseid"],
@@ -239,6 +252,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Triassic",
+    continents: ["Africa", "Antarctica"],
     periodColor: "Amber Orange",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Therapsid", "Cynodont"],
@@ -409,6 +423,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Carnivore",
     period: "Neogene",
+    continents: ["South America"],
     periodColor: "Golden Ochre",
     gameplayTaxon: "Archosaur",
     taxa: ["Vertebrate", "Amniote", "Archosaur", "Crocodyliform", "Alligatorid", "Caiman"],
@@ -455,10 +470,11 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Quaternary",
+    continents: ["North America", "South America"],
     periodColor: "Ice Blue",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Carnivoran", "Felid", "Machairodont"],
-    tags: ["Ambush", "Raptorial", "Apex Predator"],
+    tags: ["Ambush", "Raptorial", "Apex Predator", "Dead End"],
     visualTags: ["Caniniform", "Retractable Claws"],
     flavorText:
       "Smilodon combined elongated upper canines with exceptionally powerful forelimbs, a build suited to restraining prey before delivering a carefully positioned bite.",
@@ -471,6 +487,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["Europe", "Asia", "North America"],
     periodColor: "Ice Blue",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Proboscidean", "Elephantid"],
@@ -487,6 +504,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Herbivore",
     period: "Paleogene",
+    continents: ["Asia"],
     periodColor: "Magenta",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Perissodactyl", "Rhinocerotoid", "Paraceratheriid"],
@@ -503,6 +521,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Herbivore",
     period: "Quaternary",
+    continents: ["South America"],
     periodColor: "Ice Blue",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Xenarthran", "Ground Sloth", "Megatheriid"],
@@ -519,6 +538,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 3,
     diet: "Omnivore",
     period: "Quaternary",
+    continents: ["South America"],
     periodColor: "Ice Blue",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Carnivoran", "Ursid", "Tremarctine"],
@@ -535,6 +555,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Neogene",
+    continents: ["North America"],
     periodColor: "Golden Ochre",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Carnivoran", "Canid", "Borophagine"],
@@ -551,6 +572,7 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     printedLevel: 1,
     diet: "Carnivore",
     period: "Quaternary",
+    continents: ["North America", "South America"],
     periodColor: "Ice Blue",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Carnivoran", "Canid", "Canine"],
@@ -559,5 +581,56 @@ export const GENERAL_POOL_CANDIDATES: CreatureCard[] = [
     flavorText:
       "Dire wolves were robust New World canids whose remains occur in large numbers at some fossil sites, suggesting predators repeatedly drawn to concentrated prey resources.",
     cardFace: "/card-faces/dire-wolf.webp",
+  }),
+  candidate({
+    key: "snow-leopard",
+    name: "Snow Leopard",
+    scientificName: "Panthera uncia",
+    printedLevel: 1,
+    diet: "Carnivore",
+    period: "Quaternary",
+    living: true,
+    continents: ["Asia"],
+    periodColor: "Ice Blue",
+    gameplayTaxon: "Synapsid",
+    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Carnivoran", "Felid", "Pantherine"],
+    tags: ["Solitary", "Ambush", "Underwool"],
+    flavorText:
+      "A thick, woolly coat and a long tail it wraps around itself for warmth let the snow leopard hunt blue sheep and ibex in the cold, steep mountains of Central and South Asia. Unlike the other big cats of its genus, it cannot roar.",
+    cardFace: "/card-faces/snow-leopard.webp",
+  }),
+  candidate({
+    key: "komodo-dragon",
+    name: "Komodo Dragon",
+    scientificName: "Varanus komodoensis",
+    printedLevel: 1,
+    diet: "Carnivore",
+    period: "Quaternary",
+    living: true,
+    continents: ["Asia", "Oceania"],
+    periodColor: "Ice Blue",
+    gameplayTaxon: "Diapsid",
+    taxa: ["Vertebrate", "Amniote", "Diapsid", "Lepidosaur", "Squamate", "Varanid"],
+    tags: ["Specialized", "Solitary", "Apex Predator"],
+    flavorText:
+      "The largest living lizard, the Komodo dragon wounds deer, pigs and even water buffalo with a venomous bite that stops their blood from clotting. Captive females kept apart from males have laid eggs that hatched.",
+    cardFace: "/card-faces/komodo-dragon.webp",
+  }),
+  candidate({
+    key: "muskox",
+    name: "Muskox",
+    scientificName: "Ovibos moschatus",
+    printedLevel: 1,
+    diet: "Herbivore",
+    period: "Quaternary",
+    living: true,
+    continents: ["North America", "Europe", "Asia"],
+    periodColor: "Ice Blue",
+    gameplayTaxon: "Synapsid",
+    taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Bovid", "Caprine"],
+    tags: ["Specialized", "Underwool", "Circle Defense"],
+    flavorText:
+      "Muskoxen face wolves in a tight ring, horns outward, with their calves in the middle. Beneath their long outer hair grows qiviut, a fine underwool shed every year. Despite the name, they are closer to sheep and goats than to oxen.",
+    cardFace: "/card-faces/muskox.webp",
   }),
 ];

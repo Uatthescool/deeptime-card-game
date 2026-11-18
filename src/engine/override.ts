@@ -138,7 +138,8 @@ export function checkOverride(
   );
   const ancestorJump = difference === 2 && ancestorMatch(current, incoming);
   const levelLegal = rapid ? difference === 2 : (difference >= 0 && difference <= 1) || airSacsJump || ancestorJump;
-  const step = `Level ${current.printedLevel} → ${incomingLevel}${underwool ? " (Underwool counts it 1 lower)" : ""}`;
+  const lowered = incoming.printedLevel - incomingLevel;
+  const step = `Level ${current.printedLevel} → ${incomingLevel}${lowered ? ` (Underwool counts it ${lowered} lower)` : ""}`;
   const levelText = rapid
     ? levelLegal
       ? `${step}, the two Levels Rapid Speciation requires`

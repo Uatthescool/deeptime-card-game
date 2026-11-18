@@ -69,7 +69,7 @@ export function explainCreatureLane(
   const allowances = player.allowances;
 
   // Rapid Speciation: the next Creature must override exactly two Levels up.
-  // Underwool lets its Creature into a Frozen Niche on its own side, at 1 Level lower.
+  // Underwool lets its Creature into a Frozen Niche on its own side, at up to 1 Level lower (never below Level 1).
   const underwool = underwoolEntry(state, playerId, laneIndex, creature);
   const level = playLevel(state, playerId, laneIndex, creature);
 

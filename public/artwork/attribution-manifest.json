@@ -134,19 +134,19 @@
       "cardName": "Kentrosaurus",
       "cardKind": "creature",
       "scientificName": "Kentrosaurus aethiopicus",
-      "commonsFile": "File:Fossil Kentrosaurus aethiopicus in Museum für Naturkunde Berlin 001.JPG",
-      "creator": "Sebastian Wallroth",
-      "credit": "Own work",
+      "commonsFile": "File:Kentrosaurus 02.JPG (2009 version)",
+      "creator": "Conty",
+      "credit": "Own work; the original 5 July 2009 version, released into the public domain ({{PD-self}}). The 2021 redrawn version of this file is CC BY-SA 4.0 and is not used.",
       "license": "Public domain",
       "licenseUrl": null,
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fossil_Kentrosaurus_aethiopicus_in_Museum_f%C3%BCr_Naturkunde_Berlin_001.JPG",
-      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Fossil_Kentrosaurus_aethiopicus_in_Museum_f%C3%BCr_Naturkunde_Berlin_001.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-      "sourceSha1": "73db30081e8d43e3fbd6457129015c166c4a6e7c",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kentrosaurus_02.JPG",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/archive/1/13/20210226065223%21Kentrosaurus_02.JPG",
+      "sourceSha1": "d552055130a121e26ef5f2e7e81fa3acc86fdacd",
       "sourceDimensions": {
-        "width": 2491,
-        "height": 1164
+        "width": 2552,
+        "height": 1764
       },
-      "modifications": "Cropped from center as needed; resized; converted to sRGB WebP. Also set into the Kentrosaurus card face, with the card's frame, period border and lettering.",
+      "modifications": "Taken from a 2000 px copy of the 2009 version; trimmed and fitted whole inside the frame on white; resized; converted to sRGB WebP. Also set into the Kentrosaurus card face, with the card's frame, period border and lettering, and cropped to a close-up of the head for the Kentrosaurus board card.",
       "derivativeLicense": null
     },
     {
@@ -1447,6 +1447,206 @@
         "height": 2304
       },
       "modifications": "Cropped to a wide frame around the camel; resized; converted to sRGB WebP. Also set into the Bactrian Camel card face, with the card's frame, period border and lettering. Also cropped to a close-up of the head for the Bactrian Camel board card.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "hatzegopteryx",
+      "cardName": "Hatzegopteryx",
+      "cardKind": "creature",
+      "scientificName": "Hatzegopteryx thambema",
+      "commonsFile": "File:Hatzegopteryx thambema.png",
+      "creator": "Connor Ashbridge",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hatzegopteryx_thambema.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Hatzegopteryx_thambema.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "27f3d39a2a0b82ecbb63d3a3c69d28cd26db1c70",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 3798
+      },
+      "modifications": "Transparent background set on white; trimmed and fitted whole inside the frame; resized; converted to sRGB WebP. Also set into the Hatzegopteryx card face, with the card's frame, period border and lettering.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "quetzalcoatlus",
+      "cardName": "Quetzalcoatlus",
+      "cardKind": "creature",
+      "scientificName": "Quetzalcoatlus northropi",
+      "commonsFile": "File:Life restoration of a group of giant azhdarchids, Quetzalcoatlus northropi, foraging on a Cretaceous fern prairie.png",
+      "creator": "Mark Witton and Darren Naish",
+      "credit": "Witton & Naish (2008), PLoS ONE 3(5): e2271",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Life_restoration_of_a_group_of_giant_azhdarchids,_Quetzalcoatlus_northropi,_foraging_on_a_Cretaceous_fern_prairie.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Life_restoration_of_a_group_of_giant_azhdarchids%2C_Quetzalcoatlus_northropi%2C_foraging_on_a_Cretaceous_fern_prairie.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "a575fcd9f76aadc1453c84918562569fc36268b9",
+      "sourceDimensions": {
+        "width": 1993,
+        "height": 1515
+      },
+      "modifications": "Cropped from the top (y = 30) at full width; resized; converted to sRGB WebP. Also set into the Quetzalcoatlus card face, with the card's frame, period border and lettering.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "haasts-eagle",
+      "cardName": "Haast's Eagle",
+      "cardKind": "creature",
+      "scientificName": "Hieraaetus moorei",
+      "commonsFile": "File:Giant Haasts eagle attacking New Zealand moa.jpg",
+      "creator": "John Megahan",
+      "credit": "PLoS Biology 3(1): e20 (2005)",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Giant_Haasts_eagle_attacking_New_Zealand_moa.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Giant_Haasts_eagle_attacking_New_Zealand_moa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "6ed022c076f68c9f59422d83f758058f3b0b547d",
+      "sourceDimensions": {
+        "width": 1375,
+        "height": 1101
+      },
+      "modifications": "Cropped from the top (y = 40) at full width; resized; converted to sRGB WebP. Also set into the Haast's Eagle card face, with the card's frame, period border and lettering.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "meganeura",
+      "cardName": "Meganeura",
+      "cardKind": "creature",
+      "scientificName": "Meganeura monyi",
+      "commonsFile": "File:Gfp-giant-dragonfly-meganeura.jpg",
+      "creator": "Yinan Chen",
+      "credit": "Good Free Photos (www.goodfreephotos.com), photograph of a museum model",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Gfp-giant-dragonfly-meganeura.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/7/77/Gfp-giant-dragonfly-meganeura.jpg",
+      "sourceSha1": "2636cb4086c723ab9b868aa0c5ef2d4c609d878a",
+      "sourceDimensions": {
+        "width": 1896,
+        "height": 1533
+      },
+      "modifications": "Made from Commons' 960 × 776 preview of the file: cropped to full width from y = 10 (cutting the tail tip); resized; converted to sRGB WebP. Also set into the Meganeura card face, with the card's frame, period border and lettering.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "pteranodon",
+      "cardName": "Pteranodon",
+      "cardKind": "creature",
+      "scientificName": "Pteranodon longiceps",
+      "commonsFile": "File:Pteranodon TD.png",
+      "creator": "TotalDino",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pteranodon_TD.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Pteranodon_TD.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "ca9fe819b3a093f22141e7dace6292410131c837",
+      "sourceDimensions": {
+        "width": 2400,
+        "height": 1200
+      },
+      "modifications": "Transparent background set on white; trimmed and fitted whole inside the frame; resized; converted to sRGB WebP. Also set into the Pteranodon card face, with the card's frame, period border and lettering.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "pterodaustro",
+      "cardName": "Pterodaustro",
+      "cardKind": "creature",
+      "scientificName": "Pterodaustro guinazui",
+      "commonsFile": "File:Pterodaustro guinazui.png",
+      "creator": "Connor Ashbridge",
+      "credit": "Own work",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pterodaustro_guinazui.png",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Pterodaustro_guinazui.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sourceSha1": "9ab06abdadf331353e87b54e9d69ae75e629700f",
+      "sourceDimensions": {
+        "width": 4000,
+        "height": 3704
+      },
+      "modifications": "Transparent background set on white; trimmed and fitted whole inside the frame; resized; converted to sRGB WebP. Also set into the Pterodaustro card face, with the card's frame, period border and lettering.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "spinosaurus",
+      "cardName": "Spinosaurus",
+      "cardKind": "creature",
+      "scientificName": "Spinosaurus aegyptiacus",
+      "commonsFile": "File:Spinosaurus swimming white background.jpg",
+      "creator": "Mike Bowler",
+      "credit": "Spinosaurus (Flickr), white-background version of File:Spinosaurus swimming.jpg",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Spinosaurus_swimming_white_background.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Spinosaurus_swimming_white_background.jpg",
+      "sourceSha1": "c428698f248bb89ab2f74bb860109bbc87640bdd",
+      "sourceDimensions": {
+        "width": 2836,
+        "height": 2432
+      },
+      "modifications": "Photograph of a life-size model, on the Commons white-background version; taken from a 960 px Commons preview; trimmed and fitted whole inside the frame on white; resized; converted to sRGB WebP. Also set into the Spinosaurus card face, with the card's frame, period border and lettering, and cropped to a close-up of the head for the Spinosaurus board card.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "muskox",
+      "cardName": "Muskox",
+      "cardKind": "creature",
+      "scientificName": "Ovibos moschatus",
+      "commonsFile": "File:Ovibos moschatus.jpg",
+      "creator": "U.S. Fish and Wildlife Service",
+      "credit": "U.S. Fish and Wildlife Service National Digital Library (item 889)",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ovibos_moschatus.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Ovibos_moschatus.jpg",
+      "sourceSha1": null,
+      "sourceDimensions": {
+        "width": 530,
+        "height": 349
+      },
+      "modifications": "Made from the 530 × 349 Commons file, which was first enlarged to 774 × 519 with a 3 px white edge; trimmed that edge; cropped to full width from y = 38; resized; converted to sRGB WebP. Also set into the Muskox card face, with the card's frame, period border and lettering, and cropped to a close-up of the head for the Muskox board card.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "snow-leopard",
+      "cardName": "Snow Leopard",
+      "cardKind": "creature",
+      "scientificName": "Panthera uncia",
+      "commonsFile": "File:Snow leopard (1985510).jpg",
+      "creator": "strichpunkt",
+      "credit": "Pixabay (image 1985510)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Snow_leopard_(1985510).jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/6/69/Snow_leopard_%281985510%29.jpg",
+      "sourceSha1": null,
+      "sourceDimensions": {
+        "width": 1920,
+        "height": 1272
+      },
+      "modifications": "Made from a 1920 × 1272 copy of the file (the original is 4500 × 2981); cropped to full width from y = 90; resized; converted to sRGB WebP. Also set into the Snow Leopard card face, with the card's frame, period border and lettering, and cropped to a close-up of the head for the Snow Leopard board card.",
+      "derivativeLicense": null
+    },
+    {
+      "cardKey": "komodo-dragon",
+      "cardName": "Komodo Dragon",
+      "cardKind": "creature",
+      "scientificName": "Varanus komodoensis",
+      "commonsFile": "File:Varan de Komodo Thoiry 1981.jpg",
+      "creator": "Vassil",
+      "credit": "Own work; a young Komodo dragon at the Parc de Thoiry",
+      "license": "Public domain",
+      "licenseUrl": null,
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Varan_de_Komodo_Thoiry_1981.jpg",
+      "originalFile": "https://upload.wikimedia.org/wikipedia/commons/4/48/Varan_de_Komodo_Thoiry_1981.jpg",
+      "sourceSha1": null,
+      "sourceDimensions": {
+        "width": 1920,
+        "height": 1050
+      },
+      "modifications": "Made from a 1920 × 1050 copy of the file (the original is 2348 × 1284); cropped to 1858 px wide from x = 10; resized; converted to sRGB WebP. Also set into the Komodo Dragon card face, with the card's frame, period border and lettering, and cropped to a close-up of the head for the Komodo Dragon board card.",
       "derivativeLicense": null
     }
   ]

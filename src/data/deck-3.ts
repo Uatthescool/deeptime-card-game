@@ -15,6 +15,7 @@ type DeckThreeCreature = {
   tags: string[];
   visualTags: string[];
   flavorText: string;
+  living?: boolean;
   cardFace?: string;
 };
 
@@ -96,6 +97,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 0,
     diet: "Carnivore",
     period: "Quaternary",
+    living: true,
     periodColor: "Ice White",
     gameplayTaxon: "Actinopterygian",
     taxa: ["Vertebrate", "Gnathostome", "Osteichthyan", "Actinopterygian", "Teleost", "Scombriform", "Chiasmodontid"],
@@ -296,6 +298,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 2,
     diet: "Carnivore",
     period: "Quaternary",
+    living: true,
     periodColor: "Ice White",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Cetacean", "Odontocete", "Delphinid"],
@@ -360,6 +363,7 @@ export const DECK_3_UNIQUE_CREATURES: CreatureCard[] = [
     printedLevel: 4,
     diet: "Carnivore",
     period: "Quaternary",
+    living: true,
     periodColor: "Ice White",
     gameplayTaxon: "Synapsid",
     taxa: ["Vertebrate", "Amniote", "Synapsid", "Mammal", "Artiodactyl", "Cetacean", "Mysticete", "Balaenopterid"],

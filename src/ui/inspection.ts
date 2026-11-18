@@ -60,5 +60,6 @@ export function inspectionHandlers(target: InspectionTarget, onPreview: PreviewH
 export function typeLabel(card: CardDefinition) {
   if (card.kind === "creature") return card.gameplayTaxon;
   if (card.kind === "event") return `${card.eventType === "continuous" ? "Continuous" : "Instantaneous"} Event`;
+  if (card.kind === "concept" && card.group) return "Concept · Group";
   return card.kind[0]!.toUpperCase() + card.kind.slice(1);
 }

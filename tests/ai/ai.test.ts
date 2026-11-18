@@ -105,7 +105,8 @@ function scrambleHidden(state: GameState, me: PlayerId, seed: number): GameState
   opponent.hand = pool.slice(0, opponent.hand.length);
   opponent.deck = pool.slice(opponent.hand.length);
   const own = copy.players[me];
-  const revealed = copy.pendingBiodiversity?.playerId === me || copy.pendingFilterFeeder?.playerId === me ? 2 : 0;
+  const feeder = copy.pendingFilterFeeder?.playerId === me ? copy.pendingFilterFeeder : null;
+  const revealed = feeder ? feeder.placed + feeder.cardUids.length : copy.pendingBiodiversity?.playerId === me ? 2 : 0;
   own.deck = [...own.deck.slice(0, revealed), ...shuffle(own.deck.slice(revealed))];
   copy.rng = Math.floor(random() * 0xffffffff) >>> 0;
   return copy;

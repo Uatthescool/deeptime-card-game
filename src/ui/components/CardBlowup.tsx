@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { expandedTagNames, TAG_RULES } from "../../data/cards.ts";
+import { expandedTagNames, tagRuleText } from "../../data/cards.ts";
 import { findCreature, type GameState, liveBattlePower, nicheIsFrozen, victoryBreakdown } from "../../engine/index.ts";
 import type { InspectionTarget } from "../inspection.ts";
 import { creatureMarkers, isBurrowed } from "../creatureStates.ts";
@@ -61,7 +61,7 @@ function bubblesFor(game: GameState, target: InspectionTarget): Bubble[] {
         lines: [
           `This Niche is Frozen through Turn ${found.lane.frozenUntilTurn}.`,
           card.tags.includes("Underwool")
-            ? "Frozen Niches and their Creatures can't be interacted with, but Underwool keeps this Creature's Victory Levels, and another Underwool Creature may override it."
+            ? "Frozen Niches and their Creatures can't be interacted with, but Underwool keeps this Creature's Victory Levels (plus any its Level 1 floor adds), and another Underwool Creature may override it."
             : "Frozen Niches and their Creatures can't be interacted with and contribute no Victory Levels.",
         ],
       });
@@ -95,7 +95,7 @@ function bubblesFor(game: GameState, target: InspectionTarget): Bubble[] {
         lines: [
           tag === "Bastion" && card.tags.includes("Circle Defense")
             ? "Granted by Circle Defense, which changes how this Creature's Bastion works."
-            : (TAG_RULES[tag] ?? "No inherent effect is currently assigned."),
+            : (tagRuleText(card, tag) ?? "No inherent effect is currently assigned."),
         ],
       });
     }

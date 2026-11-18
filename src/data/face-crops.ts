@@ -18,7 +18,7 @@ export const FACE_CROPS: Record<string, FaceCrop | null> = {
   dilophosaurus: { x: 0.31, y: 0.25, w: 0.16 },
   gojirasaurus: { x: 0.73, y: 0.2, w: 0.18 },
   carnotaurus: { x: 0.79, y: 0.42, w: 0.15 },
-  spinosaurus: { x: 0.2, y: 0.72, w: 0.2 },
+  spinosaurus: { x: 0.59, y: 0.45, w: 0.22 },
   // Deck 2
   eoraptor: { x: 0.88, y: 0.14, w: 0.16 },
   protoceratops: { x: 0.08, y: 0.45, w: 0.22 },
@@ -26,7 +26,7 @@ export const FACE_CROPS: Record<string, FaceCrop | null> = {
   amargasaurus: { x: 0.93, y: 0.38, w: 0.14 },
   ankylosaurus: null,
   "giant-moa": null,
-  kentrosaurus: null,
+  kentrosaurus: { x: 0.15, y: 0.34, w: 0.2 },
   mussaurus: null,
   pachycephalosaurus: { x: 0.22, y: 0.22, w: 0.15 },
   plateosaurus: { x: 0.47, y: 0.3, w: 0.15 },
@@ -84,4 +84,7 @@ export const FACE_CROPS: Record<string, FaceCrop | null> = {
   paraceratherium: { x: 0.93, y: 0.08, w: 0.14 },
   "bactrian-camel": { x: 0.13, y: 0.76, w: 0.22 },
   "woolly-mammoth": { x: 0.68, y: 0.27, w: 0.2 },
+  muskox: { x: 0.25, y: 0.44, w: 0.32 },
+  "snow-leopard": { x: 0.45, y: 0.52, w: 0.3 },
+  "komodo-dragon": { x: 0.26, y: 0.5, w: 0.26 },
 };
